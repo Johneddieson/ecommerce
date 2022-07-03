@@ -11,6 +11,8 @@ import {AngularFireModule} from "@angular/fire";
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AuthServiceService} from '../app/auth-service.service';
 import { AuthGuard } from './auth.guard';
+import {HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -24,7 +26,8 @@ import { AuthGuard } from './auth.guard';
       appId: "1:412207897516:web:3f353ca8a23f46df653809",
       measurementId: "G-949B7C6RY3"
     }),
-    AngularFirestoreModule],
+    AngularFirestoreModule,
+  HttpClientModule],
   providers: [AuthGuard, AuthServiceService,{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
