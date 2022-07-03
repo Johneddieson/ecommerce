@@ -1,0 +1,47 @@
+
+<ion-content>
+  <div class="wrapper">
+    <h3>Sign Up</h3>
+    <ion-item lines="none">
+      <ion-label position="floating">First Name</ion-label>
+      <ion-input [(ngModel)]="firstname" type="text" placeholder="First Name"></ion-input>
+    </ion-item>
+   
+    <ion-item lines="none">
+      <ion-label position="floating">Last Name</ion-label>
+      <ion-input type="text" [(ngModel)]="lastname" placeholder="Last Name"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label position="floating">Address1</ion-label>
+      <ion-input [(ngModel)]="address1" type="text" placeholder="Address 1"></ion-input>
+    </ion-item>
+
+    
+    <ion-item lines="none">
+      <ion-label position="floating">Address2</ion-label>
+      <ion-input type="text" [(ngModel)]="address2" placeholder="Address 2"></ion-input>
+    </ion-item>
+   
+    <ion-item lines="none">
+      <ion-label position="floating">Phone Number</ion-label>
+      <ion-input type="number" [(ngModel)]="phonenumber" placeholder="Phone Number"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input [(ngModel)]="email" type="text" placeholder="Email"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label position="floating">Password</ion-label>
+      <ion-input [(ngModel)]="password" type="password" placeholder="password"></ion-input>
+    </ion-item>
+    
+    <ion-button (click)="SignUp()">Sign Up</ion-button>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div id="clickable" class="text"(click)="gotosignin()">
+Already a member? Sign In
+  </div>
+</ion-footer>

@@ -1,0 +1,10 @@
+{
+  "name": "com.trackingsystem",
+  "integrations": {
+    "capacitor": {
+      "enabled": false
+    },
+    "cordova": {}
+  },
+  "type": "angular"
+}
