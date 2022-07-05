@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { AlertController } from '@ionic/angular';
@@ -6,6 +6,10 @@ import { AuthServiceService } from '../auth-service.service';
 import { map } from 'rxjs/operators';
 import * as firebase from 'firebase/app'
 import { MessengerService } from '../messenger.service';
+import { fromEvent, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LocationStrategy } from '@angular/common';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -19,8 +23,21 @@ sub
 productList: any[] = []
 getCartDetails: any = []
 cartItem:number = 0
-  constructor(private msg: MessengerService, private alertCtrl: AlertController, private auth: AuthServiceService,  private afstore: AngularFirestore, private afauth: AngularFireAuth) {
+private unsubscriber : Subject<void> = new Subject<void>();
+  constructor(private msg: MessengerService, private alertCtrl: AlertController, private auth: AuthServiceService,  private afstore: AngularFirestore, private afauth: AngularFireAuth,
+    private locationStrategy: LocationStrategy,
+    private router: Router,
+    private applicationRef: ApplicationRef,
+    private zone: NgZone) {
 
+      router.events.subscribe(() => {
+        zone.run(() => {
+          setTimeout(() => {
+            this.applicationRef.tick()
+            this.loadCart()
+          }, 0)
+        })
+      })
     this.afauth.authState.subscribe(user => {
 
       if (user && user.uid) {
@@ -37,17 +54,36 @@ cartItem:number = 0
     })
    }
 
-  ngOnInit() {
+  ngOnInit(): void {
 this.loadCart()
+history.pushState(null, null, location.href);
+this.locationStrategy.onPopState(() => {
+  history.pushState(null, null, location.href);
+})
+
+var wew = sessionStorage.getItem('cart')
+console.log(wew)
   }
+  // CartDetails() {
+  //   if (sessionStorage.getItem('cart')) {
+  //     this.getCartDetails = JSON.parse(sessionStorage.getItem('cart'))
+  //     console.log("the cart", this.getCartDetails)
+  //     this.numbers = this.getCartDetails
+  //   }
+  // }
 loadCart() {
-  if (localStorage.getItem('cart') != null) {
+  if (sessionStorage.getItem('cart') != null) {
 var thearray = []
-    thearray.push(JSON.parse(localStorage.getItem('cart')))
-    this.numbers = thearray.length;
+    thearray.push(JSON.parse(sessionStorage.getItem('cart')))
+    console.log("the", thearray)
+    thearray.forEach(fe => {
+      console.log("Wewaa", fe)
+    })
+    this.numbers = thearray[0].length;
   } 
 }
   Increase(data) {
+    localStorage.removeItem('cart')
     data.Quantity +=1
   this.loadCart()
   }
@@ -70,21 +106,20 @@ var thearray = []
 this.loadCart()
     }
   }
-  alertNgam() {
-  }
+  
   itemsCart: any = []
   AddtoCart(data) {
-    var cartData = localStorage.getItem('cart')
+    var cartData = sessionStorage.getItem('cart')
     if (cartData == null) {
       let storageDataGet: any = []
       storageDataGet.push(data)
-      localStorage.setItem('cart', JSON.stringify(storageDataGet))
+      sessionStorage.setItem('cart', JSON.stringify(storageDataGet))
 
     } else {
       var id = data.id
       let index: number = -1
 
-      this.itemsCart = JSON.parse(localStorage.getItem('cart'))
+      this.itemsCart = JSON.parse(sessionStorage.getItem('cart'))
       for (let i= 0; i<this.itemsCart.length; i++) {
         if (id == this.itemsCart[i].id) {
           this.itemsCart[i].Quantity = data.Quantity
@@ -96,9 +131,9 @@ this.loadCart()
       if (index == -1) {
           this.itemsCart.push(data)
           
-        localStorage.setItem('cart', JSON.stringify(this.itemsCart))
+          sessionStorage.setItem('cart', JSON.stringify(this.itemsCart))
       } else {
-        localStorage.setItem('cart', JSON.stringify(this.itemsCart))
+        sessionStorage.setItem('cart', JSON.stringify(this.itemsCart))
       }
     this.cartItemFunc()
    
@@ -106,9 +141,12 @@ this.loadCart()
     this.loadCart()
   }
   cartItemFunc() {
-    var cartValue = JSON.parse(localStorage.getItem('cart')) 
+    var cartValue = JSON.parse(sessionStorage.getItem('cart')) 
       this.cartItem = cartValue.length
     this.msg.cartSubject.next(this.cartItem)
   
+  }
+  checkout() {
+  this.router.navigateByUrl('/checkout')
   }
 }

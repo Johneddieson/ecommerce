@@ -12,6 +12,7 @@ import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AuthServiceService} from '../app/auth-service.service';
 import { AuthGuard } from './auth.guard';
 import {HttpClientModule } from '@angular/common/http';
+import { AuthForLoginSignupGuard } from './auth-for-login-signup.guard';
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,7 +29,7 @@ import {HttpClientModule } from '@angular/common/http';
     }),
     AngularFirestoreModule,
   HttpClientModule],
-  providers: [AuthGuard, AuthServiceService,{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [AuthForLoginSignupGuard, AuthGuard, AuthServiceService,{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

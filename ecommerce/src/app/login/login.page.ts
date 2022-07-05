@@ -3,6 +3,8 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, NavController } from '@ionic/angular';
+import { fromEvent, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AuthServiceService } from '../auth-service.service';
 
 @Component({
@@ -11,27 +13,27 @@ import { AuthServiceService } from '../auth-service.service';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
+  private unsubscriber : Subject<void> = new Subject<void>();
   Email1: any;
   Password1: any;
-  sessionStorage;
   constructor(private navCtrl: NavController,private auth: AuthServiceService, 
     private afstore: AngularFirestore,
     private afauth: AngularFireAuth,private loadingCtrl: LoadingController,
-    private alertCtrl: AlertController, private router: Router) {
+    private alertCtrl: AlertController, private router: Router,
+    ) {
   
-      if (this.auth.isLoggedIn) {
-        this.router.navigateByUrl('/home')
-       } else {
-         this.router.navigateByUrl('/login')
-         
-       }
+        // this.afauth.authState.subscribe(data => {
+        //   if (data && data.uid) {
+        //     router.navigateByUrl('/tabs')
+        //   }
+        // })
     }
 
   ngOnInit() {
-    // setInterval(() => {
-
-    // }, 100)
+ 
+    
   }
+ 
   LogIn(email, password) {
     this.auth.SignIn(email.value, password.value).then((res => {
       console.log("user", res)
@@ -41,7 +43,7 @@ export class LoginPage implements OnInit {
         el.present();
         setTimeout(() => {
           el.dismiss()
-          this.router.navigateByUrl('home')
+          this.router.navigateByUrl('tabs')
         }, 3000)
       })
 

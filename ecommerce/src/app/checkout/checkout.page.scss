@@ -5,10 +5,10 @@
     font-size: 20px;
     line-height: 84px;
 }
-// .buttonsactive:active {
-//     background-color: red;
-//     font-weight: 500;
-// }
+.buttonsactive:active {
+    background-color: red;
+    font-weight: 500;
+}
 .container {
     width: 100%;
     ion-thumbnail {
@@ -46,7 +46,7 @@
         #btn {
             padding: 10px 20px;
             color: #fff;
-            background-color: #69a03a;
+            background-color: red;
             
         }
         #btn:active {
@@ -57,6 +57,20 @@
         ion-icon {
             margin: 10px;
             color: #69A03A;
+        }
+    }
+}
+
+
+ion-footer {
+    --background: #69a03a;
+    ion-row {
+        background: #69a03a;
+        color: white;
+        ion-col {
+            &:last-child {
+                text-align: end;
+            }
         }
     }
 }
