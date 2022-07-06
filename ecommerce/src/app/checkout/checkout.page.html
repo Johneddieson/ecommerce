@@ -24,7 +24,7 @@
          <img src="{{data.ImageUrl}}" />  
         </ion-thumbnail>
         <ion-label>
-          <h2>{{data.ProductName}} <span style="float: right; color: #69a03a;">₱ {{data.UnitPrice}}</span>
+          <h2>{{data.ProductName}} <span style="float: right; color: #69a03a;">{{data.UnitPrice | currency: '₱'}}</span>
           </h2>
           <h3>
             <!-- <ion-icon name="star-outline"></ion-icon>
@@ -34,8 +34,8 @@
           </h3>
           <p class="rate"> {{data.Stock}} remaining stock</p>
           <div id="qty">
-            <span (click)="dec(data.id, data.Quantity)" class="minus"> - </span>  {{data.Quantity}}
-            <span (click)="inc(data.id, data.Quantity)" class="plus"> + </span>  
+            <span  class="minus">  </span>  {{data.Quantity}}
+            <span  class="plus">  </span>  
             <span style="float: right; ">
              <button id="btn" (click)="singleDelete(data)"> Remove</button> 
             </span>

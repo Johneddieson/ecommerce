@@ -8,6 +8,7 @@ import { AlertController } from '@ionic/angular';
 import { MessengerService } from '../messenger.service';
 import * as firebase from 'firebase/app'
 import { map } from 'rxjs/operators';
+import * as moment from 'moment';
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.page.html',
@@ -115,7 +116,8 @@ export class CheckoutPage implements OnInit {
     this.total = 0
       this.cartItem = 0
     this.msg.cartSubject.next(this.cartItem)
-        
+    this.loadCart()
+    
     
   }
 
@@ -150,16 +152,54 @@ OrderNow() {
       {
         text: 'Ok',
         handler: () => {
-          alert("Ordered Successfully")
           
-          console.log("my info", this.myInformation.Email)
-          this.afstore.collection('Orders').add({
-            OrderDetails: this.getCartDetails,
-            TotalAmount: this.total
-          }).then(el => {
-            console.log("wew", el)
-          }).catch(err => {
-            console.log("error", err)
+          this.alertCtrl.create({
+            message: 'Ordered Successfully!',
+            buttons: [
+              {
+                text: 'Ok',
+                role: 'cancel'
+              }
+            ]
+          }).then(els => {
+            console.log("my info", this.myInformation)
+            if (!this.myInformation.FirstName || !this.myInformation.LastName
+              || !this.myInformation.Address1 || !this.myInformation.Address2 || 
+              !this.myInformation.PhoneNumber) {
+                this.alertCtrl.create({
+                  message: 'Oops! There are some of your information that is not identified, Please Edit before we proceed',
+                  buttons: [
+                    {
+                      text: 'Ok',
+                     handler: () => {
+                      this.router.navigateByUrl('/tabs/tab3')
+                     } 
+                    }
+                  ]
+                }).then(els2 => {
+                  els2.present()
+                })
+              } else {
+                els.present()
+                var datetime = moment(new Date()).format("DD-MM-YYYY hh:mm A")
+            this.afstore.collection('Orders').add({
+              OrderDetails: this.getCartDetails,
+              BillingFirstname: this.myInformation.FirstName,
+              BillingLastname: this.myInformation.LastName,
+              BillingAddress1: this.myInformation.Address1,
+              BillingAddress2: this.myInformation.Address2,
+              BillingPhonenumber: this.myInformation.PhoneNumber,
+              Billingemail: this.myInformation.Email,
+              BillingIndexId: this.myInformation.Uid,
+              Status: 'Open',
+              Datetime: datetime,
+              TotalAmount: parseFloat(this.total.toString()).toFixed(2)
+            }).then(el => {
+            }).catch(err => {
+            })
+            this.removeall()
+            
+          }
           })
         }
       },

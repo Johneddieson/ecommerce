@@ -24,7 +24,7 @@
  
    
   <div class="form">
-    <ion-input class="uploadfile"  type="file" (change)="fileChanged($event)"></ion-input>
+    <ion-input class="uploadfile"  type="file" (change)="fileChanged($event)" accept="image/*"></ion-input>
 
     <form [formGroup]="registerForm"  (ngSubmit)="submit()" novalidate>
       

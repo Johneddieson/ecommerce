@@ -15,11 +15,11 @@ const routes: Routes = [
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule),
     canActivate: [AuthGuard]
   },
-  {
-    path: '',
-    redirectTo: '/tabs/tab1',
-    pathMatch: 'full'
-  },
+  // {
+  //   path: '',
+  //   redirectTo: '/tabs/tab1',
+  //   pathMatch: 'full'
+  // },
   {
     path: 'login',
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule),
@@ -44,7 +44,13 @@ const routes: Routes = [
     path: 'checkout',
     loadChildren: () => import('./checkout/checkout.module').then( m => m.CheckoutPageModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'adminpage',
+    loadChildren: () => import('./adminpage/adminpage.module').then( m => m.AdminpagePageModule),
+    canActivate: [AuthGuard]
   }
+ 
 ];
 @NgModule({
   imports: [

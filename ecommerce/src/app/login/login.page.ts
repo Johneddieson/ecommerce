@@ -24,7 +24,6 @@ export class LoginPage implements OnInit {
   
         // this.afauth.authState.subscribe(data => {
         //   if (data && data.uid) {
-        //     router.navigateByUrl('/tabs')
         //   }
         // })
     }
@@ -36,35 +35,26 @@ export class LoginPage implements OnInit {
  
   LogIn(email, password) {
     this.auth.SignIn(email.value, password.value).then((res => {
-      console.log("user", res)
-      this.loadingCtrl.create({
-        message: 'Logging In...'
-      }).then(el => {
-        el.present();
-        setTimeout(() => {
-          el.dismiss()
-          this.router.navigateByUrl('tabs')
-        }, 3000)
-      })
-
+      
+        
+        if (res.user.displayName == "admin") {
+        this.router.navigateByUrl('adminpage')
+      } else {
+        this.router.navigateByUrl('tabs')
+      }
+        
+     
       sessionStorage.setItem('user', JSON.stringify(res.user));
    this.Email1 = ''
    this.Password1 = ''
     })).catch(err => {
-      this.loadingCtrl.create({
-        message: 'Logging In...'
-      }).then(el => {
-        el.present();
-        setTimeout(() => {
-          el.dismiss()
-          this.alertCtrl.create({
-            message: err.message
-          }).then(el => {
-            el.present()
-          })
-        }, 3000)
-      })
       
+      
+        this.alertCtrl.create({
+          message: err.message
+        }).then(el => {
+          el.present()
+        })
     })
   }
 

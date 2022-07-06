@@ -76,7 +76,9 @@ export class AddProductPage implements OnInit {
     console.log("the files", files)
     const data = new FormData()
     data.append('file', files[0])
-    data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
+    //00fb1c6ab7c377f68517
+    // data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
+    data.append('UPLOADCARE_PUB_KEY', '00fb1c6ab7c377f68517')
     this.http.post('https://upload.uploadcare.com/base/', data).subscribe((events: any) => {
       var json = {events}
       for (var prop in json) {
@@ -113,7 +115,7 @@ export class AddProductPage implements OnInit {
       
       this.afstore.collection('Products').add({
         ProductName: this.registerForm.value.firstname,
-        Stock: this.registerForm.value.cellphonenumber,
+        Stock: parseInt(this.registerForm.value.cellphonenumber),
         UnitPrice: this.registerForm.value.password,
         ImageUrl: this.photoLink,
         Quantity: 1

@@ -1,17 +1,35 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <div class="wrapper">
+    <h3>My Information</h3>
+    <ion-item lines="none">
+      <ion-label position="floating">First Name</ion-label>
+      <ion-input [(ngModel)]="firstname" type="text" placeholder="First Name"></ion-input>
+    </ion-item>
+   
+    <ion-item lines="none">
+      <ion-label position="floating">Last Name</ion-label>
+      <ion-input type="text" [(ngModel)]="lastname" placeholder="Last Name"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label position="floating">Address1</ion-label>
+      <ion-input [(ngModel)]="address1" type="text" placeholder="Address 1"></ion-input>
+    </ion-item>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+    
+    <ion-item lines="none">
+      <ion-label position="floating">Address2</ion-label>
+      <ion-input type="text" [(ngModel)]="address2" placeholder="Address 2"></ion-input>
+    </ion-item>
+   
+    <ion-item lines="none">
+      <ion-label position="floating">Phone Number</ion-label>
+      <ion-input type="number" [(ngModel)]="phonenumber" placeholder="Phone Number"></ion-input>
+    </ion-item>
+
+    
+    
+    
+    <ion-button (click)="Edit()">Edit</ion-button>
+  </div>
 </ion-content>

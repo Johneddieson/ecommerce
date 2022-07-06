@@ -55,7 +55,15 @@ private unsubscriber : Subject<void> = new Subject<void>();
    }
 
   ngOnInit(): void {
-this.loadCart()
+    
+    this.router.events.subscribe(() => {
+      this.zone.run(() => {
+        setTimeout(() => {
+          this.applicationRef.tick()
+          this.loadCart()
+        }, 0)
+      })
+    })
 history.pushState(null, null, location.href);
 this.locationStrategy.onPopState(() => {
   history.pushState(null, null, location.href);
@@ -75,11 +83,11 @@ loadCart() {
   if (sessionStorage.getItem('cart') != null) {
 var thearray = []
     thearray.push(JSON.parse(sessionStorage.getItem('cart')))
-    console.log("the", thearray)
-    thearray.forEach(fe => {
-      console.log("Wewaa", fe)
-    })
+    
+   
     this.numbers = thearray[0].length;
+  } else {
+    this.numbers = 0
   } 
 }
   Increase(data) {
@@ -109,12 +117,31 @@ this.loadCart()
   
   itemsCart: any = []
   AddtoCart(data) {
+      if (data.Quantity > data.Stock) {
+        this.alertCtrl.create({
+          message: 'The quantity order should not be greater than the stock available',
+          buttons: [
+            {
+              text: 'Ok',
+              role: 'cancel'
+            }
+          ]
+        }).then(el => {
+          el.present()
+          data.Quantity = 1
+        })
+      } else {
+
+      
     var cartData = sessionStorage.getItem('cart')
     if (cartData == null) {
+      var theid = data.id
+      let index: number = -1
       let storageDataGet: any = []
-      storageDataGet.push(data)
-      sessionStorage.setItem('cart', JSON.stringify(storageDataGet))
-
+        storageDataGet.push(data)
+        sessionStorage.setItem('cart', JSON.stringify(storageDataGet)) 
+       
+        data.Quantity = 1
     } else {
       var id = data.id
       let index: number = -1
@@ -123,6 +150,7 @@ this.loadCart()
       for (let i= 0; i<this.itemsCart.length; i++) {
         if (id == this.itemsCart[i].id) {
           this.itemsCart[i].Quantity = data.Quantity
+          data.Quantity = 1
           index = i;
           break;
         }
@@ -132,14 +160,19 @@ this.loadCart()
           this.itemsCart.push(data)
           
           sessionStorage.setItem('cart', JSON.stringify(this.itemsCart))
+          
+          data.Quantity = 1
       } else {
         sessionStorage.setItem('cart', JSON.stringify(this.itemsCart))
+       
+        data.Quantity = 1
       }
     this.cartItemFunc()
    
     }
     this.loadCart()
   }
+}
   cartItemFunc() {
     var cartValue = JSON.parse(sessionStorage.getItem('cart')) 
       this.cartItem = cartValue.length
