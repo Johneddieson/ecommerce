@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons  slot="end">
+      
+      <ion-icon size="large" (click)="addproduct()" class="addproduct" name="add-outline"></ion-icon>
+    </ion-buttons>
+    <ion-title>All Orders</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<br>
+<br>
+<br>
+<ion-content>
+  <!-- <ion-button (click)="closeAccordion()" expand="full">Close accordion</ion-button>
+  <ion-button (click)="toggleSection()" expand="full">Toggle Section</ion-button> -->
+<ion-accordion-group multiple="true">
+  <ion-accordion *ngFor="let data of allPendingOrders">
+    <ion-item slot="header" lines="none">
+      <ion-label class="labelname">{{data.BillingFirstname}} {{data.BillingLastname}}<br> Date Ordered : {{data.Datetime}}
+      <br>
+      Total Amount : {{data.TotalAmount | currency: '₱'}}
+    </ion-label> 
+      
+      <!-- <ion-label class="labeldate"> Date Ordered : {{data.Datetime}}</ion-label>
+      <ion-label class="totalamount">Total Amount : {{data.TotalAmount | currency: '₱'}}</ion-label> -->
+    </ion-item>
+    <ion-list slot="content">
+     
+      <ion-item lines="none" *ngFor="let datadetails of data.OrderDetails">
+        <ion-avatar slot="start">
+          <img src="{{datadetails.ImageUrl}}">
+        </ion-avatar>
+        <ion-label>
+          <!-- <h2>Fullname: {{data.BillingFirstname}} {{data.BillingLastname}}</h2> -->
+          <h2>Product Name: {{datadetails.ProductName}}</h2>
+          <h3>Email: {{data.Billingemail}}</h3>
+        
+          <p>Address1: {{data.BillingAddress1}}</p>
+          <p>Address2: {{data.BillingAddress2}}</p>
+          <p>Phone Number: {{data.BillingPhonenumber}}</p>
+          <p>Quantity: {{datadetails.Quantity}}</p>
+          <p>Unit Price: {{datadetails.UnitPrice | currency: '₱'}}</p>
+        </ion-label>
+       
+      </ion-item>
+      <ion-button (click)="approveOrder(data)" size="small"  fill="outline" color="success">Approve Order</ion-button>
+        
+      <ion-button (click)="cancelOrder(data)" size="small"  fill="outline" color="danger">Cancel Order</ion-button>
+    </ion-list>
+  </ion-accordion>
+
+</ion-accordion-group>
+</ion-content>

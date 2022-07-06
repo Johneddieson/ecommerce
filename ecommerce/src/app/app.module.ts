@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -12,7 +11,8 @@ import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AuthServiceService} from '../app/auth-service.service';
 import { AuthGuard } from './auth.guard';
 import {HttpClientModule } from '@angular/common/http';
-
+import { AuthForLoginSignupGuard } from './auth-for-login-signup.guard';
+import { CurrencyPipe } from '@angular/common';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -27,8 +27,8 @@ import {HttpClientModule } from '@angular/common/http';
       measurementId: "G-949B7C6RY3"
     }),
     AngularFirestoreModule,
-  HttpClientModule],
-  providers: [AuthGuard, AuthServiceService,{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  HttpClientModule,],
+  providers: [CurrencyPipe, AuthForLoginSignupGuard, AuthGuard, AuthServiceService,{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

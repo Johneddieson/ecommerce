@@ -113,6 +113,7 @@ export class AuthServiceService {
   SignOut() {
     return this.afAuth.signOut().then(() => {
       sessionStorage.removeItem('user');
+      sessionStorage.removeItem('cart');
       this.router.navigate(['/login']);
     })
   }

@@ -28,37 +28,45 @@ phonenumber: any
       this.navCtrl.navigateForward('login')
     }
     SignUp() {
-     console.log(this.email, this.password)
-     
+      
       this.auth.SignUp(this.email, this.password).then(res => {
   this.loadingCtrl.create({
   message: 'Registering User...',
-  duration: 3000
+ 
 }).then(el => {
   el.present()
   res.user.updateProfile({
-    displayName: 'admin'
-  })
+    displayName: 'customer'
+  })  
 
 sessionStorage.setItem('user', JSON.stringify(res.user))
+
 this.afstore.doc(`users/${res.user.uid}`).set({
-  Email: this.email,
+  Email: this.email == undefined ? "" : this.email,
   Uid: res.user.uid,
-  FirstName: this.firstname,
-  LastName: this.lastname,
-  Address1: this.address1,
-  Address2: this.address2,
-  PhoneNumber: this.phonenumber
+  FirstName: this.firstname == undefined ? "" : this.firstname,
+  LastName: this.lastname == undefined ? "" : this.lastname,
+  Address1: this.address1 == undefined ? "" : this.address1,
+  Address2: this.address2 == undefined ? "" : this.address2,
+  PhoneNumber: this.phonenumber== undefined ? "" : this.phonenumber
+}).then(suc => {
+
+}).catch(err => {
+  console.log("err", err)
 })
 
-this.email = ''
-this.password = ''
-this.firstname= ''
-this.lastname= ''
-this.address1= ''
-this.address2= ''
-this.phonenumber= ''
-this.router.navigateByUrl('/')
+setTimeout(() => {
+  el.dismiss()
+  this.email = ''
+  this.password = ''
+  this.firstname= ''
+  this.lastname= ''
+  this.address1= ''
+  this.address2= ''
+  this.phonenumber= ''
+  this.router.navigateByUrl('/tabs')
+}, 3000)
+
 })
 
 }).catch(err => {
