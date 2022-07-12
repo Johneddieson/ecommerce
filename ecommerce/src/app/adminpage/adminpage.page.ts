@@ -1,6 +1,6 @@
 import { LocationStrategy } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AlertButton, AlertController } from '@ionic/angular';
+import { AlertButton, AlertController, Platform } from '@ionic/angular';
 import { AuthServiceService } from '../auth-service.service';
 
 @Component({
@@ -12,7 +12,8 @@ export class AdminpagePage implements OnInit {
 
   constructor(private locationStrategy: LocationStrategy,
     private alertCtrl: AlertController,
-    private auth: AuthServiceService) { }
+    private auth: AuthServiceService,
+    private plt: Platform) { }
 
   ngOnInit() {
   

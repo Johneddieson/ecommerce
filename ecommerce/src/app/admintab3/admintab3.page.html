@@ -1,9 +1,29 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>admintab3</ion-title>
+  <ion-toolbar class="toolbar">
+    <ion-buttons slot="start">
+      <!-- <ion-back-button color="light" defaultHref="home"></ion-back-button> -->
+      <ion-icon name="cart"></ion-icon>
+    </ion-buttons>
+    <ion-title>Inventory Movement</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content fullscreen>
+  <ion-list>
+    <!-- <ion-list-header> Recent Conversations </ion-list-header> -->
+
+    <ion-item *ngFor="let data of inventoryList">
+      <ion-avatar slot="start">
+        <img src="{{data.ImageUrl}}" />
+      </ion-avatar>
+      <ion-label>
+        <h2>{{data.ProductName}}</h2>
+        <h3>{{data.Quantity}}</h3>
+        <p>{{data.Destination}}</p>
+        <p>{{data.Datetime}}</p>
+      </ion-label>
+    </ion-item>
+
+  </ion-list>
 
 </ion-content>

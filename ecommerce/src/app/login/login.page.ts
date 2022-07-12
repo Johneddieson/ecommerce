@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
@@ -20,12 +20,24 @@ export class LoginPage implements OnInit {
     private afstore: AngularFirestore,
     private afauth: AngularFireAuth,private loadingCtrl: LoadingController,
     private alertCtrl: AlertController, private router: Router,
+    private applicationRef: ApplicationRef,
+    private zone: NgZone
     ) {
-  
-        // this.afauth.authState.subscribe(data => {
-        //   if (data && data.uid) {
-        //   }
-        // })
+      // router.events.subscribe(() => {
+      //   zone.run(() => {
+      //     setTimeout(() => {
+      //       this.applicationRef.tick()
+      //     this.afauth.authState.subscribe(data => {
+      //    if (data.displayName == "admin") {
+      //     router.navigateByUrl('/adminpage')
+      //    } else {
+
+      //    }
+      //   })
+      //     }, 0)
+      //   })
+      // })
+        
     }
 
   ngOnInit() {

@@ -1,20 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { AttrAst } from '@angular/compiler';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, IonInput, LoadingController } from '@ionic/angular';
 import { loadingController } from '@ionic/core';
-
+import * as moment from 'moment';
 @Component({
   selector: 'app-add-product',
   templateUrl: './add-product.page.html',
   styleUrls: ['./add-product.page.scss'],
 })
+ 
 export class AddProductPage implements OnInit {
   registerForm: FormGroup;
   photoLink: any
   withPhoto: boolean = false
+  @ViewChild(IonInput) myInputVariable: IonInput;
   constructor(public http: HttpClient, public formBuilder: FormBuilder, public loadingCtrl: LoadingController, public alertCtrl: AlertController,
     private afstore: AngularFirestore) {
    
@@ -48,12 +50,19 @@ export class AddProductPage implements OnInit {
         // Validators.pattern("^[0&9]{2}[0-9]{9}")
              this.customPatternValid({ pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/, msg: 'This format is not allowed' }),
              this.customPatternValid({ pattern: /^([^.?!-]*)$/, msg: 'Negative is not allowed' }),
+             this.customPatternValid({ pattern: /^([^.?!_]*)$/, msg: 'Under Score is not allowed' }),
+             this.customPatternValid({ pattern: /^([^.?!=]*)$/, msg: 'Equal is not allowed' }),
+             this.customPatternValid({ pattern: /^([^.?!+]*)$/, msg: 'Plus is not allowed' }),
+             this.customPatternValid({ pattern: /^([^.?!.]*)$/, msg: 'Period is not allowed' }),
       
     ]),
       password: new FormControl('', [
   Validators.required,
   this.customPatternValid({ pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/, msg: 'This format is not allowed' }),
   this.customPatternValid({ pattern: /^([^-]*)$/, msg: 'Negative is not allowed' }),
+  this.customPatternValid({ pattern: /^([^?!_]*)$/, msg: 'Under Score is not allowed' }),
+  this.customPatternValid({ pattern: /^([^?!=]*)$/, msg: 'Equal is not allowed' }),
+  this.customPatternValid({ pattern: /^([^?!+]*)$/, msg: 'Plus is not allowed' }),
 
 ])
     })
@@ -70,6 +79,13 @@ export class AddProductPage implements OnInit {
         return null
       }
     }
+      }
+      reset() {
+        console.log("wew", 
+        this.myInputVariable.value)
+
+        this.myInputVariable.value = ""
+      
       }
   fileChanged(event) {
     const files = event.target.files
@@ -120,6 +136,16 @@ export class AddProductPage implements OnInit {
         ImageUrl: this.photoLink,
         Quantity: 1
       })
+      var datetime = moment(new Date()).format("DD-MM-YYYY hh:mm A")
+      this.afstore.collection('Inventory').add({
+        Quantity: parseInt(this.registerForm.value.cellphonenumber) *  1,
+        Datetime: datetime,
+        read: false,
+        Destination: "Admin",
+        ProductName: this.registerForm.value.firstname,
+        UnitPrice: this.registerForm.value.password,
+        ImageUrl: this.photoLink
+      })
 
       setTimeout(() => {
         el.dismiss()   
@@ -136,6 +162,8 @@ export class AddProductPage implements OnInit {
           ]
         }).then(els => {
           els.present()
+          this.withPhoto = false
+          this.myInputVariable.value = "";
         }).catch(err => {
 
         })

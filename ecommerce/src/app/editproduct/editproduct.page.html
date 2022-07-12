@@ -15,20 +15,25 @@
       <!-- <ion-back-button color="light" defaultHref="home"></ion-back-button> -->
       <ion-icon name="pencil"></ion-icon>
     </ion-buttons>
-    <ion-title>Add Product</ion-title>
+    <ion-title>Edit Product</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding ion-text-center">
   
     <img src="{{photoLink}}" *ngIf="photoLink != ''" class="camera"/>
  
+   <br>
+   <br>
+   <br>
+   <br>
+   <br>
    
   <div class="form">
-    <ion-input class="uploadfile"  type="file" #inputFile (change)="fileChanged($event)" accept="image/*"></ion-input>
+    <ion-input hidden class="uploadfile"  type="file" #inputFile (change)="fileChanged($event)" accept="image/*"></ion-input>
     <form [formGroup]="registerForm"  (ngSubmit)="submit()" novalidate>
       
       <ion-item lines="none">
-        <ion-input  placeholder="Enter product name" formControlName="firstname"></ion-input>
+        <ion-input disabled  placeholder="Enter product name" formControlName="firstname" [(ngModel)]="productname"></ion-input>
       </ion-item>
       <ion-text type="text" color="danger" *ngIf="registerForm.get('firstname').hasError('required') && registerForm.get('firstname').touched">
         Product Name shouldn't be empty 
@@ -43,7 +48,7 @@
        </ion-text>
       
        <ion-item lines="none">
-        <ion-input type="tel"  placeholder="Enter Stock" formControlName="cellphonenumber"></ion-input>
+        <ion-input type="tel"  placeholder="Enter Stock" [(ngModel)]="stock" formControlName="cellphonenumber"></ion-input>
       </ion-item>
       <ion-text color="danger" *ngIf="registerForm.get('cellphonenumber').hasError('required') && registerForm.get('cellphonenumber').touched">
         Stock of product shouldn't be empty 
@@ -57,7 +62,7 @@
         </ion-text>
       </div>
        <ion-item lines="none">
-        <ion-input type="tel"  placeholder="Enter Price" formControlName="password"></ion-input>
+        <ion-input type="tel"  [(ngModel)]="price"  placeholder="Enter Price" formControlName="password"></ion-input>
       </ion-item>
       <ion-text color="danger" *ngIf="registerForm.get('password').hasError('required') && registerForm.get('password').touched">
         Price of product shouldn't be empty
@@ -67,10 +72,13 @@
           {{registerForm.controls.password.errors.invalidMsg}}
         </ion-text>
       </div>
-      
+     
       <button type="submit" hidden #btn></button>
       <ion-button color="dark" (click)="btn.click()" [disabled]="registerForm.invalid" expand="block">Create Product</ion-button>
     </form>
+    <!-- <ion-item lines="none">
+      <ion-input type="tel"  [(ngModel)]="currentstock"  placeholder="Current Stock" ></ion-input>
+    </ion-item> -->
   </div>
   </ion-content>
 

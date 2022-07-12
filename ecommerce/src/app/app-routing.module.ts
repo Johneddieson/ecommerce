@@ -49,6 +49,17 @@ const routes: Routes = [
     path: 'adminpage',
     loadChildren: () => import('./adminpage/adminpage.module').then( m => m.AdminpagePageModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'viewproducts',
+    loadChildren: () => import('./viewproducts/viewproducts.module').then( m => m.ViewproductsPageModule),
+    canActivate: [AuthGuard]
+ 
+  },
+  {
+    path: 'editproduct/:id',
+    loadChildren: () => import('./editproduct/editproduct.module').then( m => m.EditproductPageModule),
+    canActivate: [AuthGuard]
   }
  
 ];
