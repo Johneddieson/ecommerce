@@ -1,4 +1,10 @@
+import { LocationStrategy } from '@angular/common';
 import { Component } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { Router } from '@angular/router';
+import { LoadingController, AlertController } from '@ionic/angular';
+import { AuthServiceService } from '../auth-service.service';
 
 @Component({
   selector: 'app-tab2',
@@ -7,6 +13,9 @@ import { Component } from '@angular/core';
 })
 export class Tab2Page {
 
-  constructor() {}
+  constructor(private router: Router, private afstore: AngularFirestore,
+    private afauth: AngularFireAuth, private loadingCtrl: LoadingController,
+    private locationStrategy: LocationStrategy, private auth: AuthServiceService,
+    private alertCtrl: AlertController){}
 
 }
