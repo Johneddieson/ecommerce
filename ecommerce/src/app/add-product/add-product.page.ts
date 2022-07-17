@@ -25,6 +25,13 @@ export class AddProductPage implements OnInit {
   ngOnInit() {
     this.photoLink = 'https://static.wikia.nocookie.net/otonari-no-tenshi/images/c/c9/No_images_available.jpg/revision/latest?cb=20220104141308'
     this.registerForm = new FormGroup({
+      category: new FormControl('', [
+        Validators.required,
+        this.customPatternValid({ pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/, msg: "Always Starts With Capital Letter"}),
+        this.customPatternValid({ pattern: /^([^0-9]*)$/, msg: 'Numbers is not allowed' }),
+        Validators.minLength(5),
+        // Validators.maxLength(10),
+      ]),
       firstname: new FormControl('', [
         Validators.required,
         this.customPatternValid({ pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/, msg: "Always Starts With Capital Letter"}),
@@ -94,7 +101,7 @@ export class AddProductPage implements OnInit {
     data.append('file', files[0])
     //00fb1c6ab7c377f68517
     // data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
-    data.append('UPLOADCARE_PUB_KEY', '00fb1c6ab7c377f68517')
+    data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
     this.http.post('https://upload.uploadcare.com/base/', data).subscribe((events: any) => {
       var json = {events}
       for (var prop in json) {
@@ -130,6 +137,7 @@ export class AddProductPage implements OnInit {
 
       
       this.afstore.collection('Products').add({
+        Category:this.registerForm.value.category,
         ProductName: this.registerForm.value.firstname,
         Stock: parseInt(this.registerForm.value.cellphonenumber),
         UnitPrice: this.registerForm.value.password,
@@ -144,7 +152,8 @@ export class AddProductPage implements OnInit {
         Destination: "Admin",
         ProductName: this.registerForm.value.firstname,
         UnitPrice: this.registerForm.value.password,
-        ImageUrl: this.photoLink
+        ImageUrl: this.photoLink,
+        DatetimeToSort: new Date()
       })
 
       setTimeout(() => {

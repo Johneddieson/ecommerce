@@ -6,7 +6,7 @@ import { AuthGuard } from './auth.guard';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'tabs',
+    redirectTo: '/login',
     pathMatch: 'full',
   },
 
@@ -60,7 +60,29 @@ const routes: Routes = [
     path: 'editproduct/:id',
     loadChildren: () => import('./editproduct/editproduct.module').then( m => m.EditproductPageModule),
     canActivate: [AuthGuard]
-  }
+  },
+  // {
+  //   path: 'changepassword',
+  //   loadChildren: () => import('./changepassword/changepassword.module').then( m => m.ChangepasswordPageModule)
+  // },
+  // {
+  //   path: '',
+  //   loadChildren: () => import('./menu/menu.module').then( m => m.MenuPageModule),
+  //   canActivate: [AuthGuard]
+  // },
+  
+  // {
+  //   path: 'dashboard',
+  //   loadChildren: () => import('./dashboard/dashboard.module').then( m => m.DashboardPageModule)
+  // },
+  // {
+  //   path: 'products',
+  //   loadChildren: () => import('./products/products.module').then( m => m.ProductsPageModule)
+  // },
+  // {
+  //   path: 'about',
+  //   loadChildren: () => import('./about/about.module').then( m => m.AboutPageModule)
+  // }
  
 ];
 @NgModule({

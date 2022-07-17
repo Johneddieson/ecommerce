@@ -21,7 +21,7 @@
 <ion-content class="ion-padding ion-text-center">
   
     <img src="{{photoLink}}" *ngIf="photoLink != ''" class="camera"/>
- 
+    <ion-input type="file" (change)="fileChanged($event)"></ion-input>
    <br>
    <br>
    <br>
@@ -74,7 +74,7 @@
       </div>
      
       <button type="submit" hidden #btn></button>
-      <ion-button color="dark" (click)="btn.click()" [disabled]="registerForm.invalid" expand="block">Create Product</ion-button>
+      <ion-button color="dark" (click)="btn.click()" [disabled]="registerForm.invalid" expand="block">Update Product</ion-button>
     </form>
     <!-- <ion-item lines="none">
       <ion-input type="tel"  [(ngModel)]="currentstock"  placeholder="Current Stock" ></ion-input>

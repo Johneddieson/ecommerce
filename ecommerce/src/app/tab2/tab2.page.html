@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-item lines="none">
       <ion-label style="font-weight: 800;font-size: 3em;">
-        Today
+        Notifications
         <p style="font-weight: 400;color: #433465 ;">{{today | date:'fullDate'}}</p>
       </ion-label>
     </ion-item>
@@ -11,45 +11,46 @@
 
 <ion-content [fullscreen]="true">
 
-  <ion-card  class="ion-margin">
+  <ion-card  class="ion-margin" *ngFor="let data of notificationsList">
     <ion-card-header>
       <!-- [style.color]="item.value.itemPriority === 'high' ? 'red' : (item.value.itemPriority === 'low' ? 'green' : 'orange')" -->
       <ion-card-subtitle>
-        Subtitle
+        Remarks: {{data.remarks}}
       </ion-card-subtitle>
 
       <ion-item>
-        <ion-icon *ngIf="item.value.itemPriority === 'high'" color="danger" size="small" name="ellipse"></ion-icon>
+        <!-- <ion-icon *ngIf="item.value.itemPriority === 'high'" color="danger" size="small" name="ellipse"></ion-icon>
         <ion-icon *ngIf="item.value.itemPriority === 'low'" color="success" size="small" name="ellipse"></ion-icon>
-        <ion-icon *ngIf="item.value.itemPriority === 'middle'" color="warning" size="small" name="ellipse"></ion-icon>
-        <ion-label> Item Name</ion-label>
+        <ion-icon *ngIf="item.value.itemPriority === 'middle'" color="warning" size="small" name="ellipse"></ion-icon> -->
+        <ion-label text-wrap>{{data.Message}}</ion-label>
       </ion-item>
 
     </ion-card-header>
 
+  
     <ion-card-content>
       <!-- {{item.value.itemDueDate | date:'fullDate'}} -->
-      <ion-label>Due  11/11/2022</ion-label>
+      <ion-label>Due  {{data.Datetime}}</ion-label>
     </ion-card-content>
 
     <ion-row>
     
 
-      <ion-item button (click)="update(item)">
-        <ion-icon name="create-outline"></ion-icon>
-        <p>Update</p>
+      <ion-item *ngIf="!data.read" button (click)="update(data)">
+        <!-- <ion-icon name="book"></ion-icon> -->
+        <p>Mark as read</p>
       </ion-item>
 
-      <ion-item button (click)="delete(item.key)">
+      <!-- <ion-item button (click)="delete(item.key)">
         <ion-icon name="trash-outline"></ion-icon>
         <p>Cancel</p>
-      </ion-item>
+      </ion-item> -->
     </ion-row>
 
   </ion-card>
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="addNewItem()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 </ion-content>

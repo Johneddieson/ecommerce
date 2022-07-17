@@ -1,21 +1,22 @@
-import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TabsPageRoutingModule } from './tabs-routing.module';
+import { IonicModule } from '@ionic/angular';
 
-import { TabsPage } from './tabs.page';
+import { MenuPageRoutingModule } from './menu-routing.module';
+
+import { MenuPage } from './menu.page';
 import { SharedComponentsModule } from '../components/shared-components.module';
 
 @NgModule({
   imports: [
-    IonicModule,
     CommonModule,
     FormsModule,
-    TabsPageRoutingModule,
+    IonicModule,
+    MenuPageRoutingModule,
     SharedComponentsModule
   ],
-  declarations: [TabsPage]
+  declarations: [MenuPage]
 })
-export class TabsPageModule {}
+export class MenuPageModule {}

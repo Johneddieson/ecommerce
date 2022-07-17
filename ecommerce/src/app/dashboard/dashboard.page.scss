@@ -1,0 +1,19 @@
+.hero {
+    background-image: url('https://ucarecdn.com/b4223107-fa83-4409-9ca9-b80e6ef36a5d/mixologistremovebgpreview.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 30vh;
+    width: 100%;
+}
+
+
+ion-grid {
+    --ion-grid-padding-sm: 20px;
+    --ion-grid-padding-md: 30px;
+    --ion-grid-padding-lg: 40px;
+    --ion-grid-padding-xl: 100px;
+}
+h1 {
+    text-transform: uppercase;
+}

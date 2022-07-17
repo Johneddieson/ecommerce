@@ -1,11 +1,41 @@
 <ion-header>
   <ion-toolbar class="toolbar">
-    <ion-buttons slot="start">
+    <ion-buttons  slot="start">
       <!-- <ion-back-button color="light" defaultHref="home"></ion-back-button> -->
-      <ion-icon name="eye"></ion-icon>
+      <!-- <ion-icon class="buttonsactive"  name="cart"></ion-icon> -->
+      <ion-button #productbtn (mouseenter)="dropdown=true" (mouseleave)="hideDropdown($event)" fill="clear" color="dark"
+      class="dropdown-btn"  routerDirection="root" routerLinkActive="active-item">
+      Categories
+      <ion-icon slot="end" [name]="dropdown ? 'chevron-down' : 'chevron-up'"></ion-icon>
+    </ion-button>
+    
     </ion-buttons>
-    <ion-title>All Products</ion-title>
+
+    
   </ion-toolbar>
+  <div *ngIf="dropdown" class="dropdown" (mouseleave)="dropdown = false" #dropdownbox>
+   
+    <ion-item button routerLink="/viewproducts"  (click)="dropdown = false"  [queryParams]="{category: 'Milktea'}" lines="none"
+    routerDirection="root">
+    All
+    </ion-item>
+    <ion-item button routerLink="/viewproducts"  (click)="dropdown = false"  lines="none"
+    routerDirection="root">
+    All
+    </ion-item>
+    <ion-item button routerLink="/viewproducts"  (click)="dropdown = false"  [queryParams]="{category: 'Milktea'}" lines="none"
+    routerDirection="root">
+    Milktea
+    </ion-item>
+    <ion-item button routerLink="/viewproducts" (click)="dropdown = false"  [queryParams]="{category: 'Fruit tea'}" lines="none"
+    routerDirection="root">
+    Fruit Tea
+    </ion-item>
+    <ion-item button routerLink="/viewproducts" (click)="dropdown = false"  [queryParams]="{category: 'Slushee'}" lines="none"
+    routerDirection="root">
+    Slushee
+    </ion-item>
+  </div>
 </ion-header>
 <ion-content>
   <div class="container">

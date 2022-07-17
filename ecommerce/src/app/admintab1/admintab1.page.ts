@@ -50,7 +50,7 @@ export class Admintab1Page implements OnInit {
                 Status: i.Status,
                 TotalAmount: i.TotalAmount,
                 id: i.id,
-                DatetimeToSort: moment(i.Datetime).toDate(),
+                DatetimeToSort: i.DatetimeToSort,
                 OrderDetails: i.OrderDetails
               })
             })
@@ -71,6 +71,12 @@ export class Admintab1Page implements OnInit {
       inputs: [
         {
           type: 'radio',
+          label: 'POS',
+          value: 'POS'
+
+        },
+        {
+          type: 'radio',
           label: 'View Products',
           value: 'View Products'
 
@@ -81,12 +87,12 @@ export class Admintab1Page implements OnInit {
           value: 'Add Product'
 
         },
-        {
-          type: 'radio',
-          label: 'Edit Information',
-          value: 'Edit Information'
+        // {
+        //   type: 'radio',
+        //   label: 'Edit Information',
+        //   value: 'Edit Information'
 
-        },
+        // },
         {
           type: 'radio',
           label: 'Change Password',
@@ -104,10 +110,8 @@ export class Admintab1Page implements OnInit {
             } else if (data == "Add Product") {
 
               this.router.navigateByUrl('/add-product')
-            } else if (data == "Edit Information") {
-
-            } else if (data == "Change Password") {
-
+            } else if (data == "POS") {
+              
             }
           }
         },
@@ -128,6 +132,7 @@ export class Admintab1Page implements OnInit {
   toggleSection() {
     this.accordionGroup.value = 'frameworks'
   }
+  
   approveOrder(data) {
 
     this.alertCtrl.create({
@@ -153,7 +158,8 @@ export class Admintab1Page implements OnInit {
               Message: confirmed,
               Datetime: datetime,
               read: false,
-              remarks: "Your order has been confirmed"
+              remarks: "Your order has been confirmed",
+              DatetimeToSort: new Date()
             })
 
             //Decreasing Stocks
@@ -174,7 +180,8 @@ export class Admintab1Page implements OnInit {
                 Destination: data.BillingFirstname + " " + data.BillingLastname,
                 ProductName: fe.ProductName,
                 UnitPrice: fe.UnitPrice,
-                ImageUrl: fe.ImageUrl
+                ImageUrl: fe.ImageUrl,
+                DatetimeToSort: new Date()
               })
             })
 
@@ -192,7 +199,8 @@ export class Admintab1Page implements OnInit {
               TotalAmount: data.TotalAmount,
               id: data.id,
               OrderDetails: data.OrderDetails,
-              read: false
+              read: false,
+              DatetimeToSort: new Date()
             })
             this.alertCtrl.create({
               header: 'Success',
@@ -264,7 +272,8 @@ export class Admintab1Page implements OnInit {
                       Message: confirmed,
                       Datetime: datetime,
                       read: false,
-                      remarks: dataremarks.remarks
+                      remarks: dataremarks.remarks,
+                      DatetimeToSort: new Date()
                     })
 
                     //History Saving
@@ -280,7 +289,22 @@ export class Admintab1Page implements OnInit {
                       Status: "Cancelled",
                       TotalAmount: data.TotalAmount,
                       id: data.id,
-                      OrderDetails: data.OrderDetails
+                      OrderDetails: data.OrderDetails,
+                      DatetimeToSort: new Date()
+                    })
+
+                    this.alertCtrl.create({
+                      header: 'Success',
+                      message: 'This order cancelled successfully',
+                      buttons: [
+                        {
+                          text: 'Ok',
+                          role: 'cancel'
+                        }
+                      ]
+      
+                    }).then(els2 => {
+                      els2.present()
                     })
                   }
                 }
@@ -288,19 +312,7 @@ export class Admintab1Page implements OnInit {
             }).then(el => {
               el.present()
 
-              this.alertCtrl.create({
-                header: 'Success',
-                message: 'This order cancelled successfully',
-                buttons: [
-                  {
-                    text: 'Ok',
-                    role: 'cancel'
-                  }
-                ]
-
-              }).then(els2 => {
-                els2.present()
-              })
+             
 
             })
           }
