@@ -1,5 +1,5 @@
 import { LocationStrategy } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
@@ -20,7 +20,11 @@ notifCounts = 0
   constructor(private router: Router, private afstore: AngularFirestore,
     private afauth: AngularFireAuth, private loadingCtrl: LoadingController,
     private locationStrategy: LocationStrategy, private auth: AuthServiceService,
-    private alertCtrl: AlertController) {
+    private alertCtrl: AlertController,
+    private applicationRef: ApplicationRef,
+    private zone: NgZone) {
+     
+
     this.afauth.authState.subscribe(data => {
       if (data && data.uid) {
         if (data.displayName == 'admin') {
@@ -51,6 +55,7 @@ notifCounts = 0
             data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
             this.notificationsList = data
 
+            console.log("wewewew", this.notificationsList)
             var filterOnlyNotRead = data.filter(f => f.read != true)
               this.notifCounts = filterOnlyNotRead.length
               console.log("count", this.notifCounts)
@@ -64,6 +69,29 @@ notifCounts = 0
     //     history.pushState(null, null, location.href);
     // this.locationStrategy.onPopState(() => {
     //   history.pushState(null, null, location.href);
+    // })
+    // this.router.events.subscribe((d) => {
+    //   console.log("pota", d)
+    //   this.zone.run(() => {
+    //     setTimeout(() => {
+    //       this.applicationRef.tick()
+    //         var thesession = JSON.parse(sessionStorage.getItem('user'))
+    //         console.log("current user", thesession)
+    //         if (thesession != null) {
+             
+    //           if (thesession.displayName == "customer") {
+                
+    //             this.router.navigateByUrl('tabs')
+      
+    //           } else {
+    //             this.router.navigateByUrl('adminpage')
+
+    //           }
+    //         } else {
+    //         }
+           
+    //     }, 0)
+    //   })
     // })
   }
   logout() {

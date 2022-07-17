@@ -21,6 +21,7 @@ registerForm: FormGroup;
   stock;
   price;
   currentstock;
+  
   @ViewChild(IonInput) myInputVariable: IonInput;
  productReference: AngularFirestoreDocument
  sub;
@@ -38,6 +39,7 @@ registerForm: FormGroup;
       this.photoLink = data.ImageUrl
       this.withPhoto = true
       this.currentstock = data.Stock.toString()
+      
     })
    }
 
@@ -45,6 +47,13 @@ registerForm: FormGroup;
    ngOnInit() {
   //  this.photoLink = 'https://static.wikia.nocookie.net/otonari-no-tenshi/images/c/c9/No_images_available.jpg/revision/latest?cb=20220104141308'
     this.registerForm = new FormGroup({
+      category: new FormControl('', [
+        Validators.required,
+        this.customPatternValid({ pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/, msg: "Always Starts With Capital Letter"}),
+        this.customPatternValid({ pattern: /^([^0-9]*)$/, msg: 'Numbers is not allowed' }),
+        Validators.minLength(5),
+        // Validators.maxLength(10),
+      ]),
       firstname: new FormControl('', [
         Validators.required,
         this.customPatternValid({ pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/, msg: "Always Starts With Capital Letter"}),
@@ -114,7 +123,7 @@ registerForm: FormGroup;
     data.append('file', files[0])
     //00fb1c6ab7c377f68517
     // data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
-    data.append('UPLOADCARE_PUB_KEY', '00fb1c6ab7c377f68517')
+    data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
     this.http.post('https://upload.uploadcare.com/base/', data).subscribe((events: any) => {
       var json = {events}
       for (var prop in json) {
@@ -163,6 +172,8 @@ registerForm: FormGroup;
         this.productReference.update({
          Stock: parseInt(this.registerForm.value.cellphonenumber),
          UnitPrice: this.registerForm.value.password,
+         ImageUrl: this.photoLink,
+         
         })
     } else {
       if (parseInt(this.registerForm.value.cellphonenumber) > parseInt(this.currentstock)) {
@@ -171,6 +182,8 @@ var totalstocks = parseInt(this.registerForm.value.cellphonenumber) - parseInt(t
         this.productReference.update({
           Stock: parseInt(this.registerForm.value.cellphonenumber),
           UnitPrice: this.registerForm.value.password,
+          ImageUrl: this.photoLink,
+          
          })
               this.afstore.collection('Inventory').add({
         Quantity: totalstocks *  1,
@@ -179,13 +192,16 @@ var totalstocks = parseInt(this.registerForm.value.cellphonenumber) - parseInt(t
         Destination: "Admin",
         ProductName: this.registerForm.value.firstname,
         UnitPrice: this.registerForm.value.password,
-        ImageUrl: this.photoLink
+        ImageUrl: this.photoLink,
+        DatetimeToSort: new Date()
       })
       } else {
         var totalstocks2 = parseInt(this.currentstock) - parseInt(this.registerForm.value.cellphonenumber)
         this.productReference.update({
           Stock: parseInt(this.registerForm.value.cellphonenumber),
           UnitPrice: this.registerForm.value.password,
+          ImageUrl: this.photoLink,
+          
          })
               this.afstore.collection('Inventory').add({
         Quantity: totalstocks2 *  -1,
@@ -194,7 +210,8 @@ var totalstocks = parseInt(this.registerForm.value.cellphonenumber) - parseInt(t
         Destination: "Admin",
         ProductName: this.registerForm.value.firstname,
         UnitPrice: this.registerForm.value.password,
-        ImageUrl: this.photoLink
+        ImageUrl: this.photoLink,
+        DatetimeToSort: new Date()
       })
       }
     }

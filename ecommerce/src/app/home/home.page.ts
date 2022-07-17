@@ -1,4 +1,4 @@
-import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
+import { ApplicationRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { AlertController } from '@ionic/angular';
@@ -9,7 +9,7 @@ import { MessengerService } from '../messenger.service';
 import { fromEvent, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LocationStrategy } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -23,12 +23,16 @@ sub
 productList: any[] = []
 getCartDetails: any = []
 cartItem:number = 0
+@Input()title: string;
+dropdown = false;
+@ViewChild('productbtn', {read: ElementRef}) productbtn: ElementRef;
 private unsubscriber : Subject<void> = new Subject<void>();
   constructor(private msg: MessengerService, private alertCtrl: AlertController, private auth: AuthServiceService,  private afstore: AngularFirestore, private afauth: AngularFireAuth,
     private locationStrategy: LocationStrategy,
     private router: Router,
     private applicationRef: ApplicationRef,
-    private zone: NgZone) {
+    private zone: NgZone,
+    private actRoute: ActivatedRoute) {
 
       router.events.subscribe(() => {
         zone.run(() => {
@@ -41,15 +45,32 @@ private unsubscriber : Subject<void> = new Subject<void>();
     this.afauth.authState.subscribe(user => {
 
       if (user && user.uid) {
-       this.productReference =  afstore.collection('Products')
-       this.sub = this.productReference.snapshotChanges().pipe(map(actions => actions.map(a => {
-        return {
-          id: a.payload.doc.id,
-          ...a.payload.doc.data() as any
+      //  this.productReference =  afstore.collection('Products')
+      //  this.sub = this.productReference.snapshotChanges().pipe(map(actions => actions.map(a => {
+      //   return {
+      //     id: a.payload.doc.id,
+      //     ...a.payload.doc.data() as any
+      //   }
+      //  }))).subscribe(data => {
+      //   this.productList = data
+      //  }) 
+       this.actRoute.queryParams.subscribe(params => {
+        //params.category
+        if (params.category == undefined) {
+          this.productReference =  afstore.collection('Products')
+       
+        } else {
+          this.productReference =  afstore.collection('Products', ref => ref.where("Category", "==", params.category))
         }
-       }))).subscribe(data => {
-        this.productList = data
-       })   
+        this.sub = this.productReference.snapshotChanges().pipe(map(actions => actions.map(a => {
+          return {
+            id: a.payload.doc.id,
+            ...a.payload.doc.data() as any
+          }
+         }))).subscribe(data => {
+          this.productList = data
+         }) 
+       })  
       }
     })
    }
@@ -64,10 +85,10 @@ private unsubscriber : Subject<void> = new Subject<void>();
         }, 0)
       })
     })
-history.pushState(null, null, location.href);
-this.locationStrategy.onPopState(() => {
-  history.pushState(null, null, location.href);
-})
+// history.pushState(null, null, location.href);
+// this.locationStrategy.onPopState(() => {
+//   history.pushState(null, null, location.href);
+// })
 
 var wew = sessionStorage.getItem('cart')
 console.log(wew)
@@ -182,4 +203,19 @@ this.loadCart()
   checkout() {
   this.router.navigateByUrl('/checkout')
   }
+
+  hideDropdown(event) {
+    const xTouch = (event.clientX)
+    const yTouch = (event.clientY)
+    
+    const rec = this.productbtn.nativeElement.getBoundingClientRect();
+    const topBoundary = rec.top+2
+    const leftBoundary = rec.left+2
+    const rightBoundary = rec.right-2
+    
+    if (xTouch < leftBoundary || xTouch > rightBoundary || yTouch < topBoundary) {
+      this.dropdown = false
+    }
+    
+      }
 }

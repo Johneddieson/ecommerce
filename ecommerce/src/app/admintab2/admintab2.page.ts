@@ -47,7 +47,7 @@ export class Admintab2Page implements OnInit {
                 Status: i.Status == "Closed" ? "Approved" : "Cancelled",
                 TotalAmount: i.TotalAmount,
                 id: i.id,
-                DatetimeToSort: moment(i.Datetime).toDate(),
+                DatetimeToSort: i.DatetimeToSort,
                 OrderDetails: i.OrderDetails
               })
             })

@@ -13,18 +13,21 @@
     <h3>Sign In</h3>
     <ion-item lines="none">
       <ion-label position="floating">Email</ion-label>
-      <ion-input [(ngModel)]="Email1" #email type="text" placeholder="Email"></ion-input>
+      <ion-input [disabled]="ishide" [(ngModel)]="Email1" #email type="text" placeholder="Email"></ion-input>
     </ion-item>
     <ion-item lines="none">
       <ion-label position="floating">Password</ion-label>
-      <ion-input [(ngModel)]="Password1" #password type="password" placeholder="password"></ion-input>
+      <ion-input [disabled]="ishide" [(ngModel)]="Password1" #password type="password" placeholder="password"></ion-input>
     </ion-item>
     
-    <ion-button (click)="LogIn(email, password)">Sign In</ion-button>
+    <ion-button *ngIf="!ishide" (click)="LogIn(email, password)">Sign In</ion-button>
+    <ion-button *ngIf="ishide && isthisadmin" (click)="navigateadmin()">Continue as Admin</ion-button>
+    <ion-button *ngIf="ishide && !isthisadmin" (click)="navigatecustomer()">Continue as Cutomer</ion-button>
+    <ion-button *ngIf="!ishide" color="warning"  (click)="ResetPassword()">Reset Password</ion-button>
   </div>
 </ion-content>
 
-<ion-footer>
+<ion-footer *ngIf="!ishide">
   <div id="clickable" class="text"(click)="gotosignup()">
 Create an Account Instead
   </div>

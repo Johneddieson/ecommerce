@@ -193,7 +193,8 @@ OrderNow() {
               BillingIndexId: this.myInformation.Uid,
               Status: 'Open',
               Datetime: datetime,
-              TotalAmount: parseFloat(this.total.toString()).toFixed(2)
+              TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+              DatetimeToSort: new Date()
             }).then(el => {
             }).catch(err => {
             })

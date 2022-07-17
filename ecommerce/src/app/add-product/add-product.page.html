@@ -26,7 +26,14 @@
   <div class="form">
     <ion-input class="uploadfile"  type="file" #inputFile (change)="fileChanged($event)" accept="image/*"></ion-input>
     <form [formGroup]="registerForm"  (ngSubmit)="submit()" novalidate>
-      
+      <ion-item lines="none">
+        <ion-label>Category</ion-label>
+        <ion-select formControlName="category">
+          <ion-select-option  value="Milktea">Milk Tea</ion-select-option>
+          <ion-select-option value="Fruit tea">Fruit Tea</ion-select-option>
+          <ion-select-option value="Slushee">Slushee</ion-select-option>
+        </ion-select>
+      </ion-item>
       <ion-item lines="none">
         <ion-input  placeholder="Enter product name" formControlName="firstname"></ion-input>
       </ion-item>

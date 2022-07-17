@@ -16,6 +16,9 @@ export class LoginPage implements OnInit {
   private unsubscriber : Subject<void> = new Subject<void>();
   Email1: any;
   Password1: any;
+  ishide = false;
+  continueAsCustomer
+  isthisadmin = false
   constructor(private navCtrl: NavController,private auth: AuthServiceService, 
     private afstore: AngularFirestore,
     private afauth: AngularFireAuth,private loadingCtrl: LoadingController,
@@ -23,28 +26,77 @@ export class LoginPage implements OnInit {
     private applicationRef: ApplicationRef,
     private zone: NgZone
     ) {
-      // router.events.subscribe(() => {
-      //   zone.run(() => {
-      //     setTimeout(() => {
-      //       this.applicationRef.tick()
-      //     this.afauth.authState.subscribe(data => {
-      //    if (data.displayName == "admin") {
-      //     router.navigateByUrl('/adminpage')
-      //    } else {
-
-      //    }
-      //   })
-      //     }, 0)
-      //   })
-      // })
+      
         
     }
 
   ngOnInit() {
  
-    
+    this.router.events.subscribe(() => {
+      this.zone.run(() => {
+        setTimeout(() => {
+          this.applicationRef.tick()
+            var thesession = JSON.parse(sessionStorage.getItem('user'))
+            console.log("current user", thesession)
+            if (thesession != null) {
+              this.ishide = true
+              if (thesession.displayName == "customer") {
+                this.continueAsCustomer = `CONTINUE AS ${thesession.displayName.toUpperCase()}`
+                this.isthisadmin = false
+
+              } else {
+                this.continueAsCustomer = `CONTINUE AS ${thesession.displayName.toUpperCase()}`
+                this.isthisadmin = true
+
+              }
+            } else {
+              this.ishide = false
+            }
+           
+        }, 0)
+      })
+    })
   }
- 
+  ResetPassword() {
+this.alertCtrl.create({
+  header: 'Reset Password',
+  inputs: [
+    {
+      name: 'Email',
+      placeholder: 'Please type your email',
+      type: 'email'
+    }
+  ],
+  buttons: [
+    {
+      text: 'Ok',
+      handler: (data) => {
+        console.log("hahaha", data)
+        this.auth.ForgotPassword(data.Email)
+        .then(success => {
+          this.alertCtrl.create({
+            header: 'Success',
+            message: 'The reset password code has been sent to your email'
+          }).then(els => {
+            els.present()
+          })
+        }).catch(error => {
+          this.alertCtrl.create({
+            header: 'Error',
+            message: "Email not found"
+          }).then(els2 => {
+            els2.present()
+          })
+        })
+      }
+    }
+  ]
+}).then(El => {
+  El.present()
+})
+
+   
+  }
   LogIn(email, password) {
     this.auth.SignIn(email.value, password.value).then((res => {
       
@@ -68,6 +120,12 @@ export class LoginPage implements OnInit {
           el.present()
         })
     })
+  }
+  navigateadmin() {
+    this.router.navigateByUrl('adminpage')
+  }
+  navigatecustomer() {
+    this.router.navigateByUrl('tabs')
   }
 
   gotosignup() {

@@ -17,10 +17,10 @@ export class AdminpagePage implements OnInit {
 
   ngOnInit() {
   
-    history.pushState(null, null, location.href);
-    this.locationStrategy.onPopState(() => {
-      history.pushState(null, null, location.href);
-    })
+    // history.pushState(null, null, location.href);
+    // this.locationStrategy.onPopState(() => {
+    //   history.pushState(null, null, location.href);
+    // })
 }
 
 approveOrder(data) {
