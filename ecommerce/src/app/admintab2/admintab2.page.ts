@@ -63,4 +63,65 @@ export class Admintab2Page implements OnInit {
   ngOnInit() {
   }
 
+
+  addproduct() {
+    this.alertCtrl.create({
+      header: 'Choose',
+      inputs: [
+        {
+          type: 'radio',
+          label: 'POS',
+          value: 'POS'
+
+        },
+        {
+          type: 'radio',
+          label: 'View Products',
+          value: 'View Products'
+
+        },
+        {
+          type: 'radio',
+          label: 'Add Product',
+          value: 'Add Product'
+
+        },
+        // {
+        //   type: 'radio',
+        //   label: 'Edit Information',
+        //   value: 'Edit Information'
+
+        // },
+        {
+          type: 'radio',
+          label: 'Change Password',
+          value: 'Change Password'
+
+        },
+      ],
+      buttons: [
+        {
+          text: 'Go',
+          handler: data => {
+            console.log("data", data)
+            if (data == "View Products") {
+              this.router.navigateByUrl('/viewproducts')  
+            } else if (data == "Add Product") {
+
+              this.router.navigateByUrl('/add-product')
+            } else if (data == "POS") {
+              this.router.navigateByUrl('/createpos')
+            }
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    }).then(el => {
+      el.present()
+    })
+  }
+
 }

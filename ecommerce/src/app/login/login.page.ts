@@ -37,7 +37,6 @@ export class LoginPage implements OnInit {
         setTimeout(() => {
           this.applicationRef.tick()
             var thesession = JSON.parse(sessionStorage.getItem('user'))
-            console.log("current user", thesession)
             if (thesession != null) {
               this.ishide = true
               if (thesession.displayName == "customer") {
