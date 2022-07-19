@@ -4,6 +4,8 @@ import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument 
 import { map } from 'rxjs/operators';
 import * as moment from 'moment';
 import { RSA_PKCS1_OAEP_PADDING } from 'constants';
+import { AlertController } from '@ionic/angular';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-admintab3',
   templateUrl: './admintab3.page.html',
@@ -19,7 +21,9 @@ inventoryList: any[] = []
 inventoryList2: any[] = []
 productObject 
   constructor(private afauth: AngularFireAuth,
-    private afstore: AngularFirestore) {
+    private afstore: AngularFirestore,
+    private alertCtrl: AlertController,
+    private router: Router) {
       this.afauth.authState.subscribe(data => {
         if (data && data.uid) {
           
@@ -63,5 +67,63 @@ this.inventoryList = data
 
   ngOnInit() {
   }
+  addproduct() {
+    this.alertCtrl.create({
+      header: 'Choose',
+      inputs: [
+        {
+          type: 'radio',
+          label: 'POS',
+          value: 'POS'
 
+        },
+        {
+          type: 'radio',
+          label: 'View Products',
+          value: 'View Products'
+
+        },
+        {
+          type: 'radio',
+          label: 'Add Product',
+          value: 'Add Product'
+
+        },
+        // {
+        //   type: 'radio',
+        //   label: 'Edit Information',
+        //   value: 'Edit Information'
+
+        // },
+        {
+          type: 'radio',
+          label: 'Change Password',
+          value: 'Change Password'
+
+        },
+      ],
+      buttons: [
+        {
+          text: 'Go',
+          handler: data => {
+            console.log("data", data)
+            if (data == "View Products") {
+              this.router.navigateByUrl('/viewproducts')  
+            } else if (data == "Add Product") {
+
+              this.router.navigateByUrl('/add-product')
+            } else if (data == "POS") {
+              this.router.navigateByUrl('/createpos')
+            }
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        }
+      ]
+    }).then(el => {
+      el.present()
+    })
+  }
 }

@@ -61,6 +61,11 @@ const routes: Routes = [
     loadChildren: () => import('./editproduct/editproduct.module').then( m => m.EditproductPageModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'createpos',
+    loadChildren: () => import('./createpos/createpos.module').then( m => m.CreateposPageModule),
+    canActivate: [AuthGuard]
+  },
   // {
   //   path: 'changepassword',
   //   loadChildren: () => import('./changepassword/changepassword.module').then( m => m.ChangepasswordPageModule)

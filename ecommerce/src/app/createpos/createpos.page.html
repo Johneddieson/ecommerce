@@ -1,0 +1,56 @@
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+<ion-header class="ion-no-border">
+	<ion-toolbar>
+    <div class="back-circle"></div>
+		<ion-title class="ion-text-center custom-font">POS</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen="true">
+
+
+<div class="ion-padding">
+
+  <form class="ion-padding" [formGroup]="registerForm"  (ngSubmit)="submit()" novalidate>
+
+    <div class="wrap-input">
+    <input formControlName="firstname" class="input" type="text" name="user-firstname" placeholder="First Name">
+    </div>
+    <ion-text type="text" color="danger" *ngIf="registerForm.get('firstname').hasError('required') && registerForm.get('firstname').touched">
+      First name shouldn't be empty 
+     </ion-text>
+     <div *ngIf="!registerForm.controls.firstname.valid && (registerForm.controls.firstname.dirty ||registerForm.controls.firstname.touched)" class="error">
+       <ion-text color="danger" *ngIf="registerForm.controls.firstname.errors.invalidMsg">
+         {{registerForm.controls.firstname.errors.invalidMsg}}
+       </ion-text>
+     </div>
+        <br>
+    
+     <div class="wrap-input">
+    <input class="input" type="text" name="user-middlename" placeholder="Middle Name">
+    </div> 
+
+    <div class="wrap-input">
+    <input class="input" type="text" name="user-lastname" placeholder="Last Name">
+    </div>  
+
+    <div class="container-form-btn">
+      <button [hidden]="registerForm.invalid" class="form-btn custom-font">
+        proceed for choosing products
+      </button>
+      
+    </div>   
+
+
+  </form>
+
+</div>
+
+</ion-content>
+
+<!-- <ion-footer class="ion-no-border">
+	<ion-toolbar>
+		<p class="ion-text-center custom-font">D Mixologist <a  href="">Sign In</a></p>
+	</ion-toolbar>
+</ion-footer> -->

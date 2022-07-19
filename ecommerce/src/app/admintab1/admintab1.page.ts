@@ -111,7 +111,7 @@ export class Admintab1Page implements OnInit {
 
               this.router.navigateByUrl('/add-product')
             } else if (data == "POS") {
-              
+              this.router.navigateByUrl('/createpos')
             }
           }
         },
