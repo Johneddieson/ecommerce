@@ -33,7 +33,7 @@
     <form [formGroup]="registerForm"  (ngSubmit)="submit()" novalidate>
       
       <ion-item lines="none">
-        <ion-input disabled  placeholder="Enter product name" formControlName="firstname" [(ngModel)]="productname"></ion-input>
+        <ion-input [disabled]="!isdisabled"  placeholder="Enter product name" formControlName="firstname" [(ngModel)]="productname"></ion-input>
       </ion-item>
       <ion-text type="text" color="danger" *ngIf="registerForm.get('firstname').hasError('required') && registerForm.get('firstname').touched">
         Product Name shouldn't be empty 

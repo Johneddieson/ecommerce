@@ -1,4 +1,4 @@
-
+<!-- 
 <ion-content>
   <div class="wrapper">
     <h3>Sign Up</h3>
@@ -44,4 +44,49 @@
   <div id="clickable" class="text"(click)="gotosignin()">
 Already a member? Sign In
   </div>
-</ion-footer>
+</ion-footer> -->
+
+
+
+
+<ion-content>
+  <head>
+   <meta charset="utf-8">
+   <link rel="stylesheet" href="style.css">
+ </head>
+ <body>
+   <div class="center">
+     <h1>Sign Up</h1>
+     <h5 [hidden]="ishide" >Already a member? <a class="link" (click)="gotosignin()">Sign In</a></h5>
+     <form method="post">
+       <div class="txt_field">
+         <input type="text" [disabled]="ishide"  [(ngModel)]="Email1" required [ngModelOptions]="{standalone: true}"  #email>
+         <span></span>
+         <label>Email</label>
+       </div>
+       <div class="txt_field">
+         <input type="password" [disabled]="ishide" [(ngModel)]="Password1" required [ngModelOptions]="{standalone: true}" #password>
+         <span></span>
+         <label>Password</label>
+       </div>
+       <div *ngIf="!ishide" class="pass" (click)="ResetPassword()">Forgot Password?</div>
+       <button class="button" *ngIf="!ishide" (click)="SignUp()">Sign Up</button>
+       <button class="button" *ngIf="ishide && isthisadmin" (click)="navigateadmin()"  >Continue as Admin</button>
+       <button class="button" *ngIf="ishide && !isthisadmin" (click)="navigatecustomer()" >Continue as Customer</button>
+     
+     
+       <div class="signup_link">
+         <!-- Not a member? <a href="#">Signup</a> -->
+       </div>
+
+       
+     </form>
+   </div>
+
+ </body>
+</ion-content>
+
+
+
+
+

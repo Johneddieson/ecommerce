@@ -8,6 +8,8 @@ import { AlertController, IonAccordionGroup } from '@ionic/angular';
 import { CurrencyPipe } from '@angular/common';
 import * as firebase from 'firebase/app'
 import { Button } from 'protractor';
+import { Action } from 'rxjs/internal/scheduler/Action';
+import { isSymbol } from 'util';
 @Component({
   selector: 'app-admintab1',
   templateUrl: './admintab1.page.html',
@@ -17,8 +19,11 @@ export class Admintab1Page implements OnInit {
   @ViewChild(IonAccordionGroup) accordionGroup: IonAccordionGroup;
 
   productReference: AngularFirestoreCollection
+  currentProductStockReference: AngularFirestoreCollection
   sub
+  sub2
   allPendingOrders: any[] = []
+  currentStock: any[] = []
   constructor(private afstore: AngularFirestore, private afauth: AngularFireAuth,
     private router: Router,
     private currencyPipe: CurrencyPipe,
@@ -34,8 +39,10 @@ export class Admintab1Page implements OnInit {
               ...a.payload.doc.data() as any
             }
           }))).subscribe(data => {
-
-            console.log("all orders", data)
+            console.log("orders", data)  
+            // data.forEach(fe => {
+            //     this.allPendingOrdersWithoutRealtimeStock = fe.OrderDetails
+            //   })
 
             data = data.map((i, index) => {
               return Object.assign({
@@ -56,9 +63,53 @@ export class Admintab1Page implements OnInit {
             })
             data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
 
-            console.log("the data", data)
-            this.allPendingOrders = data
+
+           this.allPendingOrders = data
+          // this.allPendingOrdersWithoutRealtimeStock = data
+           
+         //     console.log("sdasda", this.allPendingOrdersWithoutRealtimeStock.map(function (e) {return e.OrderDetails}))
+
           })
+
+          // this.currentProductStockReference = this.afstore.collection('Products')
+
+          // this.sub2 = this.currentProductStockReference.snapshotChanges().pipe(
+          //   map(actions => actions.map(a => {
+          //     return {
+          //       id: a.payload.doc.id,
+          //       ...a.payload.doc.data() as any
+          //     }
+          //   }))
+          // ).subscribe(data => {
+          //   console.log("Current Stock", data)
+          
+          //   const mergeById = (array1, array2) =>
+          //   array1.map(itm => ({
+          //       ...Object.assign({}, itm, {
+          //        Stock: array2.find((item) => (item.id === itm.id) && item).Stock,
+          //        BillingAddress1: itm.BillingAddress1,
+          //        BillingAddress2: itm.BillingAddress2,
+          //        BillingFirstname: itm.BillingFirstname,
+          //        BillingIndexId: itm.BillingIndexId,
+          //        BillingLastname: itm.BillingLastname,
+          //        BillingPhonenumber: itm.BillingPhonenumber,
+          //        Billingemail: itm.Billingemail,
+          //        Datetime: itm.Datetime,
+          //        Status: itm.Status,
+          //        TotalAmount: itm.TotalAmount,
+          //        id: itm.id,
+          //        DatetimeToSort: itm.DatetimeToSort,
+          //        OrderDetails: itm.OrderDetails
+                
+          //      })
+          //   }));
+
+          //  var results = mergeById(this.allPendingOrdersWithoutRealtimeStock.map(function (e) {return e.OrderDetails}), data)
+          //  console.log("bobo ka naman pre", results)
+          // //  this.allPendingOrders = results
+          // })
+
+
       }
     })
   }
@@ -93,12 +144,12 @@ export class Admintab1Page implements OnInit {
         //   value: 'Edit Information'
 
         // },
-        {
-          type: 'radio',
-          label: 'Change Password',
-          value: 'Change Password'
+        // {
+        //   type: 'radio',
+        //   label: 'Change Password',
+        //   value: 'Change Password'
 
-        },
+        // },
       ],
       buttons: [
         {
@@ -134,103 +185,136 @@ export class Admintab1Page implements OnInit {
   }
   
   approveOrder(data) {
+this.currentProductStockReference = this.afstore.collection('Products')
 
-    this.alertCtrl.create({
-      header: 'Question',
-      message: 'Are you sure you want to approve this order?',
-      buttons: [
-        {
-          text: 'Yes',
-          handler: () => {
-            var datetime = moment(new Date()).format("DD-MM-YYYY hh:mm A")
+          this.sub2 = this.currentProductStockReference.snapshotChanges().pipe(
+            map(actions => actions.map(a => {
+              return {
+                id: a.payload.doc.id,
+                ...a.payload.doc.data() as any
+              }
+            }))
+          ).subscribe(dataCurrentStock => {
+             const mergeById = (array1, array2) =>
+             array2.map(itm => ({
+                ...Object.assign({}, itm, {
+                 //Stock: array2.find((item) => (item.id === itm.id) && item).Stock,
+                 Stock: array1.find((item) => (item.id === itm.id) && item).Stock,
+                 Category: itm.Category,
+                 ImageUrl: itm.ImageUrl,
+                 ProductName: itm.ProductName,
+                 Quantity: itm.Quantity,
+                 UnitPrice: itm.UnitPrice,
+                 id: itm.id                
+               })
+            }));
 
-            //Update order to Closed
-            this.afstore.doc(`Orders/${data.id}`).update({
-              Status: 'Closed'
-            })
+           var results = mergeById(dataCurrentStock, data.OrderDetails)
+            this.currentStock = results
+            
+        })
 
-            //User Notification Approved
-
-            var totalAmount = this.currencyPipe.transform(data.TotalAmount, "", "").split('0.00')[0]
-            var items = data.OrderDetails.map(function (e) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
-            var confirmed = `Your order has been confirmed by the admin. ${items}. Total amount of ₱${totalAmount}`
-            this.afstore.collection(`users/${data.BillingIndexId}/notifications`).add({
-              Message: confirmed,
-              Datetime: datetime,
-              read: false,
-              remarks: "Your order has been confirmed",
-              DatetimeToSort: new Date()
-            })
-
-            //Decreasing Stocks
-            data.OrderDetails.forEach(fe => {
-              //console.log("order details", fe)
-              this.afstore.doc(`Products/${fe.id}`).update({
-                Stock: firebase.default.firestore.FieldValue.increment(-fe.Quantity)
-              })
-            })
-
-            //Inventory Saving
-
-            data.OrderDetails.forEach(fe => {
-              this.afstore.collection('Inventory').add({
-                Quantity: parseInt(fe.Quantity) * -1,
-                Datetime: datetime,
-                read: false,
-                Destination: data.BillingFirstname + " " + data.BillingLastname,
-                ProductName: fe.ProductName,
-                UnitPrice: fe.UnitPrice,
-                ImageUrl: fe.ImageUrl,
-                DatetimeToSort: new Date()
-              })
-            })
-
-            //History Saving
-            this.afstore.collection('History').add({
-              BillingAddress1: data.BillingAddress1,
-              BillingAddress2: data.BillingAddress2,
-              BillingFirstname: data.BillingFirstname,
-              BillingIndexId: data.BillingIndexId,
-              BillingLastname: data.BillingLastname,
-              BillingPhonenumber: data.BillingPhonenumber,
-              Billingemail: data.Billingemail,
-              Datetime: data.Datetime,
-              Status: "Closed",
-              TotalAmount: data.TotalAmount,
-              id: data.id,
-              OrderDetails: data.OrderDetails,
-              read: false,
-              DatetimeToSort: new Date()
-            })
-            this.alertCtrl.create({
-              header: 'Success',
-              message: 'This order approved successfully',
-              buttons: [
-                {
-                  text: 'Ok',
-                  role: 'cancel'
+        this.alertCtrl.create({
+          header: 'Question',
+          message: 'Are you sure you want to approve this order?',
+          buttons: [
+            {
+              text: 'Yes',
+              handler: () => {
+                var filterGreaterThanStock = this.currentStock.filter(f => f.Quantity > f.Stock)   
+                if (filterGreaterThanStock.length > 0) {
+    
+                  alert(`Insufficient Stock: \n  ${filterGreaterThanStock.map(function (e) { return `${e.ProductName} > ${e.Stock} current stock \n` }).join('\n')}`);
+                } else {
+                  var datetime = moment(new Date()).format("DD-MM-YYYY hh:mm A")
+    
+                  //Update order to Closed
+                  this.afstore.doc(`Orders/${data.id}`).update({
+                    Status: 'Closed'
+                  })
+      
+                  //User Notification Approved
+      
+                  var totalAmount = this.currencyPipe.transform(data.TotalAmount, "", "")
+                  var items = data.OrderDetails.map(function (e) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
+                  var confirmed = `Your order has been confirmed by the admin. ${items}. Total amount of ₱${totalAmount}`
+                  this.afstore.collection(`users/${data.BillingIndexId}/notifications`).add({
+                    Message: confirmed,
+                    Datetime: datetime,
+                    read: false,
+                    remarks: "Your order has been confirmed",
+                    DatetimeToSort: new Date()
+                  })
+      
+                  //Decreasing Stocks
+                  data.OrderDetails.forEach(fe => {
+                    //console.log("order details", fe)
+                    this.afstore.doc(`Products/${fe.id}`).update({
+                      Stock: firebase.default.firestore.FieldValue.increment(-fe.Quantity)
+                    })
+                  })
+      
+                  //Inventory Saving
+      
+                  data.OrderDetails.forEach(fe => {
+                    this.afstore.collection('Inventory').add({
+                      Quantity: parseInt(fe.Quantity) * -1,
+                      Datetime: datetime,
+                      read: false,
+                      Destination: data.BillingFirstname + " " + data.BillingLastname,
+                      ProductName: fe.ProductName,
+                      UnitPrice: fe.UnitPrice,
+                      ImageUrl: fe.ImageUrl,
+                      DatetimeToSort: new Date()
+                    })
+                  })
+      
+                  //History Saving
+                  this.afstore.collection('History').add({
+                    BillingAddress1: data.BillingAddress1,
+                    BillingAddress2: data.BillingAddress2,
+                    BillingFirstname: data.BillingFirstname,
+                    BillingIndexId: data.BillingIndexId,
+                    BillingLastname: data.BillingLastname,
+                    BillingPhonenumber: data.BillingPhonenumber,
+                    Billingemail: data.Billingemail,
+                    Datetime: data.Datetime,
+                    Status: "Closed",
+                    TotalAmount: data.TotalAmount,
+                    id: data.id,
+                    OrderDetails: data.OrderDetails,
+                    read: false,
+                    DatetimeToSort: new Date()
+                  })
+                  this.alertCtrl.create({
+                    header: 'Success',
+                    message: 'This order approved successfully',
+                    buttons: [
+                      {
+                        text: 'Ok',
+                        role: 'cancel'
+                      }
+                    ]
+      
+                  }).then(els2 => {
+                    els2.present()
+                  })
+    
                 }
-              ]
-
-            }).then(els2 => {
-              els2.present()
-            })
-          }
-        },
-        {
-          text: 'No',
-          role: 'cancel'
-        }
-      ]
-
-    }).then(firstalert => {
-      firstalert.present()
-
-
-    })
-
-
-
+               
+              }
+            },
+            {
+              text: 'No',
+              role: 'cancel'
+            }
+          ]
+    
+        }).then(firstalert => {
+          firstalert.present()
+    
+    
+        })
   }
   cancelOrder(data) {
     this.alertCtrl.create({
@@ -265,7 +349,7 @@ export class Admintab1Page implements OnInit {
 
                     //User Notification Approved
 
-                    var totalAmount = this.currencyPipe.transform(data.TotalAmount, "", "").split('0.00')[0]
+                    var totalAmount = this.currencyPipe.transform(data.TotalAmount, "", "")
                     var items = data.OrderDetails.map(function (e) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
                     var confirmed = `Your order has been declined by the admin. ${items}. Total amount of ₱${totalAmount}`
                     this.afstore.collection(`users/${data.BillingIndexId}/notifications`).add({

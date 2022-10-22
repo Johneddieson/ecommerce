@@ -1,0 +1,40 @@
+
+
+<ion-content>
+  <ion-item button routerLink="/tabs/product"  (click)="popoverdismiss()"  routerDirection="root"  lines="none">
+    All
+  </ion-item>
+  <ion-item button routerLink="/tabs/product" (click)="popoverdismiss()"    [queryParams]="{category: 'Milktea'}" lines="none"
+  routerDirection="root">
+  Milktea
+  </ion-item>
+  <ion-item button routerLink="/tabs/product"  (click)="popoverdismiss()"   [queryParams]="{category: 'Fruit tea'}" lines="none"
+  routerDirection="root">
+  Fruit Tea
+  </ion-item>
+  <ion-item button routerLink="/tabs/product"  (click)="popoverdismiss()"  [queryParams]="{category: 'Slushee'}" lines="none"
+  routerDirection="root">
+  Slushee
+  </ion-item>
+  <ion-item button   (click)="popoverdismiss()" lines="none"
+  routerDirection="root">
+  Cancel
+  </ion-item>
+  <!-- <div  class="dropdown">
+    <ion-item button routerLink="/tabs/product"  (click)="dropdown = false"  routerDirection="root"  lines="none">
+      All
+    </ion-item>
+    <ion-item button routerLink="/tabs/product"  (click)="dropdown = false"  [queryParams]="{category: 'Milktea'}" lines="none"
+    routerDirection="root">
+    Milktea
+    </ion-item>
+    <ion-item button routerLink="/tabs/product"  (click)="dropdown = false"  [queryParams]="{category: 'Fruit tea'}" lines="none"
+    routerDirection="root">
+    Fruit Tea
+    </ion-item>
+    <ion-item button routerLink="/tabs/product" (click)="dropdown = false"  [queryParams]="{category: 'Slushee'}" lines="none"
+    routerDirection="root">
+    Slushee
+    </ion-item>
+  </div> -->
+</ion-content>
