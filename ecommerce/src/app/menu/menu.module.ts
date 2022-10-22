@@ -8,6 +8,7 @@ import { MenuPageRoutingModule } from './menu-routing.module';
 
 import { MenuPage } from './menu.page';
 import { SharedComponentsModule } from '../components/shared-components.module';
+import { CategoryPageModule } from '../category/category.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,7 @@ import { SharedComponentsModule } from '../components/shared-components.module';
     FormsModule,
     IonicModule,
     MenuPageRoutingModule,
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
   declarations: [MenuPage]
 })

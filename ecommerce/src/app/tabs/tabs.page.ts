@@ -54,11 +54,8 @@ notifCounts = 0
             })
             data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
             this.notificationsList = data
-
-            console.log("wewewew", this.notificationsList)
             var filterOnlyNotRead = data.filter(f => f.read != true)
               this.notifCounts = filterOnlyNotRead.length
-              console.log("count", this.notifCounts)
           })
       }
     })

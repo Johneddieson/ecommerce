@@ -6,7 +6,7 @@ import { AuthGuard } from './auth.guard';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/login',
+    redirectTo: '/mainpage',
     pathMatch: 'full',
   },
 
@@ -65,6 +65,20 @@ const routes: Routes = [
     path: 'createpos',
     loadChildren: () => import('./createpos/createpos.module').then( m => m.CreateposPageModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'category',
+    loadChildren: () => import('./category/category.module').then( m => m.CategoryPageModule)
+  },
+  {
+    path: 'admincheckout',
+    loadChildren: () => import('./admincheckout/admincheckout.module').then( m => m.AdmincheckoutPageModule),
+    canActivate: [AuthGuard]
+  },
+
+  {
+    path: 'mainpage',
+    loadChildren: () => import('./mainpage/mainpage.module').then( m => m.MainpagePageModule)
   },
   // {
   //   path: 'changepassword',

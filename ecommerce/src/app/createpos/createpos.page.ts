@@ -1,8 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { LocationStrategy } from '@angular/common';
+import { ThrowStmt } from '@angular/compiler';
+import { ApplicationRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AuthServiceService } from '../auth-service.service';
+import { MessengerService } from '../messenger.service';
 
 @Component({
   selector: 'app-createpos',
@@ -10,44 +17,206 @@ import { LoadingController, AlertController } from '@ionic/angular';
   styleUrls: ['./createpos.page.scss'],
 })
 export class CreateposPage implements OnInit {
-  registerForm: FormGroup;
-  photoLink: any
-  withPhoto: boolean = false
-  constructor(private afstore: AngularFirestore, private afauth: AngularFireAuth,
-    public formBuilder: FormBuilder, public loadingCtrl: LoadingController, public alertCtrl: AlertController,) {
-    this.afauth.authState.subscribe(user => {
-      if (user && user.uid) {
+  numbers = 0;
+showLog = false
+productReference: AngularFirestoreCollection
+sub
+productList: any[] = []
+getCartDetails: any = []
+cartItem:number = 0
+@Input()title: string;
+dropdown = false;
+@ViewChild('productbtn', {read: ElementRef}) productbtn: ElementRef;
+private unsubscriber : Subject<void> = new Subject<void>();
+  constructor(private msg: MessengerService, private alertCtrl: AlertController, private auth: AuthServiceService,  private afstore: AngularFirestore, private afauth: AngularFireAuth,
+    private locationStrategy: LocationStrategy,
+    private router: Router,
+    private applicationRef: ApplicationRef,
+    private zone: NgZone,
+    private actRoute: ActivatedRoute) {
 
+      router.events.subscribe(() => {
+        zone.run(() => {
+          setTimeout(() => {
+            this.applicationRef.tick()
+            this.loadCart()
+          }, 0)
+        })
+      })
+    this.afauth.authState.subscribe(user => {
+
+      if (user && user.uid) {
+      //  this.productReference =  afstore.collection('Products')
+      //  this.sub = this.productReference.snapshotChanges().pipe(map(actions => actions.map(a => {
+      //   return {
+      //     id: a.payload.doc.id,
+      //     ...a.payload.doc.data() as any
+      //   }
+      //  }))).subscribe(data => {
+      //   this.productList = data
+      //  }) 
+       this.actRoute.queryParams.subscribe(params => {
+        //params.category
+        if (params.category == undefined) {
+          this.productReference =  afstore.collection('Products')
+       
+        } else {
+          this.productReference =  afstore.collection('Products', ref => ref.where("Category", "==", params.category))
+        }
+        this.sub = this.productReference.snapshotChanges().pipe(map(actions => actions.map(a => {
+          return {
+            id: a.payload.doc.id,
+            ...a.payload.doc.data() as any
+          }
+         }))).subscribe(data => {
+          this.productList = data
+         }) 
+       })  
       }
     })
    }
 
-  ngOnInit() {
-    this.photoLink = 'https://static.wikia.nocookie.net/otonari-no-tenshi/images/c/c9/No_images_available.jpg/revision/latest?cb=20220104141308'
-    this.registerForm = new FormGroup({
-      
-      firstname: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({ pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/, msg: "Always Starts With Capital Letter"}),
-        this.customPatternValid({ pattern: /^([^0-9]*)$/, msg: 'Numbers is not allowed' }),
-        //Validators.minLength(5),
-        // Validators.maxLength(10),
-      ])
+  ngOnInit(): void {
+    
+    this.router.events.subscribe(() => {
+      this.zone.run(() => {
+        setTimeout(() => {
+          this.applicationRef.tick()
+          this.loadCart()
+        }, 0)
+      })
     })
+// history.pushState(null, null, location.href);
+// this.locationStrategy.onPopState(() => {
+//   history.pushState(null, null, location.href);
+// })
+
+var wew = sessionStorage.getItem('cart')
+console.log(wew)
+  }
+  // CartDetails() {
+  //   if (sessionStorage.getItem('cart')) {
+  //     this.getCartDetails = JSON.parse(sessionStorage.getItem('cart'))
+  //     console.log("the cart", this.getCartDetails)
+  //     this.numbers = this.getCartDetails
+  //   }
+  // }
+loadCart() {
+  if (sessionStorage.getItem('cart') != null) {
+var thearray = []
+    thearray.push(JSON.parse(sessionStorage.getItem('cart')))
+    
+   
+    this.numbers = thearray[0].length;
+  } else {
+    this.numbers = 0
+  } 
+}
+  Increase(data) {
+    localStorage.removeItem('cart')
+    data.Quantity +=1
+  this.loadCart()
+  }
+  Decrease(data) {
+    if (data.Quantity == 1) {
+      this.alertCtrl.create({
+        message: 'Quantity should not be zero',
+        buttons: [
+          {
+            text: 'Ok',
+            role: 'cancel'
+          }
+        ]
+      }).then(el => {
+        el.present()
+        this.loadCart()
+      })
+    } else {
+      data.Quantity -= 1
+this.loadCart()
+    }
+  }
+  
+  itemsCart: any = []
+  AddtoCart(data) {
+      if (data.Quantity > data.Stock) {
+        this.alertCtrl.create({
+          message: 'The quantity order should not be greater than the stock available',
+          buttons: [
+            {
+              text: 'Ok',
+              role: 'cancel'
+            }
+          ]
+        }).then(el => {
+          el.present()
+          data.Quantity = 1
+        })
+      } else {
+
+      
+    var cartData = sessionStorage.getItem('cart')
+    if (cartData == null) {
+      var theid = data.id
+      let index: number = -1
+      let storageDataGet: any = []
+        storageDataGet.push(data)
+        sessionStorage.setItem('cart', JSON.stringify(storageDataGet)) 
+       
+        data.Quantity = 1
+    } else {
+      var id = data.id
+      let index: number = -1
+
+      this.itemsCart = JSON.parse(sessionStorage.getItem('cart'))
+      for (let i= 0; i<this.itemsCart.length; i++) {
+        if (id == this.itemsCart[i].id) {
+          this.itemsCart[i].Quantity = data.Quantity
+          data.Quantity = 1
+          index = i;
+          break;
+        }
+      }
+    
+      if (index == -1) {
+          this.itemsCart.push(data)
+          
+          sessionStorage.setItem('cart', JSON.stringify(this.itemsCart))
+          
+          data.Quantity = 1
+      } else {
+        sessionStorage.setItem('cart', JSON.stringify(this.itemsCart))
+       
+        data.Quantity = 1
+      }
+    this.cartItemFunc()
+   
+    }
+    this.loadCart()
+  }
+}
+  cartItemFunc() {
+    var cartValue = JSON.parse(sessionStorage.getItem('cart')) 
+      this.cartItem = cartValue.length
+    this.msg.cartSubject.next(this.cartItem)
+  
+  }
+  checkout() {
+  this.router.navigateByUrl('/admincheckout')
   }
 
-  customPatternValid(config: any): ValidatorFn {
-    console.log("wew", config)
-    return (control: FormControl) => {
-      let urlRegeX: RegExp = config.pattern;
-      if (control.value && !control.value.match(urlRegeX)) {
-        return {
-          invalidMsg: config.msg
-        };
-      } else {
-        return null
-      }
+  hideDropdown(event) {
+    const xTouch = (event.clientX)
+    const yTouch = (event.clientY)
+    
+    const rec = this.productbtn.nativeElement.getBoundingClientRect();
+    const topBoundary = rec.top+2
+    const leftBoundary = rec.left+2
+    const rightBoundary = rec.right-2
+    
+    if (xTouch < leftBoundary || xTouch > rightBoundary || yTouch < topBoundary) {
+      this.dropdown = false
     }
+    
       }
-
 }

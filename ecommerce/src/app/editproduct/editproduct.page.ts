@@ -25,6 +25,7 @@ registerForm: FormGroup;
   @ViewChild(IonInput) myInputVariable: IonInput;
  productReference: AngularFirestoreDocument
  sub;
+ isdisabled : boolean = false
   constructor(private actRoute: ActivatedRoute, public http: HttpClient, public formBuilder: FormBuilder, public loadingCtrl: LoadingController, public alertCtrl: AlertController,
     private afstore: AngularFirestore) {
 
@@ -47,13 +48,13 @@ registerForm: FormGroup;
    ngOnInit() {
   //  this.photoLink = 'https://static.wikia.nocookie.net/otonari-no-tenshi/images/c/c9/No_images_available.jpg/revision/latest?cb=20220104141308'
     this.registerForm = new FormGroup({
-      category: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({ pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/, msg: "Always Starts With Capital Letter"}),
-        this.customPatternValid({ pattern: /^([^0-9]*)$/, msg: 'Numbers is not allowed' }),
-        Validators.minLength(5),
-        // Validators.maxLength(10),
-      ]),
+      // category: new FormControl('', [
+      //   Validators.required,
+      //   this.customPatternValid({ pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/, msg: "Always Starts With Capital Letter"}),
+      //   this.customPatternValid({ pattern: /^([^0-9]*)$/, msg: 'Numbers is not allowed' }),
+      //   Validators.minLength(5),
+      //   // Validators.maxLength(10),
+      // ]),
       firstname: new FormControl('', [
         Validators.required,
         this.customPatternValid({ pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/, msg: "Always Starts With Capital Letter"}),
@@ -122,8 +123,9 @@ registerForm: FormGroup;
     const data = new FormData()
     data.append('file', files[0])
     //00fb1c6ab7c377f68517
-    // data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
-    data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
+    
+    //this for my github account 760e7038539ea9dd5176
+    data.append('UPLOADCARE_PUB_KEY', '2f6b781d802ebb97d2e3')
     this.http.post('https://upload.uploadcare.com/base/', data).subscribe((events: any) => {
       var json = {events}
       for (var prop in json) {

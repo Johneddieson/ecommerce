@@ -13,7 +13,7 @@ const routes: Routes = [
       },
       {
         path: 'tab1',
-        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule)
+        loadChildren: () => import('../home/home.module').then(m => m.HomePageModule)
       },
       {
         path: 'tab2',
@@ -26,7 +26,7 @@ const routes: Routes = [
      
       {
         path: '',
-        redirectTo: '/tabs/product',
+        redirectTo: '/tabs/tab1',
         pathMatch: 'full'
       }
     ]

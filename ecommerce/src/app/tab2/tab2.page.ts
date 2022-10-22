@@ -26,11 +26,11 @@ myid: string
     this.afauth.authState.subscribe(data => {
       if (data && data.uid) {
         this.myid = data.uid
-        if (data.displayName == 'admin') {
-          router.navigateByUrl('adminpage')
-        } else {
-          router.navigateByUrl('tabs')
-        }
+        // if (data.displayName == 'admin') {
+        //   router.navigateByUrl('adminpage')
+        // } else {
+        //   router.navigateByUrl('tabs')
+        // }
 
         this.notificationsReference = this.afstore.collection(`users/${data.uid}/notifications`)
 

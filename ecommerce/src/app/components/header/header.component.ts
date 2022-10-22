@@ -1,5 +1,9 @@
 import { Xtb } from '@angular/compiler';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { AlertController, ModalController, PopoverController } from '@ionic/angular';
+import { CategoryPage } from 'src/app/category/category.page';
+import { DashboardPage } from 'src/app/dashboard/dashboard.page';
 
 @Component({
   selector: 'app-header',
@@ -10,8 +14,12 @@ export class HeaderComponent implements OnInit {
 
 @Input()title: string;
 dropdown = false;
+dropdownmobile = false;
+istrue;
+iconName = "chevron-up"
 @ViewChild('productbtn', {read: ElementRef}) productbtn: ElementRef;
-  constructor() { }
+  constructor(private popover: PopoverController, private alertCtrl: AlertController,
+    private router :Router) { }
 
   ngOnInit() {}
   hideDropdown(event) {
@@ -28,5 +36,52 @@ if (xTouch < leftBoundary || xTouch > rightBoundary || yTouch < topBoundary) {
 }
 
   }
+
+  categories() {
+    this.dropdownmobile = true
+//  this.popover.create({
+//   component: CategoryPage,
+//   backdropDismiss: false
+// }).then(el => {
+//   el.present()
+// })
+
+this.alertCtrl.create({
+  header: 'Choose Category',
+  
+  buttons: [
+    {
+      text: 'All',
+      handler: (data) => {
+      this.router.navigateByUrl('/tabs/product')
+      }
+    },
+    {
+      text: 'Milktea',
+      handler: (data) => {
+        this.router.navigateByUrl('/tabs/product?category=Milktea')
+      }
+    },
+    {
+      text: 'Fruit Tea',
+      handler: (data) => {
+        this.router.navigateByUrl('/tabs/product?category=Fruit tea')
+      }
+    },
+    {
+      text: 'Slushee',
+      handler: (data) => {
+        this.router.navigateByUrl('/tabs/product?category=Slushee')
+      }
+    }
+  ]
+}).then(El => {
+  El.present()
+})
+
+    }
+    async categoriesdown() {
+      this.dropdownmobile = false
+    }
 
 }
