@@ -1,6 +1,10 @@
+
+
 .toolbar {
     height: 84px;
-    --background: #69A03A;
+     --background: #69A03A;
+    // --background:  url('../../assets/milktea4.jpg') no-repeat center center / cover;
+    // background: linear-gradient(120deg,#2980b9, #8e44ad);
     color: #fff;
     font-size: 20px;
     line-height: 84px;
@@ -41,6 +45,8 @@ ion-accordion.accordion-expanded ion-item[slot="header"] {
     --background: #69A03A;
     --color: #fff;
 }
+
+
 // ion-accordion.accordion-expanding [slot="content"],
 // ion-accordion.accordion-expanded [slot="content"] {
 //     --ion-item-background: #0c0254;
