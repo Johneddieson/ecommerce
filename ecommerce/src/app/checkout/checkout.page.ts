@@ -67,7 +67,6 @@ export class CheckoutPage implements OnInit {
   CartDetails() {
     if (sessionStorage.getItem('cart')) {
       this.getCartDetails = JSON.parse(sessionStorage.getItem('cart'))
-      console.log("the cart", this.getCartDetails)
     }
   }
   inc(id, quantity) {
@@ -167,7 +166,7 @@ OrderNow() {
               || !this.myInformation.Address1 || !this.myInformation.Address2 || 
               !this.myInformation.PhoneNumber) {
                 this.alertCtrl.create({
-                  message: 'Oops! There are some of your information that is not identified, Please Edit before we proceed',
+                  message: 'Please fill up about your details first.',
                   buttons: [
                     {
                       text: 'Ok',
@@ -178,6 +177,7 @@ OrderNow() {
                   ]
                 }).then(els2 => {
                   els2.present()
+                 
                 })
               } else {
                 els.present()
@@ -197,6 +197,7 @@ OrderNow() {
               DatetimeToSort: new Date()
             }).then(el => {
             }).catch(err => {
+              alert(err)
             })
             this.removeall()
             
