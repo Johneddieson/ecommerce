@@ -42,13 +42,13 @@
 <ion-grid>
   <ion-row>
     <ion-col>
-    <ion-list>
-      <ion-item *ngFor="let data of productList" lines="none"  class="item-background-color">
+    <ion-list class="bg-transparent">
+      <ion-item *ngFor="let data of productList" class="item-background-color" color="none" lines="none">
         <ion-thumbnail slot="start">
          <img src="{{data.ImageUrl}}" />  
         </ion-thumbnail>
-        <ion-label>
-          <h2>{{data.ProductName}} <span style="float: right; color: #69a03a;">₱ {{data.UnitPrice}}</span>
+        <ion-label style="font-weight: bolder;">
+          <h2 style="font-weight: bolder;">{{data.ProductName}} <span style="float: right; font-weight: bolder;">₱ {{data.UnitPrice}}</span>
           </h2>
           <h3>
             <!-- <ion-icon name="star-outline"></ion-icon>
@@ -56,7 +56,7 @@
             <ion-icon name="star-outline"></ion-icon>
             <ion-icon name="star-outline"></ion-icon> -->
           </h3>
-          <p class="rate"> {{data.Stock}} remaining stock</p>
+          <p  style="font-weight: bolder;"> {{data.Stock}} remaining stock</p>
           <div id="qty">
             <span (click)="Decrease(data)" class="minus"> - </span>  {{data.Quantity}}
             <span (click)="Increase(data)" class="plus"> + </span>  

@@ -6,8 +6,21 @@
     line-height: 84px;
 }
 
+
+//.container {
+  //width: 100%;
+  ion-content {
+    --background:  url('../../assets/icon/backgroundimage2.jpg') no-repeat center center / cover;
+   // background-color: #654c05;
+   // background: linear-gradient(120deg,#2980b9, #8e44ad);
+   background: linear-gradient(120deg,#2980b9, #8e44ad);
+  }
+  .bg-transparent {
+    background: transparent;
+  }
 .container {
-    width: 100%;
+   
+   // width: 100%;
     ion-thumbnail {
         width: 100px !important;
         height: 100px !important;
@@ -16,7 +29,7 @@
         }
     }
     .rate {
-        color: #ccc;
+        color: #000000;
     }
     #qty {
         margin-top: 5px;
@@ -94,15 +107,20 @@
     border-bottom: 2px solid var(--ion-color-dark);
 }
 
-.dropdown {
-    width: 136px;
-    height: 150px;
-    background: #fff;
-    position: absolute;
-    top: 40px;
-    left: 87px;
-    z-index: 1;
-    ion-item:hover {
-        --ion-item-color: var(--ion-color-primary);
-    }
+// .dropdown {
+//     width: 136px;
+//     height: 150px;
+//     background: #fff;
+//     position: absolute;
+//     top: 40px;
+//     left: 87px;
+//     z-index: 1;
+//     ion-item:hover {
+//         --ion-item-color: var(--ion-color-primary);
+//     }
+// }
+
+
+ion-back-button {
+    display: block;
 }

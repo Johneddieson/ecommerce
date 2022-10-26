@@ -13,18 +13,18 @@
 </ion-header>
 
 <ion-content fullscreen>
-  <ion-list>
+  <ion-list class="bg-transparent">
     <!-- <ion-list-header> Recent Conversations </ion-list-header> -->
 
-    <ion-item *ngFor="let data of inventoryList">
+    <ion-item *ngFor="let data of inventoryList" color="none" lines="none">
       <ion-avatar slot="start">
         <img src="{{data.ImageUrl}}" />
       </ion-avatar>
-      <ion-label>
-        <h2>{{data.ProductName}}</h2>
-        <h3>{{data.Quantity}}</h3>
-        <p>{{data.Destination}}</p>
-        <p>{{data.Datetime}}</p>
+      <ion-label style="font-weight: bolder;">
+        <h2 style="font-weight: bolder;">{{data.ProductName}}</h2>
+        <h3 style="font-weight: bolder;">{{data.Quantity}}</h3>
+        <p style="font-weight: bolder;">{{data.Destination}}</p>
+        <p style="font-weight: bolder;">{{data.Datetime}}</p>
       </ion-label>
     </ion-item>
 

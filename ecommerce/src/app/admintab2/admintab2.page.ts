@@ -92,12 +92,7 @@ export class Admintab2Page implements OnInit {
         //   value: 'Edit Information'
 
         // },
-        {
-          type: 'radio',
-          label: 'Change Password',
-          value: 'Change Password'
-
-        },
+      
       ],
       buttons: [
         {

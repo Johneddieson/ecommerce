@@ -95,12 +95,7 @@ this.inventoryList = data
         //   value: 'Edit Information'
 
         // },
-        {
-          type: 'radio',
-          label: 'Change Password',
-          value: 'Change Password'
-
-        },
+       
       ],
       buttons: [
         {

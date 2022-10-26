@@ -1,19 +1,8 @@
-<!-- <ion-header>
-  <ion-toolbar>
-    <ion-title>AddProduct</ion-title>
-  </ion-toolbar>
-</ion-header>
 
-<ion-content padding>
-  <!-- <div class="camera"></div> -->
-  <!-- <img *ngIf="photoLink != ''" src="{{photoLink}}" />
-  <ion-input type="file" (change)="fileChanged($event)"></ion-input>
-</ion-content>  -->
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons slot="start">
-      <!-- <ion-back-button color="light" defaultHref="home"></ion-back-button> -->
-      <ion-icon name="pencil"></ion-icon>
+      <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>Add Product</ion-title>
   </ion-toolbar>
@@ -76,7 +65,7 @@
       </div>
       
       <button type="submit" hidden #btn></button>
-      <ion-button color="dark" (click)="btn.click()" [disabled]="registerForm.invalid" expand="block">Create Product</ion-button>
+      <ion-button color="tertiary" (click)="btn.click()" [disabled]="registerForm.invalid" expand="block">Create Product</ion-button>
     </form>
   </div>
   </ion-content>
