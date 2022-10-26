@@ -1,76 +1,24 @@
-<!-- <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap" rel="stylesheet">
-
-<ion-header class="ion-no-border">
-	<ion-toolbar>
-    <div class="back-circle"></div>
-		<ion-title class="ion-text-center custom-font">POS</ion-title>
-	</ion-toolbar>
-</ion-header>
-
-<ion-content fullscreen="true">
-
-
-<div class="ion-padding">
-
-  <form class="ion-padding" [formGroup]="registerForm" novalidate>
-
-    <div class="wrap-input">
-    <input formControlName="firstname" class="input" type="text" name="user-firstname" placeholder="Name of customer">
-    </div>
-    <ion-text type="text" color="danger" *ngIf="registerForm.get('firstname').hasError('required') && registerForm.get('firstname').touched">
-      Name of customer shouldn't be empty 
-     </ion-text>
-     <div *ngIf="!registerForm.controls.firstname.valid && (registerForm.controls.firstname.dirty ||registerForm.controls.firstname.touched)" class="error">
-       <ion-text color="danger" *ngIf="registerForm.controls.firstname.errors.invalidMsg">
-         {{registerForm.controls.firstname.errors.invalidMsg}}
-       </ion-text>
-     </div>
- 
-    <div class="container-form-btn">
-      <button [hidden]="registerForm.invalid" class="form-btn custom-font">
-        proceed for choosing products
-      </button>
-      
-    </div>   
-
-
-  </form>
-
-</div>
-
-</ion-content> -->
-
-
-<!-- <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>
-      Ionic Data Table
-    </ion-title>
-  </ion-toolbar>
-</ion-header> -->
-
-
-
-
-
 
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons  slot="start">
       <!-- <ion-back-button color="light" defaultHref="home"></ion-back-button> -->
       <!-- <ion-icon class="buttonsactive"  name="cart"></ion-icon> -->
+     <ion-back-button></ion-back-button>
+     
+    
+    </ion-buttons>
+
+
+    <ion-buttons  slot="end">
       <ion-button #productbtn (mouseenter)="dropdown=true" (mouseleave)="hideDropdown($event)" fill="clear" color="dark"
       class="dropdown-btn"  routerDirection="root" routerLinkActive="active-item">
       <ion-title>Categories</ion-title>
       
       <ion-icon slot="end" [name]="dropdown ? 'chevron-down' : 'chevron-up'"></ion-icon>
     </ion-button>
-    
-    </ion-buttons>
-
-    <ion-buttons *ngIf="numbers != 0" slot="end">
       
-      <ion-button (click)="checkout()"><ion-badge color="danger">{{numbers}}</ion-badge>Checkout</ion-button>
+      <ion-button *ngIf="numbers != 0" (click)="checkout()"><ion-badge color="danger">{{numbers}}</ion-badge>Checkout</ion-button>
       </ion-buttons>
     
   </ion-toolbar>
@@ -98,13 +46,13 @@
 <ion-grid>
   <ion-row>
     <ion-col>
-    <ion-list>
-      <ion-item *ngFor="let data of productList">
-        <ion-thumbnail slot="start">
+    <ion-list class="bg-transparent">
+      <ion-item *ngFor="let data of productList" color="none" lines="none">
+        <ion-thumbnail slot="start" class="transparent">
          <img src="{{data.ImageUrl}}" />  
         </ion-thumbnail>
-        <ion-label>
-          <h2>{{data.ProductName}} <span style="float: right; color: #69a03a;">₱ {{data.UnitPrice}}</span>
+        <ion-label style="font-weight: bolder;">
+          <h2 style="font-weight: bolder;">{{data.ProductName}} <span style="float: right; color: #000000; font-weight: bolder;">₱ {{data.UnitPrice}}</span>
           </h2>
           <h3>
             <!-- <ion-icon name="star-outline"></ion-icon>
@@ -112,7 +60,7 @@
             <ion-icon name="star-outline"></ion-icon>
             <ion-icon name="star-outline"></ion-icon> -->
           </h3>
-          <p class="rate"> {{data.Stock}} remaining stock</p>
+          <p class="rate" style="font-weight: bolder;"> {{data.Stock}} remaining stock</p>
           <div id="qty">
             <span (click)="Decrease(data)" class="minus"> - </span>  {{data.Quantity}}
             <span (click)="Increase(data)" class="plus"> + </span>  

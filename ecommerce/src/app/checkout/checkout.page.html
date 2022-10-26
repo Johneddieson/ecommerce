@@ -1,8 +1,8 @@
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons  slot="start">
-      <!-- <ion-back-button color="light" defaultHref="home"></ion-back-button> -->
-      <ion-icon class="buttonsactive"   name="checkbox"></ion-icon>
+      <ion-back-button></ion-back-button>
+    
     </ion-buttons>
 
     <!-- <ion-buttons *ngIf="numbers != 0" slot="end">
@@ -18,13 +18,13 @@
 <ion-grid>
   <ion-row>
     <ion-col>
-    <ion-list>
-      <ion-item *ngFor="let data of getCartDetails">
+    <ion-list class="bg-transparent">
+      <ion-item *ngFor="let data of getCartDetails" color="none" lines="none">
         <ion-thumbnail slot="start">
          <img src="{{data.ImageUrl}}" />  
         </ion-thumbnail>
         <ion-label>
-          <h2>{{data.ProductName}} <span style="float: right; color: #69a03a;">{{data.UnitPrice | currency: '₱'}}</span>
+          <h2 style="font-weight: bolder;">{{data.ProductName}} <span style="float: right; font-weight: bolder;">{{data.UnitPrice | currency: '₱'}}</span>
           </h2>
           <h3>
             <!-- <ion-icon name="star-outline"></ion-icon>
@@ -32,9 +32,9 @@
             <ion-icon name="star-outline"></ion-icon>
             <ion-icon name="star-outline"></ion-icon> -->
           </h3>
-          <p class="rate"> {{data.Stock}} remaining stock</p>
+          <p  style="font-weight: bolder;"> {{data.Stock}} remaining stock</p>
           <div id="qty">
-            <span  class="minus">  </span>  {{data.Quantity}}
+            <span style="font-weight: bolder;"> {{data.Quantity}} </span>  
             <span  class="plus">  </span>  
             <span style="float: right; ">
              <button id="btn" (click)="singleDelete(data)"> Remove</button> 
@@ -51,7 +51,7 @@
 <ion-footer>
   <ion-row>
     <ion-col size="7">
-      <ion-text>
+      <ion-text style="font-weight: bolder;">
         <h4>Total :  {{total | currency: '₱'}} </h4>
       </ion-text>
     </ion-col>

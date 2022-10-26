@@ -17,7 +17,7 @@
 <ion-accordion-group multiple="true">
   <ion-accordion *ngFor="let data of allPendingOrders">
     <ion-item slot="header" lines="none">
-      <ion-label class="labelname">{{data.BillingFirstname}} {{data.BillingLastname}}<br> Date Ordered : {{data.Datetime}}
+      <ion-label class="labelname" style="font-weight: bolder;">{{data.BillingFirstname}} {{data.BillingLastname}}<br> Date Ordered : {{data.Datetime}}
       <br>
       Total Amount : {{data.TotalAmount | currency: '₱'}}
     </ion-label> 
@@ -25,28 +25,28 @@
       <!-- <ion-label class="labeldate"> Date Ordered : {{data.Datetime}}</ion-label>
       <ion-label class="totalamount">Total Amount : {{data.TotalAmount | currency: '₱'}}</ion-label> -->
     </ion-item>
-    <ion-list slot="content">
+    <ion-list slot="content" class="bg-transparent">
      
-      <ion-item lines="none" *ngFor="let datadetails of data.OrderDetails">
+      <ion-item color="none" lines="none" *ngFor="let datadetails of data.OrderDetails">
         <ion-avatar slot="start">
           <img src="{{datadetails.ImageUrl}}">
         </ion-avatar>
-        <ion-label>
+        <ion-label style="font-weight: bolder;">
           <!-- <h2>Fullname: {{data.BillingFirstname}} {{data.BillingLastname}}</h2> -->
-          <h2>Product Name: {{datadetails.ProductName}}</h2>
-          <h3>Email: {{data.Billingemail}}</h3>
+          <h2 style="font-weight: bolder;">Product Name: {{datadetails.ProductName}}</h2>
+          <h3 style="font-weight: bolder;">Email: {{data.Billingemail}}</h3>
         
-          <p>Address1: {{data.BillingAddress1}}</p>
-          <p>Address2: {{data.BillingAddress2}}</p>
-          <p>Phone Number: {{data.BillingPhonenumber}}</p>
-          <p>Quantity: {{datadetails.Quantity}}</p>
-          <p>Unit Price: {{datadetails.UnitPrice | currency: '₱'}}</p>
+          <p style="font-weight: bolder;">Address1: {{data.BillingAddress1}}</p>
+          <p style="font-weight: bolder;">Address2: {{data.BillingAddress2}}</p>
+          <p style="font-weight: bolder;">Phone Number: {{data.BillingPhonenumber}}</p>
+          <p style="font-weight: bolder;">Quantity: {{datadetails.Quantity}}</p>
+          <p style="font-weight: bolder;">Unit Price: {{datadetails.UnitPrice | currency: '₱'}}</p>
         </ion-label>
        
       </ion-item>
-      <ion-button (click)="approveOrder(data)" size="small"  fill="outline" color="success">Approve Order</ion-button>
+      <ion-button (click)="approveOrder(data)" size="small"   color="success">Approve Order</ion-button>
         
-      <ion-button (click)="cancelOrder(data)" size="small"  fill="outline" color="danger">Cancel Order</ion-button>
+      <ion-button (click)="cancelOrder(data)" size="small"   color="danger">Cancel Order</ion-button>
     </ion-list>
   </ion-accordion>
 

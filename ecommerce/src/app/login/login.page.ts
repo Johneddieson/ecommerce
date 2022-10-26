@@ -13,7 +13,6 @@ import { AuthServiceService } from '../auth-service.service';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  private unsubscriber : Subject<void> = new Subject<void>();
   Email1: any;
   Password1: any;
   ishide = false;
@@ -102,6 +101,7 @@ this.alertCtrl.create({
         
         if (res.user.displayName == "admin") {
         this.router.navigateByUrl('adminpage')
+        
       } else {
         this.router.navigateByUrl('tabs')
       }

@@ -1,10 +1,4 @@
-// ion-content {
-//     --background:  url('../../assets/milktea4.jpg') no-repeat center center / cover;
-//    // background-color: #654c05;
-//    // background: linear-gradient(120deg,#2980b9, #8e44ad);
-//    background: linear-gradient(120deg,#2980b9, #8e44ad);
-   
-//   }
+
 
 
 .toolbar {
@@ -47,13 +41,35 @@
 //     background: #00ff00;
 // }
 
-ion-accordion.accordion-expanded ion-item[slot="header"] {
-    // --background: var(--ion-color-primary);
-    --background: #69A03A;
-    --color: #fff;
-}
-// ion-accordion.accordion-expanding [slot="content"],
-// ion-accordion.accordion-expanded [slot="content"] {
-//     --ion-item-background: #0c0254;
-//     --ion-item-color: #fff;
+// ion-accordion.accordion-expanded ion-item[slot="header"] {
+//     // --background: var(--ion-color-primary);
+//     --background: #69A03A;
+//     --color: #fff;
 // }
+
+
+// ion-accordion.accordion-expanded ion-item[slot="header"] {
+//     //  --background: var(--ion-color-primary);
+//     // --background: #69A03A;
+//     // --color: #fff;
+//     --background:  url('../../assets/icon/backgroundimage.jpg') no-repeat center center / cover;
+//  }
+ion-accordion.accordion-expanded ion-item[slot="header"] {
+    //  --background: var(--ion-color-primary);
+    // --background: #69A03A;
+    // --color: #fff;
+    --background:  url('../../assets/icon/backgroundimage.jpg') no-repeat center center / cover;
+ }
+ 
+ ion-accordion.accordion-collapsed ion-item[slot="header"] {
+     --background:  url('../../assets/icon/backgroundimage3.jpg') no-repeat center center / cover; 
+ }
+ 
+ 
+ ion-accordion.accordion-expanding [slot="content"],
+ion-accordion.accordion-expanded [slot="content"] {
+    // --ion-item-background: #0c0254;
+    // --ion-item-color: #fff;
+    --ion-item-background:  url('../../assets/icon/backgroundimage2.jpg') no-repeat center center / cover;
+}
+ 
