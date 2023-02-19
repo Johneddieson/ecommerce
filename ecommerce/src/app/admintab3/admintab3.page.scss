@@ -11,6 +11,12 @@
 }
 
 
+.addproduct {
+  cursor: pointer;
+}
+.addproduct:active {
+  color: red;
+}
 .bg-transparent {
     background: transparent;
   }

@@ -12,9 +12,9 @@
     
     </ion-buttons>
 
-    <ion-buttons *ngIf="numbers != 0" slot="end">
+    <ion-buttons *ngIf="numbers != 0" slot="end" routerLink="/tabs/tab3/forcheckout">
       
-      <ion-button (click)="checkout()"><ion-badge color="danger">{{numbers}}</ion-badge>Checkout</ion-button>
+      <ion-button><ion-badge color="danger">{{numbers}}</ion-badge>Checkout</ion-button>
       </ion-buttons>
     
   </ion-toolbar>
@@ -48,21 +48,20 @@
          <img src="{{data.ImageUrl}}" />  
         </ion-thumbnail>
         <ion-label style="font-weight: bolder;">
-          <h2 style="font-weight: bolder;">{{data.ProductName}} <span style="float: right; font-weight: bolder;">₱ {{data.UnitPrice}}</span>
+          <h2 style="font-weight: 1000; color: black;">
+            {{data.ProductName}} ({{data.Category}}) 
           </h2>
-          <h3>
-            <!-- <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon> -->
-          </h3>
-          <p  style="font-weight: bolder;"> {{data.Stock}} remaining stock</p>
+          <span style="float: right; ">
+            <button id="btn" (click)="AddtoCart(data)"> Add</button> 
+           </span>
+          <p class="rate" style="font-weight: 1000; color: black;"> {{data.Stock}} grams remaining stock</p>
+          <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category == 'Slushee'">₱ {{data.UnitPrice}}</p>
+          <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category != 'Slushee'">(MD): ₱ {{data.MediumPrice}}</p>
+          <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category != 'Slushee'">(LG): ₱ {{data.LargePrice}}</p>
+       
           <div id="qty">
             <span (click)="Decrease(data)" class="minus"> - </span>  {{data.Quantity}}
             <span (click)="Increase(data)" class="plus"> + </span>  
-            <span style="float: right; ">
-             <button id="btn" (click)="AddtoCart(data)"> Add</button> 
-            </span>
           </div>
         </ion-label>
       </ion-item>

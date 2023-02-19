@@ -55,6 +55,16 @@ export class ViewproductsPage implements OnInit {
               }
             }))
           ).subscribe(data => {
+            data = data.filter(f => f.Stock > 0)
+          data = data.sort(function(a, b) {
+            if (a.ProductName < b.ProductName) {
+              return -1
+            }
+            if (a.ProductName > b.ProductName) {
+              return 1
+            }
+            return 0
+          })
             this.products = data
           })
         })
@@ -70,17 +80,27 @@ export class ViewproductsPage implements OnInit {
       buttons: [
         {
           text: 'Yes',
-          handler: () => {
+          handler: async () => {
             var datetime = moment(new Date()).format("DD-MM-YYYY hh:mm A")
 
-            this.afstore.collection('Inventory').add({
-              Quantity: parseInt(data.Stock) * -1,
+            // this.afstore.collection('Inventory').add({
+            //   Quantity: parseInt(data.Stock) * -1,
+            //   Datetime: datetime,
+            //   read: false,
+            //   Destination: "Admin",
+            //   ProductName: data.ProductName,
+            //   UnitPrice: data.UnitPrice,
+            //   ImageUrl: data.ImageUrl
+            // })
+            await this.afstore.collection('Inventory').add({
               Datetime: datetime,
-              read: false,
-              Destination: "Admin",
+              Category: data.Category,
               ProductName: data.ProductName,
-              UnitPrice: data.UnitPrice,
-              ImageUrl: data.ImageUrl
+              Quantity: parseInt(data.Stock) * -1,
+              ImageUrl: data.ImageUrl,
+              DatetimeToSort: new Date(),
+              ProductId: data.id,
+              Destination: 'Admin'
             })
             this.afstore.doc(`Products/${data.id}`).delete()
           }
@@ -114,5 +134,45 @@ export class ViewproductsPage implements OnInit {
     }
 
   }
+ async clickProducts(dataProducts) 
+  {
+    var alertCtrl = await this.alertCtrl.create({
+    header: 'Choose what you want to do to this product',
+    inputs: [
+      {
+        type: 'radio',
+        name: 'Edit',
+        value: 'Edit',
+        label: 'Edit',
+      },
+      {
+        type: 'radio',
+        name: 'Delete',
+        value: 'Delete',
+        label: 'Delete'
+      },
+    ],
+    buttons: [
+      {
+        text: 'Go',
+        handler: (data) => {
+          if (data == 'Edit')
+          {
 
+            this.EditProduct(dataProducts)
+          }
+          else
+          {
+            this.DeleteProduct(dataProducts)
+          }
+        }
+      },
+      {
+        text: 'Close',
+        role: 'Cancel'
+      }
+    ]      
+    })
+    await alertCtrl.present()
+  }
 }

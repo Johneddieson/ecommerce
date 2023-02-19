@@ -1,33 +1,39 @@
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons slot="start">
-      <!-- <ion-back-button color="light" defaultHref="home"></ion-back-button> -->
       <ion-icon name="cart"></ion-icon>
     </ion-buttons>
     <ion-buttons  slot="end">
-      
-      <ion-icon size="large" (click)="addproduct()" class="addproduct" name="settings"></ion-icon>
+      <ion-button (click)="addproduct()" class="addproduct">
+        <ion-icon size="large" name="settings"></ion-icon>
+      </ion-button>
+      <ion-button hidden  class="addproduct">
+        <ion-icon size="large" name="text-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
-    <ion-title>Inventory Movement</ion-title>
+    <ion-title>Inventory</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content fullscreen>
   <ion-list class="bg-transparent">
-    <!-- <ion-list-header> Recent Conversations </ion-list-header> -->
-
     <ion-item *ngFor="let data of inventoryList" color="none" lines="none">
       <ion-avatar slot="start">
         <img src="{{data.ImageUrl}}" />
       </ion-avatar>
       <ion-label style="font-weight: bolder;">
-        <h2 style="font-weight: bolder;">{{data.ProductName}}</h2>
-        <h3 style="font-weight: bolder;">{{data.Quantity}}</h3>
-        <p style="font-weight: bolder;">{{data.Destination}}</p>
-        <p style="font-weight: bolder;">{{data.Datetime}}</p>
+        <h2 style="font-weight: bolder;">{{data.Category}}</h2>
+        <h3 style="font-weight: bolder;">{{data.ProductName}}</h3>
+        <p style="font-weight: bolder;">{{data.Stock}} grams</p>
+        <!-- <p style="font-weight: bolder;">{{data.Destination}}</p>
+        <p style="font-weight: bolder;">{{data.Datetime}}</p> -->
       </ion-label>
     </ion-item>
 
   </ion-list>
-
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">  
+    <ion-fab-button color="tertiary" (click)="SearchCategory()">  
+      <ion-icon name="search-outline"></ion-icon>  
+    </ion-fab-button>  
+  </ion-fab> 
 </ion-content>

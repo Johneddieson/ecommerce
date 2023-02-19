@@ -1,6 +1,6 @@
 import { LocationStrategy } from '@angular/common';
 import { mergeAnalyzedFiles } from '@angular/compiler';
-import { Component, OnInit } from '@angular/core';
+import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
@@ -22,47 +22,37 @@ export class CheckoutPage implements OnInit {
   meReference: AngularFirestoreDocument
   sub
   myInformation: any = {}
-  constructor(private alertCtrl: AlertController, private locationStrategy: LocationStrategy, private router: Router, private afauth: AngularFireAuth, private afstore: AngularFirestore, private msg: MessengerService) {
+  paymentMethod: string = ''
+  constructor(private applicationRef: ApplicationRef,
+    private zone: NgZone,
+    private alertCtrl: AlertController, private locationStrategy: LocationStrategy, private router: Router, private afauth: AngularFireAuth, private afstore: AngularFirestore, private msg: MessengerService) {
 
     this.afauth.authState.subscribe(data => {
       if (data && data.uid) {
         this.meReference = afstore.doc(`users/${data.uid}`);
         this.sub = this.meReference.valueChanges().subscribe(data => {
           this.myInformation = data
-
-
-          this.afstore.collection('Orders').snapshotChanges().pipe(
-            map(actions => actions.map(a => {
-              return {
-                id: a.payload.doc.id,
-                ...a.payload.doc.data() as any
-              }
-            }))
-          ).subscribe(data2 => {
-           
-            this.getOrders = data2
-            console.log("orders", this.getOrders)
-            var dashboard = this.getOrders 
-            dashboard = dashboard.map((i, index) => {
-              console.log("orders", i)
-              return Object.assign({}, i, {
-                
-              })
-         
-            })
-            // data2.forEach(fe => {
-            //   this.getOrders = fe.OrderDetails
-            // console.log("orders", this.getOrders)
-            // })
-          })
         })
+        
       }
     })
    }
 
   ngOnInit() {
-    this.CartDetails()
-    this.loadCart()
+    this.msg.cartSubject.next(this.CartDetails())
+    this.msg.cartSubject.next(this.loadCart())
+     
+    // this.router.events.subscribe(() => {
+    //   this.zone.run(() => {
+    //     setTimeout(() => {
+    //       this.applicationRef.tick()
+    //       this.msg.cartSubject.next(this.CartDetails())
+    //       this.msg.cartSubject.next(this.loadCart())
+                 
+           
+    //     }, 0)
+    //   })
+    // })
   }
   CartDetails() {
     if (sessionStorage.getItem('cart')) {
@@ -144,7 +134,7 @@ cartItemFunc() {
 gotohome() {
   this.router.navigate(['tabs'])
 }
-OrderNow() {
+async OrderNow() {
   this.alertCtrl.create({
     message: 'Are you sure you want to finalize your order?',
     buttons: [
@@ -160,18 +150,18 @@ OrderNow() {
                 role: 'cancel'
               }
             ]
-          }).then(els => {
-            console.log("my info", this.myInformation)
+          }).then(async els => {
             if (!this.myInformation.FirstName || !this.myInformation.LastName
-              || !this.myInformation.Address1 || !this.myInformation.Address2 || 
-              !this.myInformation.PhoneNumber) {
+              || !this.myInformation.Address1 || 
+              !this.myInformation.PhoneNumber) 
+              {
                 this.alertCtrl.create({
                   message: 'Please fill up about your details first.',
                   buttons: [
                     {
                       text: 'Ok',
                      handler: () => {
-                      this.router.navigateByUrl('/tabs/tab3')
+                      this.router.navigateByUrl('/tabs/tab3/edit')
                      } 
                     }
                   ]
@@ -179,28 +169,52 @@ OrderNow() {
                   els2.present()
                  
                 })
-              } else {
-                els.present()
-                var datetime = moment(new Date()).format("DD-MM-YYYY hh:mm A")
-            this.afstore.collection('Orders').add({
-              OrderDetails: this.getCartDetails,
-              BillingFirstname: this.myInformation.FirstName,
-              BillingLastname: this.myInformation.LastName,
-              BillingAddress1: this.myInformation.Address1,
-              BillingAddress2: this.myInformation.Address2,
-              BillingPhonenumber: this.myInformation.PhoneNumber,
-              Billingemail: this.myInformation.Email,
-              BillingIndexId: this.myInformation.Uid,
-              Status: 'Open',
-              Datetime: datetime,
-              TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-              DatetimeToSort: new Date()
-            }).then(el => {
-            }).catch(err => {
-              alert(err)
-            })
-            this.removeall()
-            
+              } else 
+              {
+                if (this.paymentMethod == '')
+                {
+                    var alertNoPaymentMethod = await this.alertCtrl.create({
+                      message: 'Payment Method is required',
+                      buttons: 
+                      [
+                        {
+                          text: 'Ok',
+                          role: 'cancel'
+                        }
+                      ]
+                    })
+                    await alertNoPaymentMethod.present();
+                }
+                else 
+                {
+                  els.present()
+                  var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
+              this.afstore.collection('Orders').add({
+                OrderDetails: this.getCartDetails,
+                BillingFirstname: this.myInformation.FirstName,
+                BillingLastname: this.myInformation.LastName,
+                BillingAddress1: this.myInformation.Address1,
+                BillingAddress2: this.myInformation.Address2,
+                BillingPhonenumber: this.myInformation.PhoneNumber,
+                Billingemail: this.myInformation.Email,
+                BillingIndexId: this.myInformation.Uid,
+                Status: 'Open',
+                Datetime: datetime,
+                TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+                DatetimeToSort: new Date(),
+                Discount: 'None',
+                PaymentMethod: this.paymentMethod
+              }).then(el => {
+              }).catch(err => {
+                alert(err)
+              })
+              this.removeall()
+              this.paymentMethod = ''
+              this.meReference.update({
+                Address1: '',
+                Address2: ''
+              })
+                }
           }
           })
         }
@@ -214,5 +228,48 @@ OrderNow() {
     el.present()
   })
 }
-
+async selectPaymentMethod()
+{
+  var alertForPaymentMethod = await this.alertCtrl.create({
+    header: 'Select Payment Method',
+    inputs: [
+      {
+        type: 'radio',
+        name: 'G-Cash',
+        value: 'G-Cash',
+        label: 'G-Cash'
+      },
+      {
+        type: 'radio',
+        name: 'Cash',
+        value: 'Cash',
+        label: 'Cash'
+      },
+    ],
+    buttons: 
+    [
+      {
+        text: 'Select',
+        handler: (data) => {
+            if (data == 'G-Cash')
+            {
+              this.paymentMethod = ''
+              this.paymentMethod = data
+            }
+            else 
+            {
+              this.paymentMethod = ''
+              this.paymentMethod = data
+              
+            }
+        }
+      },
+      {
+        text: 'Close',
+        role: 'cancel'
+      }
+    ]
+  })
+  await alertForPaymentMethod.present()
+}
 }

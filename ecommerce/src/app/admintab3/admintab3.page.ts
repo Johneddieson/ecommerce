@@ -26,32 +26,6 @@ productObject
     private router: Router) {
       this.afauth.authState.subscribe(data => {
         if (data && data.uid) {
-          
-          this.inventoryReference = this.afstore.collection('Inventory')
-          this.sub = this.inventoryReference.snapshotChanges()
-          .pipe(map(actions => actions.map(a => {
-            return {
-              id: a.payload.doc.id,
-              ...a.payload.doc.data() as any
-            }
-          }))).subscribe( data => {  
-           data =  data.map((i, index) => {
-                return Object.assign({
-                  id: i.id,
-                  Datetime: i.Datetime,
-                  DatetimeToSort: i.DatetimeToSort,  
-                  Destination: i.Destination,
-                  ImageUrl: i.ImageUrl,
-                  read: i.read,
-                  Quantity: i.Quantity,
-                  UnitPrice: i.UnitPrice,
-                  ProductName:  i.ProductName
-                })
-              })
-              console.log("the data", data)
-              data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-this.inventoryList = data
-            })
         }
       })
      }
@@ -66,6 +40,7 @@ this.inventoryList = data
     }
 
   ngOnInit() {
+    this.queryProducts('')
   }
   addproduct() {
     this.alertCtrl.create({
@@ -120,5 +95,80 @@ this.inventoryList = data
     }).then(el => {
       el.present()
     })
+  }
+  async queryProducts(parameter)
+  {
+    this.inventoryReference = this.afstore.collection('Products')
+    this.sub = this.inventoryReference.snapshotChanges()
+    .pipe(map(actions => actions.map(a => {
+      return {
+        id: a.payload.doc.id,
+        ...a.payload.doc.data() as any
+      }
+    }))).subscribe( data => {  
+        data = data.sort(function(a, b) {
+          if (a.ProductName < b.ProductName) {
+            return -1
+          }
+          if (a.ProductName > b.ProductName) {
+            return 1
+          }
+          return 0
+        })
+        if (parameter == '')
+        {
+          data = data
+        }
+        else 
+        {
+          data = data.filter(f => f.Category == parameter);
+        }
+        this.inventoryList = data
+        
+      })
+  }
+
+  async SearchCategory()
+  {
+    var alertCtrl = await this.alertCtrl.create({
+      header: 'Search Category',
+      inputs: [
+        {
+          type: 'radio',
+          label: '--SHOW ALL--',
+          value: ''
+        },
+        {
+          type: 'radio',
+          label: 'Milktea',
+          value: 'Milktea'
+        },
+        {
+          type: 'radio',
+          label: 'Fruit tea',
+          value: 'Fruit tea'
+        },
+        {
+          type: 'radio',
+          label: 'Slushee',
+          value: 'Slushee'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Search',
+          handler: (data) => {
+            // alert(data)
+            this.queryProducts(data)
+          }
+        },
+        {
+          text: 'Close',
+          role: 'cancel'
+        }
+      ]
+    }) 
+  
+    await alertCtrl.present();
   }
 }

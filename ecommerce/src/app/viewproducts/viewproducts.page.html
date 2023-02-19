@@ -1,14 +1,14 @@
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons  slot="start">
-   
-   <ion-back-button></ion-back-button>    
+      <ion-icon name="arrow-back-outline" slot="icon-only" style="cursor: pointer;" routerLink="/adminpage/atab1"></ion-icon>    
     </ion-buttons>
+    <ion-title>View Products</ion-title>
 <ion-buttons slot="end">
   
   <ion-button #productbtn (mouseenter)="dropdown=true" (mouseleave)="hideDropdown($event)" fill="clear" color="dark"
   class="dropdown-btn"  routerDirection="root" routerLinkActive="active-item">
-  Categories
+  <ion-title>Categories</ion-title>
   <ion-icon slot="end" [name]="dropdown ? 'chevron-down' : 'chevron-up'"></ion-icon>
 </ion-button>
 </ion-buttons>
@@ -44,21 +44,23 @@
     <ion-row>
       <ion-col>
       <ion-list class="bg-transparent">
-        <ion-item *ngFor="let data of products" color="none" lines="none">
+        <ion-item *ngFor="let data of products" color="none" lines="none" style="cursor: pointer;" (click)="clickProducts(data)">
           <ion-thumbnail slot="start">
            <img src="{{data.ImageUrl}}" />  
           </ion-thumbnail>
-          <ion-label style="font-weight: bolder;">
-            <h2 style="font-weight: bolder;">{{data.ProductName}} <span style="float: right; font-weight: bolder;"> {{data.UnitPrice | currency: '₱'}}</span>
-            </h2>
-            <h3 style="font-weight: bolder;">
-    
-            </h3>
-            <p class="rate" style="font-weight: bolder;"> {{data.Stock}} remaining stock</p>
-            <div id="qty">
-              <!-- <span (click)="Decrease(data)" class="minus"> - </span>  1
-              <span (click)="Increase(data)" class="plus"> + </span>   -->
-              <span style="float: right; ">
+          <ion-label style="font-weight: 1000; color: white;">
+            <h2 style="font-weight: 1000; color: white;">
+              {{data.ProductName}} 
+          
+              </h2>
+            <!-- <p class="rate" style="font-weight: 1000; color: white;"> {{data.Stock}} remaining stock</p> -->
+            <span *ngIf="data.Category == 'Slushee'" style="font-weight: 1000; color: white;"> {{data.UnitPrice | currency: '₱'}}</span>
+            <span *ngIf="data.Category != 'Slushee'" style="font-weight: 1000; color: white;">(MD) : {{data.MediumPrice | currency: '₱'}}</span>
+           <br>
+            <span *ngIf="data.Category != 'Slushee'" style="font-weight: 1000; color: white;">(LG) : {{data.LargePrice | currency: '₱'}}</span> 
+      
+            <!-- <div id="qty">
+              <span style="float: right;">
                <button id="btn2" (click)="DeleteProduct(data)"> Delete</button> 
              
               </span>
@@ -67,7 +69,7 @@
               
                </span>
                
-            </div>
+            </div> -->
           </ion-label>
         </ion-item>
        

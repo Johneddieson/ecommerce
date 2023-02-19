@@ -32,6 +32,15 @@
     .rate {
         color: #ccc;
     }
+    #btn {
+        padding: 10px 20px;
+        color: #fff;
+        background-color: #69a03a;
+        
+    }
+    #btn:active {
+        background-color: rgb(5, 21, 66);
+    }
     #qty {
         margin-top: 5px;
         .minus {

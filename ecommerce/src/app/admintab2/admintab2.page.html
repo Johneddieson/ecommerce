@@ -1,8 +1,12 @@
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons  slot="end">
-      
-      <ion-icon size="large" (click)="addproduct()" class="addproduct" name="settings"></ion-icon>
+      <ion-button (click)="addproduct()" class="addproduct">
+        <ion-icon size="large" name="settings"></ion-icon>
+      </ion-button>
+      <ion-button hidden  class="addproduct">
+        <ion-icon size="large" name="text-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-title>History</ion-title>
   </ion-toolbar>
@@ -17,15 +21,26 @@
 <ion-accordion-group multiple="true">
   <ion-accordion *ngFor="let data of allPendingOrders">
     <ion-item slot="header" lines="none">
-      <ion-label class="labelname">{{data.BillingFirstname}} {{data.BillingLastname}}<br> Date Ordered : {{data.Datetime}}
+      <ion-label class="labelname" style="font-weight: 1000; color: black;" text-wrap>
+        Fullname : {{data.BillingFirstname}} {{data.BillingLastname}}
+        <br>
+        Email: {{data.Billingemail}}
+        <br>
+        Address: {{data.BillingAddress1}}
+         <br> 
+        Phone Number: {{data.BillingPhonenumber}}
+        <br> 
+        Date Ordered : {{data.Datetime}}
+      <br>
+      Discount : {{data.Discount}}
+      <br>
+      Payment : {{data.PaymentMethod}}
       <br>
       Total Amount : {{data.TotalAmount | currency: '₱'}}
       <br>
       Status : {{data.Status}}
     </ion-label> 
       
-      <!-- <ion-label class="labeldate"> Date Ordered : {{data.Datetime}}</ion-label>
-      <ion-label class="totalamount">Total Amount : {{data.TotalAmount | currency: '₱'}}</ion-label> -->
     </ion-item>
     <ion-list slot="content" class="bg-transparent">
      
@@ -33,16 +48,10 @@
         <ion-avatar slot="start">
           <img src="{{datadetails.ImageUrl}}">
         </ion-avatar>
-        <ion-label style="font-weight: bolder;">
-          <!-- <h2>Fullname: {{data.BillingFirstname}} {{data.BillingLastname}}</h2> -->
-          <h2 style="font-weight: bolder;">Product Name: {{datadetails.ProductName}}</h2>
-          <h3 style="font-weight: bolder;">Email: {{data.Billingemail}}</h3>
-        
-          <p style="font-weight: bolder;">Address1: {{data.BillingAddress1}}</p>
-          <p style="font-weight: bolder;">Address2: {{data.BillingAddress2}}</p>
-          <p style="font-weight: bolder;">Phone Number: {{data.BillingPhonenumber}}</p>
-          <p style="font-weight: bolder;">Quantity: {{datadetails.Quantity}}</p>
-          <p style="font-weight: bolder;">Unit Price: {{datadetails.UnitPrice | currency: '₱'}}</p>
+        <ion-label>
+          <h2 style="font-weight: 1000; color: white;">Product Name: {{datadetails.ProductName}}</h2>
+          <p style="font-weight: 1000; color: white;">Quantity: {{datadetails.Quantity}}</p>
+          <p style="font-weight: 1000; color: white;">Unit Price: {{datadetails.UnitPrice | currency: '₱'}}</p>
         </ion-label>
        
       </ion-item>

@@ -4,20 +4,20 @@
     <h3 style="font-weight: bolder;">My Information</h3>
     <ion-item lines="none">
       <ion-label position="floating">First Name</ion-label>
-      <ion-input  [(ngModel)]="firstname" type="text" placeholder="First Name" [disabled]="!isDisabled"></ion-input>
+      <ion-input  [(ngModel)]="firstname" type="text" placeholder="First Name"></ion-input>
     </ion-item>
    
     <ion-item lines="none">
       <ion-label position="floating">Last Name</ion-label>
-      <ion-input type="text" [(ngModel)]="lastname" placeholder="Last Name" [disabled]="!isDisabled"></ion-input>
+      <ion-input type="text" [(ngModel)]="lastname" placeholder="Last Name"></ion-input>
     </ion-item>
     <ion-item lines="none">
-      <ion-label position="floating">Address1</ion-label>
-      <ion-input [(ngModel)]="address1" type="text" placeholder="Address 1"></ion-input>
+      <ion-label position="floating">Address</ion-label>
+      <ion-input [disabled]="isDisabled" [(ngModel)]="address1" type="text" placeholder="Address 1"></ion-input>
     </ion-item>
 
     
-    <ion-item lines="none">
+    <ion-item lines="none" hidden>
       <ion-label position="floating">Address2</ion-label>
       <ion-input type="text" [(ngModel)]="address2" placeholder="Address 2"></ion-input>
     </ion-item>
@@ -32,4 +32,9 @@
     
     <ion-button (click)="Edit()">Edit</ion-button>
   </div>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!isEdit" (click)="getCurrentLocation()">  
+    <ion-fab-button>  
+      <ion-icon  name="location-outline"></ion-icon>  
+    </ion-fab-button>  
+  </ion-fab>
 </ion-content>
