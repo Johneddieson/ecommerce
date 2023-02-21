@@ -17,7 +17,7 @@
     --background:  url('../../assets/icon/backgroundimage.jpg') no-repeat center center / cover;
    // background-color: #654c05;
    // background: linear-gradient(120deg,#2980b9, #8e44ad);
-   background: linear-gradient(120deg,#2980b9, #8e44ad);
+//    background: linear-gradient(120deg,#2980b9, #8e44ad);
   }
 
   ion-thumbnail {
@@ -31,6 +31,15 @@
   .rate {
       color: #ccc;
   }
+  #btn {
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #69a03a;
+    
+}
+#btn:active {
+    background-color: rgb(5, 21, 66);
+}
   #qty {
       margin-top: 5px;
       .minus {

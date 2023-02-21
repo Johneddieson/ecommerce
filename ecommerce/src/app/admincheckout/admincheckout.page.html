@@ -1,15 +1,18 @@
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons  slot="start">
-      <!-- <ion-back-button color="light" defaultHref="home"></ion-back-button> -->
-      <ion-icon class="buttonsactive"   name="checkbox"></ion-icon>
+      <ion-icon name="arrow-back-outline" slot="icon-only" style="cursor: pointer;" routerLink="/createpos"></ion-icon>    
     </ion-buttons>
 
-    <!-- <ion-buttons *ngIf="numbers != 0" slot="end">
-      
-      <ion-button (click)="checkout()"><ion-badge color="danger">{{numbers}}</ion-badge>Checkout</ion-button>
-      </ion-buttons> -->
     <ion-title>Check Out</ion-title>
+    <ion-buttons  slot="end">
+      <ion-button color="light" (click)="selectDiscount()">
+        <img class="discount" />
+        </ion-button>
+        <ion-button color="light" (click)="selectPaymentMethod()">
+          <img class="paymentMethod" />
+          </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -26,12 +29,6 @@
         <ion-label>
           <h2>{{data.ProductName}} <span style="float: right; color: #69a03a;">{{data.UnitPrice | currency: '₱'}}</span>
           </h2>
-          <h3>
-            <!-- <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon> -->
-          </h3>
           <p class="rate"> {{data.Stock}} remaining stock</p>
           <div id="qty">
             <span  class="minus">  </span>  {{data.Quantity}}
@@ -53,8 +50,10 @@
     <ion-col size="7">
       <ion-text>
         <h4>Total :  {{total | currency: '₱'}} </h4>
+        <h4>Payment Method :  {{paymentMethod}} </h4>
       </ion-text>
     </ion-col>
+  
     <ion-col size="5">
       <ion-button *ngIf="total > 0" color="light" (click)="OrderNow()">Confirm Order</ion-button>
     </ion-col>

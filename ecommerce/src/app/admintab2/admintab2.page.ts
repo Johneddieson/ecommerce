@@ -32,7 +32,7 @@ export class Admintab2Page implements OnInit {
             }
           }))).subscribe(data => {
 
-            console.log("all orders", data)
+            //console.log("all orders", data)
 
             data = data.map((i, index) => {
               return Object.assign({
@@ -44,11 +44,13 @@ export class Admintab2Page implements OnInit {
                 BillingPhonenumber: i.BillingPhonenumber,
                 Billingemail: i.Billingemail,
                 Datetime: i.Datetime,
-                Status: i.Status == "Closed" ? "Approved" : "Cancelled",
+                Status: i.Status,
                 TotalAmount: i.TotalAmount,
                 id: i.id,
                 DatetimeToSort: i.DatetimeToSort,
-                OrderDetails: i.OrderDetails
+                OrderDetails: i.OrderDetails,
+                Discount: i.Discount,
+                PaymentMethod: i.PaymentMethod
               })
             })
             data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
@@ -86,6 +88,12 @@ export class Admintab2Page implements OnInit {
           value: 'Add Product'
 
         },
+        {
+          type: 'radio',
+          label: 'Inventory',
+          value: 'Inventory'
+
+        },
         // {
         //   type: 'radio',
         //   label: 'Edit Information',
@@ -106,6 +114,10 @@ export class Admintab2Page implements OnInit {
               this.router.navigateByUrl('/add-product')
             } else if (data == "POS") {
               this.router.navigateByUrl('/createpos')
+            }
+            else if (data == "Inventory")
+            {
+              this.router.navigateByUrl('/inventory')
             }
           }
         },

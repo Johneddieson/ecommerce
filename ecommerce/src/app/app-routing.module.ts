@@ -81,6 +81,15 @@ const routes: Routes = [
     loadChildren: () => import('./mainpage/mainpage.module').then( m => m.MainpagePageModule)
   },
   // {
+  //   path: 'customerfeedback',
+  //   loadChildren: () => import('./customerfeedback/customerfeedback.module').then( m => m.CustomerfeedbackPageModule)
+  // },
+  {
+    path: 'inventory',
+     loadChildren: () => import("./admintab3/admintab3.module").then(m => m.Admintab3PageModule),
+     canActivate: [AuthGuard]
+  },
+  // {
   //   path: 'changepassword',
   //   loadChildren: () => import('./changepassword/changepassword.module').then( m => m.ChangepasswordPageModule)
   // },

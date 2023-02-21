@@ -5,8 +5,13 @@
     font-size: 20px;
     line-height: 84px;
 }
-
-
+ion-item:hover {
+    background-color: #000000;
+}
+ion-item:active {
+    //background-color: #000000;
+    background-color: #c31111;
+}
 //.container {
   //width: 100%;
   ion-content {
@@ -32,7 +37,7 @@
         color: #000000;
     }
     #qty {
-        margin-top: 5px;
+        margin-top: 1px;
         .minus {
             font-weight: 600;
             padding: 5px;

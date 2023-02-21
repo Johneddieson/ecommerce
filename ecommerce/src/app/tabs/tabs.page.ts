@@ -1,7 +1,7 @@
 import { LocationStrategy } from '@angular/common';
 import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
@@ -17,6 +17,9 @@ export class TabsPage implements OnInit {
   sub
 notificationsList : any[] = []
 notifCounts = 0
+meReference: AngularFirestoreDocument;
+subDocument;
+myid: string = ''
   constructor(private router: Router, private afstore: AngularFirestore,
     private afauth: AngularFireAuth, private loadingCtrl: LoadingController,
     private locationStrategy: LocationStrategy, private auth: AuthServiceService,
@@ -27,6 +30,8 @@ notifCounts = 0
 
     this.afauth.authState.subscribe(data => {
       if (data && data.uid) {
+        this.myid = data.uid
+        this.meReference = this.afstore.doc(`users/${data.uid}`)
         if (data.displayName == 'admin') {
           router.navigateByUrl('adminpage')
         } else {
@@ -100,6 +105,10 @@ notifCounts = 0
           handler: () => {
 
             this.auth.SignOut()
+            this.meReference.update({
+              Address1: '',
+              Address2: ''
+            })
           }
         },
         {
