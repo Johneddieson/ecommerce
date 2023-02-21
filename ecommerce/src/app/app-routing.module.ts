@@ -86,7 +86,8 @@ const routes: Routes = [
   // },
   {
     path: 'inventory',
-     loadChildren: () => import("./admintab3/admintab3.module").then(m => m.Admintab3PageModule)
+     loadChildren: () => import("./admintab3/admintab3.module").then(m => m.Admintab3PageModule),
+     canActivate: [AuthGuard]
   },
   // {
   //   path: 'changepassword',
