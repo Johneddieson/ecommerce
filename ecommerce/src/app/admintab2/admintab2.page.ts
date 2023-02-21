@@ -88,6 +88,12 @@ export class Admintab2Page implements OnInit {
           value: 'Add Product'
 
         },
+        {
+          type: 'radio',
+          label: 'Inventory',
+          value: 'Inventory'
+
+        },
         // {
         //   type: 'radio',
         //   label: 'Edit Information',
@@ -108,6 +114,10 @@ export class Admintab2Page implements OnInit {
               this.router.navigateByUrl('/add-product')
             } else if (data == "POS") {
               this.router.navigateByUrl('/createpos')
+            }
+            else if (data == "Inventory")
+            {
+              this.router.navigateByUrl('/inventory')
             }
           }
         },

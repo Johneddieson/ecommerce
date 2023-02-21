@@ -35,10 +35,11 @@
     <ion-row>
     
 
-      <ion-item *ngIf="!data.read" button (click)="update(data)">
+      <!-- (click)="update(data)" -->
+      <ion-button *ngIf="!data.read" (click)="sendFeedBack(data)">
         <!-- <ion-icon name="book"></ion-icon> -->
-        <p>Mark as read</p>
-      </ion-item>
+        <p>Send Feedback</p>
+      </ion-button>
 
       <!-- <ion-item button (click)="delete(item.key)">
         <ion-icon name="trash-outline"></ion-icon>
@@ -47,9 +48,4 @@
     </ion-row>
 
   </ion-card>
-  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="addNewItem()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab> -->
 </ion-content>

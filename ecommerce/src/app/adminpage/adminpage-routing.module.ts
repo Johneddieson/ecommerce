@@ -18,7 +18,8 @@ const routes: Routes = [
       },
       {
         path: 'atab3',
-        loadChildren: () => import("../admintab3/admintab3.module").then(m => m.Admintab3PageModule)
+        // loadChildren: () => import("../admintab3/admintab3.module").then(m => m.Admintab3PageModule)
+        loadChildren: () => import('../customerfeedback/customerfeedback.module').then( m => m.CustomerfeedbackPageModule)
       },
       {
         path: 'atab4',

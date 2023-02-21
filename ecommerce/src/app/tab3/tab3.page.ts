@@ -32,14 +32,13 @@ name;
       if (data && data.uid) {
         this.meReference = this.afstore.doc(`users/${data.uid}`)
         this.sub = this.meReference.valueChanges().subscribe(data => {
-            console.log("my information", data)
             this.firstname = data.FirstName
             this.lastname = data.LastName
-            if ((!this.firstname || this.firstname == undefined) && (!this.lastname || this.lastname == undefined)) {
-              this.isDisabled = !this.isDisabled
-            } else {
-              this.isDisabled = this.isDisabled
-            }
+            // if ((!this.firstname || this.firstname == undefined) && (!this.lastname || this.lastname == undefined)) {
+            //   this.isDisabled = !this.isDisabled
+            // } else {
+            //   this.isDisabled = this.isDisabled
+            // }
             this.address1 = data.Address1
             this.address2 = data.Address2
             this.phonenumber = `${data.PhoneNumber}`

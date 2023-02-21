@@ -19,6 +19,7 @@ notificationsList : any[] = []
 notifCounts = 0
 meReference: AngularFirestoreDocument;
 subDocument;
+myid: string = ''
   constructor(private router: Router, private afstore: AngularFirestore,
     private afauth: AngularFireAuth, private loadingCtrl: LoadingController,
     private locationStrategy: LocationStrategy, private auth: AuthServiceService,
@@ -29,6 +30,7 @@ subDocument;
 
     this.afauth.authState.subscribe(data => {
       if (data && data.uid) {
+        this.myid = data.uid
         this.meReference = this.afstore.doc(`users/${data.uid}`)
         if (data.displayName == 'admin') {
           router.navigateByUrl('adminpage')

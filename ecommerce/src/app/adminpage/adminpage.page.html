@@ -14,8 +14,10 @@
     </ion-tab-button>
 
     <ion-tab-button tab="atab3">
-      <ion-icon name="cart-outline"></ion-icon>
-      <ion-label>Inventory</ion-label>
+      <ion-icon name="text-outline"></ion-icon>
+      <!-- *ngIf="feedbackLength != 0" -->
+      <ion-badge color="danger" *ngIf="feedbackLength != 0">{{feedbackLength}}</ion-badge>
+      <ion-label>Feedbacks</ion-label>
     </ion-tab-button>
 
     <!-- <ion-tab-button tab="atab4">

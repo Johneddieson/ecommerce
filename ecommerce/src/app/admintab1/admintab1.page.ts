@@ -140,18 +140,12 @@ export class Admintab1Page implements OnInit {
           value: 'Add Product'
 
         },
-        // {
-        //   type: 'radio',
-        //   label: 'Edit Information',
-        //   value: 'Edit Information'
+        {
+          type: 'radio',
+          label: 'Inventory',
+          value: 'Inventory'
 
-        // },
-        // {
-        //   type: 'radio',
-        //   label: 'Change Password',
-        //   value: 'Change Password'
-
-        // },
+        },
       ],
       buttons: [
         {
@@ -165,6 +159,10 @@ export class Admintab1Page implements OnInit {
               this.router.navigateByUrl('/add-product')
             } else if (data == "POS") {
               this.router.navigateByUrl('/createpos')
+            }
+            else if (data == "Inventory")
+            {
+              this.router.navigateByUrl('/inventory')
             }
           }
         },
