@@ -2,7 +2,7 @@ import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { AttrAst } from '@angular/compiler';
 import { Component, ElementRef, OnInit, ViewChild, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import {
   FormBuilder,
   FormControl,
@@ -10,7 +10,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { AlertController, IonInput, LoadingController } from '@ionic/angular';
+import { AlertController, IonInput, IonModal, LoadingController } from '@ionic/angular';
 import { loadingController } from '@ionic/core';
 import * as moment from 'moment';
 @Component({
@@ -28,14 +28,32 @@ export class AddProductPage implements OnInit {
   public hideInputFieldsforMilkteaAndFruitTea: boolean = true 
   public productReference: AngularFirestoreCollection
   public sub;
+  public materialArray : any[] = []
+  public sub2;
+  materialReference: AngularFirestoreCollection
+  public arrayForMaterial = []
+  materialEachElementReference: AngularFirestoreDocument
+  public disableSaveChangesButton: boolean = true
   @ViewChild(IonInput) myInputVariable: IonInput;
+  @ViewChild(IonModal) modal: IonModal;
   constructor(
     public http: HttpClient,
     public formBuilder: FormBuilder,
     public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
     private afstore: AngularFirestore
-  ) {
+  ) 
+  {
+    this.materialReference = this.afstore.collection(`Materials`, ref => ref.orderBy('Itemname'))
+    this.sub2 = this.materialReference.snapshotChanges()
+      .pipe(map(actions => actions.map(a => {
+        return {
+          id: a.payload.doc.id,
+          ...a.payload.doc.data() as any
+        }
+      }))).subscribe(data => {
+        this.materialArray = data
+      })
   }
 
   ngOnInit() {
@@ -247,6 +265,9 @@ export class AddProductPage implements OnInit {
           msg: 'Period is not allowed',
         }),
       ]),
+      materials: new FormControl('', [
+        Validators.required,
+        ]),
     });
   }
   customPatternValid(config: any): ValidatorFn {
@@ -332,7 +353,7 @@ export class AddProductPage implements OnInit {
             }
             else 
             {
-              if (this.withPhoto == false) 
+              if (this.withPhoto != false) 
               {
                 var alertNoPhoto = await this.alertCtrl.create
                 ({
@@ -349,7 +370,37 @@ export class AddProductPage implements OnInit {
               } 
               else 
               {
-                var loadingCtrl = await this.loadingCtrl.create
+                this.showMaterialsModal()    
+                      
+              }
+            }
+          })
+         
+        }
+  }
+
+  async saveFunction() 
+  {
+            var datetime = await moment(new Date()).format("MM-DD-YYYY hh:mm A")
+              await this.afstore.collection('Products').add({
+              Category: this.registerForm.value.category,
+              //GramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt(this.registerForm.value.gramsperorder) : parseInt("0"),
+              GramsPerOrder: parseInt("0"),
+              ImageUrl: this.photoLink,
+              //LargeGramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt("0") : parseInt(this.registerForm.value.gramsperorderlarge),
+              LargeGramsPerOrder: parseInt("0"),
+              LargePrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.largeprice,
+              //MediumGramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt("0") : parseInt(this.registerForm.value.gramsperordermedium),
+              MediumGramsPerOrder: parseInt("0"),
+              MediumPrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.mediumprice,
+              ProductName: this.registerForm.value.productname,
+              Quantity: 1,
+              //Stock: parseInt(this.registerForm.value.stock),
+              Stock: parseInt("0"),
+              UnitPrice: this.registerForm.value.category == 'Slushee' ? this.registerForm.value.unitprice : "0",
+              Materials: this.arrayForMaterial
+            }).then(async el => {
+              var loadingCtrl = await this.loadingCtrl.create
                 ({
                   message: 'Creating New Product',
                   spinner: 'bubbles'
@@ -369,42 +420,8 @@ export class AddProductPage implements OnInit {
                 setTimeout(async () => {
                   await loadingCtrl.dismiss();
                   await alertSuccess.present();
-                  await this.saveFunction()
+                  await this.modal.dismiss();
                 }, 4000);
-                      
-              }
-            }
-          })
-         
-        }
-  }
-
-  async saveFunction() 
-  {
-            var datetime = await moment(new Date()).format("MM-DD-YYYY hh:mm A")
-              await this.afstore.collection('Products').add({
-              Category: this.registerForm.value.category,
-              GramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt(this.registerForm.value.gramsperorder) : parseInt("0"),
-              ImageUrl: this.photoLink,
-              LargeGramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt("0") : parseInt(this.registerForm.value.gramsperorderlarge),
-              LargePrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.largeprice,
-              MediumGramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt("0") : parseInt(this.registerForm.value.gramsperordermedium),
-              MediumPrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.mediumprice,
-              ProductName: this.registerForm.value.productname,
-              Quantity: 1,
-              Stock: parseInt(this.registerForm.value.stock),
-              UnitPrice: this.registerForm.value.category == 'Slushee' ? this.registerForm.value.unitprice : "0"
-            }).then(async el => {
-              await this.afstore.collection('Inventory').add({
-                Datetime: datetime,
-                Category: this.registerForm.value.category,
-                ProductName: this.registerForm.value.productname,
-                Quantity: parseInt(this.registerForm.value.stock),
-                ImageUrl: this.photoLink,
-                DatetimeToSort: new Date(),
-                ProductId: el.id,
-                Destination: 'Admin'
-              })
                this.registerForm.reset()
               this.photoLink = 'https://static.wikia.nocookie.net/otonari-no-tenshi/images/c/c9/No_images_available.jpg/revision/latest?cb=20220104141308'
               this.hideInputFieldsforMilkteaAndFruitTea = true
@@ -417,14 +434,14 @@ export class AddProductPage implements OnInit {
   {
     var categoryvalidationiserror =  this.registerForm.controls.category.invalid
     var productnamevalidationiserror =  this.registerForm.controls.productname.invalid
-    var stockvalidationiserror =  this.registerForm.controls.stock.invalid
+    //var stockvalidationiserror =  this.registerForm.controls.stock.invalid
     var unitpricevalidationiserror =  this.registerForm.controls.unitprice.invalid
     var mediumpricevalidationiserror =  this.registerForm.controls.mediumprice.invalid
     var largepricevalidationiserror =  this.registerForm.controls.largeprice.invalid
-    var gramsperordermediumvalidationiserror =  this.registerForm.controls.gramsperordermedium.invalid
-    var gramsperorderlargevalidationiserror =  this.registerForm.controls.gramsperorderlarge.invalid
-    var gramsperordervalidationiserror =  this.registerForm.controls.gramsperorder.invalid
- 
+    //var gramsperordermediumvalidationiserror =  this.registerForm.controls.gramsperordermedium.invalid
+    //var gramsperorderlargevalidationiserror =  this.registerForm.controls.gramsperorderlarge.invalid
+    //var gramsperordervalidationiserror =  this.registerForm.controls.gramsperorder.invalid
+    var materialvalidationiserror = this.registerForm.controls.materials.invalid
     if (this.registerForm.value.category == '' || this.registerForm.value.category == null 
     || this.registerForm.value.category == undefined) 
     {
@@ -432,23 +449,26 @@ export class AddProductPage implements OnInit {
         this.isValid = false
         this.errMsg += categoryvalidationiserror === true ? "• Category<br>" : ""
         this.errMsg += productnamevalidationiserror === true ? "• Product Name<br>" : ""
-        this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
+        //this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
+        this.errMsg += materialvalidationiserror === true ? "• Materials<br>" : ""
         this.errMsg += unitpricevalidationiserror === true ? "• Unit Price<br>" : ""
-        this.errMsg += gramsperordervalidationiserror === true ? "• Grams Per Order<br>" : ""
+        //this.errMsg += gramsperordervalidationiserror === true ? "• Grams Per Order<br>" : ""
 
     }
-    else if (this.registerForm.value.category == 'Slushee')
+     else if (this.registerForm.value.category == 'Slushee')
     {
       if (categoryvalidationiserror === true || productnamevalidationiserror === true ||
-        stockvalidationiserror === true || unitpricevalidationiserror === true)
+         unitpricevalidationiserror === true || materialvalidationiserror === true 
+         )
         {
           this.errMsg = ''
           this.isValid = false
           this.errMsg += categoryvalidationiserror === true ? "• Category<br>" : ""
           this.errMsg += productnamevalidationiserror === true ? "• Product Name<br>" : ""
-          this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
+          //this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
+          this.errMsg += materialvalidationiserror === true ? "• Materials<br>" : ""
           this.errMsg += unitpricevalidationiserror === true ? "• Unit Price<br>" : ""
-          this.errMsg += gramsperordervalidationiserror === true ? "• Grams Per Order<br>" : ""
+          //this.errMsg += gramsperordervalidationiserror === true ? "• Grams Per Order<br>" : ""
         }
         else 
         {
@@ -459,19 +479,19 @@ export class AddProductPage implements OnInit {
     else 
     {
       if (categoryvalidationiserror === true || productnamevalidationiserror === true 
-        || stockvalidationiserror === true || mediumpricevalidationiserror === true
-        || largepricevalidationiserror === true || gramsperordermediumvalidationiserror === true
-        || gramsperorderlargevalidationiserror === true)
+        ||  mediumpricevalidationiserror === true
+        || largepricevalidationiserror === true || materialvalidationiserror === true)
         {
           this.errMsg = ''
           this.isValid = false
           this.errMsg += categoryvalidationiserror === true ? "• Category<br>" : ""
           this.errMsg += productnamevalidationiserror === true ? "• Product Name<br>" : ""
-          this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
+          this.errMsg += materialvalidationiserror === true ? "• Materials<br>" : ""
+          //this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
           this.errMsg += mediumpricevalidationiserror === true ? "• Medium Price<br>" : ""
           this.errMsg += largepricevalidationiserror === true ? "• Large Price<br>" : ""
-          this.errMsg += gramsperordermediumvalidationiserror === true ? "• Grams Per Order Medium<br>" : ""
-          this.errMsg += gramsperorderlargevalidationiserror === true ? "• Grams Per Order Large<br>" : ""
+          //this.errMsg += gramsperordermediumvalidationiserror === true ? "• Grams Per Order Medium<br>" : ""
+          //this.errMsg += gramsperorderlargevalidationiserror === true ? "• Grams Per Order Large<br>" : ""
         }
         else 
         {
@@ -512,5 +532,104 @@ this.validationMessageObject = {
     }
     
   }
-
+  showMaterialsModal()
+  {
+    this.setMaterials();
+    this.modal.present()
+  }
+  setMaterials()
+      {
+        this.arrayForMaterial = this.registerForm.value.materials
+        //assigned object for material list string
+        this.arrayForMaterial = this.arrayForMaterial.map((i, index) => {
+          return Object.assign(
+            {},
+            {
+              itemId: i,
+              gramsperorderlarge : parseInt("0"),
+              gramsperordermedium : parseInt("0"),
+              gramsperorder :  parseInt("0"),   
+            }
+          );
+        });
+        //get the itemname of materials by using their uniqueidentifier ID
+        this.arrayForMaterial.map((i, index) => {
+          this.materialEachElementReference = this.afstore.doc(
+            `Materials/${i.itemId}`
+          );
+    
+          this.materialEachElementReference
+            .get()
+            .pipe(
+              map((actions) => {
+                return actions.data() as any;
+              })
+            )
+            .subscribe((data) => {
+              i.itemName =  data.Itemname;
+            });
+       
+            
+          });
+        //console.log("the final array", this.arrayForMaterial)
+      }
+      updateGramsPerOrderEvent(event, mat)
+      {
+        mat.gramsperorder = parseInt(event.target.value)
+        this.validationForGramsPerOrder()
+        //mat.gramsperordermedium = this.category != 'Milktea' ? 0 : parseInt(event.target.value)
+        //mat.gramsperordersmall = this.category != 'Milktea' ? 0 : parseInt(event.target.value) 
+      }
+      updateGramsPerOrderLargeEvent(event, mat)
+      {
+        //mat.gramsperorder = this.category != 'Milktea' ? parseInt(event.target.value) : 0
+        //mat.gramsperordermedium = this.category != 'Milktea' ? 0 : parseInt(event.target.value)
+        mat.gramsperorderlarge = parseInt(event.target.value)
+        this.validationForGramsPerOrder() 
+      }
+      updateGramsPerOrderMediumEvent(event, mat)
+      {
+        //mat.gramsperorder = this.category != 'Milktea' ? parseInt(event.target.value) : 0
+        //mat.gramsperordermedium = this.category != 'Milktea' ? 0 : parseInt(event.target.value)
+        mat.gramsperordermedium = parseInt(event.target.value) 
+        this.validationForGramsPerOrder()
+      }
+      validationForGramsPerOrder()
+      {
+        var filterNanValues;
+      
+        if (this.registerForm.value.category != 'Slushee')
+        {
+          // (isNaN(f.gramsperorder) || f.gramsperorder == 0) 
+          // ||
+          filterNanValues = this.arrayForMaterial.filter(f =>  f.gramsperorderlarge == 0  || 
+          f.gramsperordermedium == 0 || isNaN(parseInt(f.gramsperorderlarge))
+          || isNaN(parseInt(f.gramsperordermedium)))
+        }
+        else 
+        {
+          filterNanValues = this.arrayForMaterial.filter(f => f.gramsperorder == 0 || isNaN(parseInt(f.gramsperorder)))
+        }
+          
+          var showCondimentsWithNaNValues = filterNanValues.map(function(e) {return `${e.itemName.replace(",", "")} \n`}).toString()
+          showCondimentsWithNaNValues = showCondimentsWithNaNValues.replace(",", "")
+          if (filterNanValues.length >= 1)
+          {
+            this.disableSaveChangesButton = true
+          }
+          else 
+          {
+            this.disableSaveChangesButton = false
+          } 
+      }
+     
+      close() {
+        this.modal.dismiss()  
+    }
+    async savechanges()
+    {
+      //console.log("Array for material", this.arrayForMaterial)
+      
+                   await this.saveFunction()
+    }
 }

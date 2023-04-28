@@ -55,7 +55,7 @@ export class ViewproductsPage implements OnInit {
               }
             }))
           ).subscribe(data => {
-            data = data.filter(f => f.Stock > 0)
+            //data = data.filter(f => f.Stock > 0)
           data = data.sort(function(a, b) {
             if (a.ProductName < b.ProductName) {
               return -1

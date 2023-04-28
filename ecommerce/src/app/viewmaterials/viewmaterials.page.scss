@@ -1,0 +1,29 @@
+.toolbar {
+    height: 84px;
+    --background: #69A03A;
+    color: #fff;
+    font-size: 20px;
+    line-height: 84px;
+}
+
+
+@media (min-width: 768px) {
+    ion-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 20px;
+    }
+  
+    ion-item {
+      text-align: center;
+    }
+  }
+  .label:hover {
+    background-color: black;
+    color: whitesmoke;
+  }
+  .label:active 
+  {
+    background-color: #69A03A;
+    color: whitesmoke;
+  }

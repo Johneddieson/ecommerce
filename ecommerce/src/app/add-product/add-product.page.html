@@ -9,6 +9,10 @@
 </ion-header>
 <ion-content class="ion-padding ion-text-center">
   
+
+ 
+
+
     <img src="{{photoLink}}" *ngIf="photoLink != ''" class="camera"/>
  
    
@@ -16,7 +20,47 @@
     <ion-input class="uploadfile"  type="file" #inputFile (change)="fileChanged($event)" accept="image/*"></ion-input>
     <form [formGroup]="registerForm"  (ngSubmit)="submit()" novalidate>
       
-      
+      <ion-modal  mode="sm" [backdropDismiss]="false"
+      class="example-modal">
+        <ng-template>
+          <ion-content color="light">
+            
+            <ion-item *ngFor="let mat of arrayForMaterial" [hidden]="registerForm.value.category != 'Slushee'">
+              
+                <ion-label text-wrap>{{mat.itemName}} :</ion-label>
+                <ion-input value="{{mat.gramsperorder <= 0 ? null : mat.gramsperorder}}"
+                placeholder="Enter grams per order" type="number"
+                (ionChange)="updateGramsPerOrderEvent($event, mat)"></ion-input>
+            </ion-item>
+            <ion-item *ngFor="let mat of arrayForMaterial" [hidden]="registerForm.value.category == 'Slushee'">
+              
+              <ion-label text-wrap>{{mat.itemName}} Medium:</ion-label>
+              <ion-input value="{{mat.gramsperordermedium <= 0 ? null : mat.gramsperordermedium}}"
+              placeholder="Enter grams per order medium" type="number"
+              (ionChange)="updateGramsPerOrderMediumEvent($event, mat)"></ion-input>
+    
+          </ion-item>
+    
+          <ion-item *ngFor="let mat of arrayForMaterial" [hidden]="registerForm.value.category == 'Slushee'">
+              
+         
+            <ion-label text-wrap>{{mat.itemName}} Large:</ion-label>
+            <ion-input value="{{mat.gramsperorderlarge <= 0 ? null : mat.gramsperorderlarge}}"
+            placeholder="Enter grams per order large" type="number"
+            (ionChange)="updateGramsPerOrderLargeEvent($event, mat)"></ion-input>
+        </ion-item>
+        
+            <ion-item lines="none">
+             <ion-buttons slot="end">
+              <ion-button color="danger" (click)="close()">Close</ion-button>
+              <!-- [disabled]="disableSaveChangesButton" -->
+              <ion-button color="success" [disabled]="disableSaveChangesButton"  (click)="savechanges()">Save Changes</ion-button>
+             </ion-buttons>
+            </ion-item> 
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+    
       
       <!-- Category -->
       <ion-item lines="none">
@@ -47,7 +91,7 @@
       
       
       <!-- Stock -->
-       <ion-item lines="none">
+       <!-- <ion-item lines="none">
         <ion-label style="font-weight: 900;" text-wrap>Stock :</ion-label>
         <ion-input type="tel"  placeholder="Enter Stock" formControlName="stock"></ion-input>
       </ion-item>
@@ -58,7 +102,7 @@
         <ion-text color="danger" style="font-weight: 1000;" *ngIf="registerForm.controls.stock.errors.invalidMsg">
           {{registerForm.controls.stock.errors.invalidMsg}}
         </ion-text>
-      </div>
+      </div> -->
 
 
 
@@ -113,11 +157,21 @@
         </div>  
       </div>
   
-
+      <ion-item lines="none">
+        <ion-label style="font-weight: 900;" text-wrap>Materials</ion-label>
+        <ion-select  [multiple]="true" formControlName="materials">
+          <ion-select-option *ngFor="let data of materialArray" [value]="data.id">
+            {{data.Itemname}}
+          </ion-select-option>
+    </ion-select>
+       </ion-item>
+       <ion-text color="danger" *ngIf="registerForm.get('materials').hasError('required') && registerForm.get('materials').touched">
+        Materials shouldn't be empty
+       </ion-text> 
 
       <!-- Grams Per Order Medium -->
       
-      <div *ngIf="!hideInputFieldsforMilkteaAndFruitTea">
+      <!-- <div *ngIf="!hideInputFieldsforMilkteaAndFruitTea">
         <ion-item lines="none">
           <ion-label style="font-weight: 900;" text-wrap>Grams Per Order(MD):</ion-label>
           <ion-input type="tel"  placeholder="Enter Grams Per Order Medium" formControlName="gramsperordermedium"></ion-input>
@@ -130,11 +184,11 @@
             {{registerForm.controls.gramsperordermedium.errors.invalidMsg}}
           </ion-text>
         </div>  
-      </div>
+      </div> -->
      
 
       <!-- Grams Per Order Large -->
-      <div *ngIf="!hideInputFieldsforMilkteaAndFruitTea">
+      <!-- <div *ngIf="!hideInputFieldsforMilkteaAndFruitTea">
         <ion-item lines="none">
           <ion-label style="font-weight: 900;" text-wrap>Grams Per Order(L):</ion-label>
           <ion-input type="tel"  placeholder="Enter Grams Per Order Large" formControlName="gramsperorderlarge"></ion-input>
@@ -147,11 +201,11 @@
             {{registerForm.controls.gramsperorderlarge.errors.invalidMsg}}
           </ion-text>
         </div>  
-      </div>
+      </div> -->
       
       
         <!-- Grams Per Order -->
-        <div *ngIf="hideInputFieldsforMilkteaAndFruitTea">
+        <!-- <div *ngIf="hideInputFieldsforMilkteaAndFruitTea">
           <ion-item lines="none">
             <ion-label style="font-weight: 900;" text-wrap>Grams Per Order :</ion-label>
             <ion-input type="tel"  placeholder="Enter Grams Per Order" formControlName="gramsperorder"></ion-input>
@@ -164,8 +218,7 @@
               {{registerForm.controls.gramsperorder.errors.invalidMsg}}
             </ion-text>
           </div>
-    
-        </div>
+        </div> -->
 
     </form>
   </div>
