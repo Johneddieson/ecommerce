@@ -20,7 +20,7 @@
           <label>Password</label>
         </div>
         <div *ngIf="!ishide" class="pass" (click)="ResetPassword()">Forgot Password?</div>
-        <button class="button" *ngIf="!ishide" (click)="LogIn(email, password)">Login</button>
+        <button class="button" *ngIf="!ishide" (click)="LogIn()">Login</button>
         <button class="button" *ngIf="ishide && isthisadmin" (click)="navigateadmin()"  >Continue as Admin</button>
         <button class="button" *ngIf="ishide && !isthisadmin" (click)="navigatecustomer()" >Continue as Customer</button>
       

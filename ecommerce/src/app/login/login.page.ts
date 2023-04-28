@@ -3,8 +3,6 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, NavController } from '@ionic/angular';
-import { fromEvent, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { AuthServiceService } from '../auth-service.service';
 
 @Component({
@@ -24,10 +22,7 @@ export class LoginPage implements OnInit {
     private alertCtrl: AlertController, private router: Router,
     private applicationRef: ApplicationRef,
     private zone: NgZone
-    ) {
-      
-        
-    }
+    ) {}
 
   ngOnInit() {
  
@@ -95,39 +90,124 @@ this.alertCtrl.create({
 
    
   }
-  LogIn(email, password) {
-    this.auth.SignIn(email.value, password.value).then((res => {
-      
-        
-        if (res.user.displayName == "admin") {
-        this.router.navigateByUrl('adminpage')
-        
-      } else {
-        this.router.navigateByUrl('tabs')
-      }
-        
-     
-      sessionStorage.setItem('user', JSON.stringify(res.user));
-   this.Email1 = ''
-   this.Password1 = ''
-    })).catch(err => {
-      
-      
-        this.alertCtrl.create({
-          message: err.message
-        }).then(el => {
-          el.present()
-        })
-    })
-  }
+  
   navigateadmin() {
     this.router.navigateByUrl('adminpage')
   }
   navigatecustomer() {
     this.router.navigateByUrl('tabs')
   }
-
   gotosignup() {
     this.navCtrl.navigateForward('signup');
   }
+  // LogIn(email, password) {
+  //   this.auth.SignIn(email.value, password.value).then((res => {
+      
+        
+  //       if (res.user.displayName == "admin") {
+  //       this.router.navigateByUrl('adminpage')
+        
+  //     } else {
+  //       this.router.navigateByUrl('tabs')
+  //     }
+        
+     
+  //     sessionStorage.setItem('user', JSON.stringify(res.user));
+  //  this.Email1 = ''
+  //  this.Password1 = ''
+  //   })).catch(err => {
+      
+      
+  //       this.alertCtrl.create({
+  //         message: err.message
+  //       }).then(el => {
+  //         el.present()
+  //       })
+  //   })
+  // }
+  LogIn()
+    {
+        this.auth.SignIn(this.Email1, this.Password1)
+        .then(async (success) => 
+        {
+            if (success.user.emailVerified == false)
+            {
+                var alertController = await this.alertCtrl.create
+                ({
+                  message: `Your email is not yet verified, Please verify it to your email box
+                  before proceeding.`,
+                  buttons: 
+                  [
+                    // {
+                    //   text: 'Yes',
+                    //   handler: async () => 
+                    //   {
+                    //     var alertSent = await this.alertCtrl.create
+                    //     ({
+                    //       message: 'Email verification has been sent to your email, Please verify it first so you can proceed.',
+                    //       buttons: [
+                    //         {
+                    //           text: 'Ok',                              
+                    //           role:'cancel'
+                    //         }
+                    //       ]
+                    //     })
+                    //     await alertSent.present();
+                    //     this.afauth.signOut();
+                    //     success.user.sendEmailVerification();
+                    //   }
+                    // },
+                    {
+                      text: 'Ok',
+                      role: 'cancel'
+                    }
+                  ]
+                })
+                await alertController.present();
+            }
+            else 
+            {
+              var successLoading = await this.loadingCtrl.create
+              ({
+                message: 'Logging in...',
+                spinner: 'lines-sharp'
+              })   
+              await successLoading.present();
+
+              setTimeout(async () => {
+                await successLoading.dismiss();
+                if (success.user.displayName == 'admin')
+                {
+                  this.router.navigateByUrl('adminpage')
+                }
+                else 
+                {
+                  this.router.navigateByUrl('home')
+                }
+                sessionStorage.setItem('user', JSON.stringify(success.user));
+                
+                //email = '';
+                //password = ''
+                this.Email1 = ''
+                this.Password1 = ''
+              }, 3000);
+            }
+        })
+        .catch(async err => 
+          {
+              var alertError = await this.alertCtrl.create
+              ({
+                message: err.message,
+                buttons: 
+                [
+                  {
+                    text: 'Close',
+                    role: 'cancel'
+                  }
+                ]
+              })
+              await alertError.present();
+          })      
+    }
+
 }

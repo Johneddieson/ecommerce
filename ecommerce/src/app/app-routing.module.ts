@@ -89,6 +89,16 @@ const routes: Routes = [
      loadChildren: () => import("./admintab3/admintab3.module").then(m => m.Admintab3PageModule),
      canActivate: [AuthGuard]
   },
+  {
+    path: 'addmaterial',
+    loadChildren: () => import('./addmaterial/addmaterial.module').then( m => m.AddmaterialPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'viewmaterials',
+    loadChildren: () => import('./viewmaterials/viewmaterials.module').then( m => m.ViewmaterialsPageModule),
+    canActivate: [AuthGuard]
+  },
   // {
   //   path: 'changepassword',
   //   loadChildren: () => import('./changepassword/changepassword.module').then( m => m.ChangepasswordPageModule)

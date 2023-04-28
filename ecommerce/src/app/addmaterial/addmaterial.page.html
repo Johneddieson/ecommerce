@@ -1,0 +1,42 @@
+<!-- <ion-header>
+  <ion-toolbar>
+    <ion-title>addmaterial</ion-title>
+  </ion-toolbar>
+</ion-header> -->
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons slot="start">
+     <ion-icon name="arrow-back-outline" slot="icon-only" style="cursor: pointer;" routerLink="/adminpage/atab1"></ion-icon>
+    </ion-buttons>
+    <ion-title>Add Material</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size-md="6" offset-md="3">
+        <ion-card>
+          <ion-card-content>
+            <form>
+              <ion-item>
+                <ion-label position="floating">Itemname</ion-label>
+                <ion-input type="text" #itemname></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="floating">Grams on hand</ion-label>
+                <ion-input type="text" #gramsonhand></ion-input>
+              </ion-item>
+
+              <ion-button color="success" expand="block" type="submit"
+              (click)="addMaterial(itemname, gramsonhand)">Save</ion-button>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+

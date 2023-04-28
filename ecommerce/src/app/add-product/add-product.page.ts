@@ -320,7 +320,7 @@ export class AddProductPage implements OnInit {
             {
                 var alertExisting = await this.alertCtrl.create({
                   message: `${this.registerForm.value.productname} in the ${this.registerForm.value.category} category 
-                  already exist.`,
+                  already exists.`,
                   buttons: [
                     {
                       text: 'Ok',

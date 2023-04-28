@@ -118,62 +118,70 @@ export class Admintab1Page implements OnInit {
 
   ngOnInit() {
   }
-  addproduct() {
-    this.alertCtrl.create({
-      header: 'Choose',
-      inputs: [
-        {
-          type: 'radio',
-          label: 'POS',
-          value: 'POS'
-
-        },
-        {
-          type: 'radio',
-          label: 'View Products',
-          value: 'View Products'
-
-        },
-        {
-          type: 'radio',
-          label: 'Add Product',
-          value: 'Add Product'
-
-        },
-        {
-          type: 'radio',
-          label: 'Inventory',
-          value: 'Inventory'
-
-        },
-      ],
-      buttons: [
-        {
-          text: 'Go',
-          handler: data => {
-            console.log("data", data)
-            if (data == "View Products") {
-              this.router.navigateByUrl('/viewproducts')  
-            } else if (data == "Add Product") {
-
-              this.router.navigateByUrl('/add-product')
-            } else if (data == "POS") {
-              this.router.navigateByUrl('/createpos')
-            }
-            else if (data == "Inventory")
-            {
-              this.router.navigateByUrl('/inventory')
-            }
-          }
-        },
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        }
-      ]
-    }).then(el => {
-      el.present()
-    })
+  morecategories() {
+    this.alertCtrl
+      .create({
+        header: 'Choose',
+        inputs: [
+          {
+            type: 'radio',
+            label: 'Add Material',
+            value: 'Add Material',
+          },
+          {
+            type: 'radio',
+            label: 'Add Product',
+            value: 'Add Product',
+          },
+          {
+            type: 'radio',
+            label: 'POS',
+            value: 'POS',
+          },
+          {
+            type: 'radio',
+            label: 'View Materials',
+            value: 'View Materials',
+          },
+          {
+            type: 'radio',
+            label: 'View Products',
+            value: 'View Products',
+          },
+        ],
+        buttons: [
+          {
+            text: 'Go',
+            handler: (data) => {
+              if (data == 'View Products') {
+                this.router.navigateByUrl('/viewproducts');
+              } 
+              else if (data == 'Add Material') {
+                this.router.navigateByUrl('/addmaterial');
+              }
+              else if (data == 'Add Product') {
+                this.router.navigateByUrl('/add-product');
+              }
+              else if (data == 'View Materials') {
+                this.router.navigateByUrl('/viewmaterials');
+              }
+              else if (data == 'POS') {
+                this.router.navigateByUrl('/createpos');
+              } 
+              // else if (data == 'Inventory') {
+              //   this.router.navigateByUrl('/inventory');
+              // }
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+        ],
+      })
+      .then((el) => {
+        el.present();
+      });
   }
 
   closeAccordion() {
