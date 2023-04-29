@@ -10,6 +10,7 @@ import * as firebase from 'firebase/app'
 import { Button } from 'protractor';
 import { Action } from 'rxjs/internal/scheduler/Action';
 import { isSymbol } from 'util';
+import * as _ from 'lodash'
 @Component({
   selector: 'app-admintab1',
   templateUrl: './admintab1.page.html',
@@ -210,37 +211,17 @@ export class Admintab1Page implements OnInit {
                 //User Notification Approved
                 var totalAmount = this.currencyPipe.transform(data.TotalAmount, "", "")
                 var items = data.OrderDetails.map(function (e) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
-                var confirmed = `Your order has been confirmed by the admin. ${items}. Total amount of ₱${totalAmount}`
+                var confirmed = `Your order has been approved by the admin. ${items}. Total amount of ₱${totalAmount}`
                 this.afstore.collection(`users/${data.BillingIndexId}/notifications`).add({
                   Message: confirmed,
                   Datetime: datetime,
                   read: false,
-                  remarks: "Your order has been confirmed",
+                  remarks: "Your order has been approved",
                   DatetimeToSort: new Date(),
                   OrderId: data.id
                 })
     
-                //Decreasing Stocks
-                data.OrderDetails.forEach(fe => {
-                  //console.log("order details", fe)
-                  this.afstore.doc(`Products/${fe.id}`).update({
-                    Stock: firebase.default.firestore.FieldValue.increment(-fe.Quantity * fe.GramsPerOrder)
-                  })
-                })
     
-                //Inventory Saving
-                data.OrderDetails.forEach(async fe => {
-                  await this.afstore.collection('Inventory').add({
-                    Datetime: datetime,
-                    Category: fe.Category,
-                    ProductName: fe.ProductName,
-                    Quantity: parseInt(fe.GramsPerOrder) * -1,
-                    ImageUrl: fe.ImageUrl,
-                    DatetimeToSort: new Date(),
-                    ProductId: fe.id,
-                    Destination: data.BillingFirstname + " " + data.BillingLastname
-                  })
-                })
     
                 //History Saving
                 this.afstore.collection('History').add({
@@ -274,6 +255,8 @@ export class Admintab1Page implements OnInit {
                 }).then(els2 => {
                   els2.present()
                 })   
+              
+              this.decreaseStock(data.OrderDetails)
               }
             },
             {
@@ -386,4 +369,28 @@ export class Admintab1Page implements OnInit {
     })
 
   }
+  decreaseStock(orders)
+{
+  //this.getMaterials()
+  var getmaterial = orders.map(function (e) {return e.Materials})
+       
+  var ew = _.flatten(getmaterial)
+
+ 
+   ew.forEach(fe => 
+    {
+        this.updateStocks(fe.itemId, fe.Quantity, fe.gramsperorder)
+    })
+}
+updateStocks(itemId, Quantity, gramsperorder)
+{
+   //this.decreaseStocks()
+  var total = parseFloat(Quantity) * parseFloat(gramsperorder) 
+  this.afstore.doc(`Materials/${itemId}`).update({
+    Stock: firebase.default.firestore.FieldValue.increment(-total),
+  }).then(el => {
+  }).catch(err => {
+    //console.log("error edit stock", err)
+  })
+}
 }

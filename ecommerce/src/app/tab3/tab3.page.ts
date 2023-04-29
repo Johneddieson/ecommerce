@@ -23,6 +23,7 @@ phonenumber;
 isDisabled = true;
 isEdit = false
 name;
+forcheckout: any
   constructor(private actRoute: ActivatedRoute, private afstore: AngularFirestore, private afauth: AngularFireAuth,
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController, private router: Router,
@@ -91,6 +92,18 @@ name;
   // }
 
   async ngOnInit() {
+
+    setInterval(() => 
+    {
+      if (this.name == "forcheckout")
+      {
+        this.forcheckout = true
+      }
+      else 
+      {
+        this.forcheckout = false
+      }
+    }, 0)
     if (this.name == 'edit')
     {
       this.isEdit = true
@@ -149,13 +162,13 @@ name;
   }
 
   async Edit() {
-    if (this.name == 'edit')
+    if (this.name != 'forcheckout')
     {
       var cartArray = JSON.parse(sessionStorage.getItem('cart'));
       
       var loadingCtrl = await this.loadingCtrl.create
       ({
-        message: 'Editing Please Wait...',
+        message: 'Please Wait...',
         spinner: 'bubbles'
       })
       await loadingCtrl.present();
@@ -206,22 +219,11 @@ name;
       else
       {
         this.loadingCtrl.create({
-          message: 'Editing Please Wait...'
+          message: 'Please Wait...'
         }).then(loading => {
           loading.present()
-          this.alertCtrl.create({
-            message: 'You edited your information successfully',
-            buttons: [
-              {
-                text: 'Ok',
-                role: 'cancel'
-              }
-            ]
-          }).then(alert => {
-    
          setTimeout(() => {
           loading.dismiss()
-          alert.present()
           this.meReference.update({
             FirstName: this.firstname,
             LastName: this.lastname,
@@ -231,9 +233,7 @@ name;
           })
           this.router.navigateByUrl('/checkout')
          }, 3000)
-          }).catch(alerterr => {
-    
-          })
+          
          
         }).catch(loadingerr => {
     

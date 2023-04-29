@@ -4,7 +4,7 @@ import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { MessengerService } from '../messenger.service';
 import * as firebase from 'firebase/app'
 import { map } from 'rxjs/operators';
@@ -23,25 +23,43 @@ export class CheckoutPage implements OnInit {
   sub
   myInformation: any = {}
   paymentMethod: string = ''
+  pendingorder: any
   constructor(private applicationRef: ApplicationRef,
     private zone: NgZone,
-    private alertCtrl: AlertController, private locationStrategy: LocationStrategy, private router: Router, private afauth: AngularFireAuth, private afstore: AngularFirestore, private msg: MessengerService) {
+    private alertCtrl: AlertController, private locationStrategy: LocationStrategy, private router: Router, 
+    private afauth: AngularFireAuth, private afstore: AngularFirestore, 
+    private msg: MessengerService,
+    private loadingController: LoadingController) {
 
     this.afauth.authState.subscribe(data => {
       if (data && data.uid) {
         this.meReference = afstore.doc(`users/${data.uid}`);
-        this.sub = this.meReference.valueChanges().subscribe(data => {
+        this.sub = this.meReference.valueChanges().subscribe(async data => {
           this.myInformation = data
+          this.pendingorder = this.myInformation.pendingorder
+          // var loadingControllerIfThereisStillPendingOrder = 
+          // await this.loadingController.create
+          // ({
+          //   message: 'Processing your order please wait...',
+      
+          // })
+          // if (this.pendingorder == true)
+          // {
+          //       await loadingControllerIfThereisStillPendingOrder.present();
+          // }
+          // else 
+          // {
+          //   await loadingControllerIfThereisStillPendingOrder.dismiss()
+          // }
         })
         
       }
     })
    }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.msg.cartSubject.next(this.CartDetails())
     this.msg.cartSubject.next(this.loadCart())
-     
     // this.router.events.subscribe(() => {
     //   this.zone.run(() => {
     //     setTimeout(() => {
@@ -54,9 +72,32 @@ export class CheckoutPage implements OnInit {
     //   })
     // })
   }
+  // CartDetails() {
+  //   if (sessionStorage.getItem('cart')) {
+  //     this.getCartDetails = JSON.parse(sessionStorage.getItem('cart'))
+  //   }
+  // }
   CartDetails() {
     if (sessionStorage.getItem('cart')) {
       this.getCartDetails = JSON.parse(sessionStorage.getItem('cart'))
+    
+       this.getCartDetails.map((i, index) => 
+      {
+        
+        i.Materials.map((iMat, index) => 
+        {
+          iMat.Quantity = i.Quantity
+          if (i.Category != "Slushee")
+          {
+            iMat.gramsperorder = i.ProductName.toLowerCase().includes('large') ? iMat.gramsperorderlarge : iMat.gramsperordermedium 
+          }
+          else 
+          {
+            iMat.gramsperorder = iMat.gramsperorder
+          }
+        })
+      })
+      //console.log("product Details", this.getCartDetails)
     }
   }
   inc(id, quantity) {
@@ -135,6 +176,7 @@ gotohome() {
   this.router.navigate(['tabs'])
 }
 async OrderNow() {
+  this.CartDetails()
   this.alertCtrl.create({
     message: 'Are you sure you want to finalize your order?',
     buttons: [
@@ -205,14 +247,17 @@ async OrderNow() {
                 Discount: 'None',
                 PaymentMethod: this.paymentMethod
               }).then(el => {
+                this.meReference.update({
+                  pendingorder: true
+                })
+                this.removeall()
+                this.paymentMethod = ''
+                this.meReference.update({
+                  Address1: '',
+                  Address2: ''
+                })
               }).catch(err => {
                 alert(err)
-              })
-              this.removeall()
-              this.paymentMethod = ''
-              this.meReference.update({
-                Address1: '',
-                Address2: ''
               })
                 }
           }

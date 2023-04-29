@@ -1,6 +1,6 @@
 import { ApplicationRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { AlertController } from '@ionic/angular';
 import { AuthServiceService } from '../auth-service.service';
 import { map } from 'rxjs/operators';
@@ -26,13 +26,17 @@ cartItem:number = 0
 @Input()title: string;
 dropdown = false;
 @ViewChild('productbtn', {read: ElementRef}) productbtn: ElementRef;
+public meReference: AngularFirestoreDocument
+sub2;
 private unsubscriber : Subject<void> = new Subject<void>();
+pendingorder: any
   constructor(private msg: MessengerService, private alertCtrl: AlertController, private auth: AuthServiceService,  private afstore: AngularFirestore, private afauth: AngularFireAuth,
     private locationStrategy: LocationStrategy,
     private router: Router,
     private applicationRef: ApplicationRef,
     private zone: NgZone,
-    private actRoute: ActivatedRoute) {
+    private actRoute: ActivatedRoute) 
+    {
 
       router.events.subscribe(() => {
         zone.run(() => {
@@ -45,17 +49,14 @@ private unsubscriber : Subject<void> = new Subject<void>();
     this.afauth.authState.subscribe(user => {
 
       if (user && user.uid) {
-      //  this.productReference =  afstore.collection('Products')
-      //  this.sub = this.productReference.snapshotChanges().pipe(map(actions => actions.map(a => {
-      //   return {
-      //     id: a.payload.doc.id,
-      //     ...a.payload.doc.data() as any
-      //   }
-      //  }))).subscribe(data => {
-      //   this.productList = data
-      //  }) 
+
+this.meReference = this.afstore.doc(`users/${user.uid}`);
+this.sub2 = this.meReference.valueChanges().subscribe(myobjectInformation => 
+  {
+      this.pendingorder = myobjectInformation.pendingorder
+  })
+
        this.actRoute.queryParams.subscribe(params => {
-        //params.category
         if (params.category == undefined) {
           this.productReference =  afstore.collection('Products')
        
@@ -68,7 +69,6 @@ private unsubscriber : Subject<void> = new Subject<void>();
             ...a.payload.doc.data() as any
           }
          }))).subscribe(data => {
-          data = data.filter(f => f.Stock > 0)
           data = data.sort(function(a, b) {
             if (a.ProductName < b.ProductName) {
               return -1
@@ -79,6 +79,7 @@ private unsubscriber : Subject<void> = new Subject<void>();
             return 0
           })
           this.productList = data
+          //console.log("all products", this.productList.map(function(e) {return e.Materials.length}))
          }) 
        })  
       }
@@ -230,6 +231,16 @@ this.loadCart()
       }
   async AddtoCart(dataProducts) 
  {
+  // if (this.pendingorder == true)
+  // {
+  //   alert("You cannot order while you have a pending order.")
+  // }
+   if(dataProducts.Materials.length <=0)
+  {
+    alert("This product has no condiments. Please order it soon.")
+  }
+  else 
+  {
     if (dataProducts.Category != 'Slushee')
     {
       var alertMilkteaAndFruitTeaCategory = await this.alertCtrl.create({
@@ -282,6 +293,7 @@ this.loadCart()
     {
       await this.addToCartFunction(dataProducts)
     }
+  }
  }
 
  async addToCartFunction(data)

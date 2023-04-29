@@ -30,6 +30,7 @@
     "cordova-browser": "6.0.0",
     "firebase": "^8.2.6",
     "http-server": "^14.1.1",
+    "lodash": "^4.17.21",
     "moment": "^2.29.3",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",

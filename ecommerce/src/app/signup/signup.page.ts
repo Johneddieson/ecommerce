@@ -269,6 +269,7 @@ export class SignupPage implements OnInit {
                 Address1: '',
                 Address2: '',
                 PhoneNumber: '',
+                pendingorder: false
               })
               .then((suc) => {})
               .catch((err) => {
