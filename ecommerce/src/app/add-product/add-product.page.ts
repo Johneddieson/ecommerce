@@ -406,7 +406,7 @@ export class AddProductPage implements OnInit {
                   spinner: 'bubbles'
                 })
                 await loadingCtrl.present();
-               
+                await this.modal.dismiss();
                 var alertSuccess = await this.alertCtrl.create
                 ({
                   message: 'Product Created successfully',
@@ -420,7 +420,7 @@ export class AddProductPage implements OnInit {
                 setTimeout(async () => {
                   await loadingCtrl.dismiss();
                   await alertSuccess.present();
-                  await this.modal.dismiss();
+                  
                 }, 4000);
                this.registerForm.reset()
               this.photoLink = 'https://static.wikia.nocookie.net/otonari-no-tenshi/images/c/c9/No_images_available.jpg/revision/latest?cb=20220104141308'
@@ -571,26 +571,19 @@ this.validationMessageObject = {
        
             
           });
-        //console.log("the final array", this.arrayForMaterial)
       }
       updateGramsPerOrderEvent(event, mat)
       {
         mat.gramsperorder = parseInt(event.target.value)
         this.validationForGramsPerOrder()
-        //mat.gramsperordermedium = this.category != 'Milktea' ? 0 : parseInt(event.target.value)
-        //mat.gramsperordersmall = this.category != 'Milktea' ? 0 : parseInt(event.target.value) 
       }
       updateGramsPerOrderLargeEvent(event, mat)
       {
-        //mat.gramsperorder = this.category != 'Milktea' ? parseInt(event.target.value) : 0
-        //mat.gramsperordermedium = this.category != 'Milktea' ? 0 : parseInt(event.target.value)
         mat.gramsperorderlarge = parseInt(event.target.value)
         this.validationForGramsPerOrder() 
       }
       updateGramsPerOrderMediumEvent(event, mat)
       {
-        //mat.gramsperorder = this.category != 'Milktea' ? parseInt(event.target.value) : 0
-        //mat.gramsperordermedium = this.category != 'Milktea' ? 0 : parseInt(event.target.value)
         mat.gramsperordermedium = parseInt(event.target.value) 
         this.validationForGramsPerOrder()
       }
@@ -600,19 +593,16 @@ this.validationMessageObject = {
       
         if (this.registerForm.value.category != 'Slushee')
         {
-          // (isNaN(f.gramsperorder) || f.gramsperorder == 0) 
-          // ||
           filterNanValues = this.arrayForMaterial.filter(f =>  f.gramsperorderlarge == 0  || 
           f.gramsperordermedium == 0 || isNaN(parseInt(f.gramsperorderlarge))
           || isNaN(parseInt(f.gramsperordermedium)))
         }
         else 
         {
-          filterNanValues = this.arrayForMaterial.filter(f => f.gramsperorder == 0 || isNaN(parseInt(f.gramsperorder)))
+          filterNanValues = this.arrayForMaterial.filter
+          (f => f.gramsperorder == 0 || isNaN(parseInt(f.gramsperorder)))
         }
           
-          var showCondimentsWithNaNValues = filterNanValues.map(function(e) {return `${e.itemName.replace(",", "")} \n`}).toString()
-          showCondimentsWithNaNValues = showCondimentsWithNaNValues.replace(",", "")
           if (filterNanValues.length >= 1)
           {
             this.disableSaveChangesButton = true

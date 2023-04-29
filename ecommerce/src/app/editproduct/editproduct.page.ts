@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { LoadingController, AlertController, IonInput } from '@ionic/angular';
+import { LoadingController, AlertController, IonInput, IonModal } from '@ionic/angular';
 import * as moment from 'moment';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-editproduct',
@@ -31,11 +32,18 @@ export class EditproductPage implements OnInit {
   public isValid: boolean = false;
   public errMsg: string = '';
   public validationMessageObject: object = {};
-  p;
+  public materialArray : any[] = []
+ public arrayForMaterial = []
+ public existingMaterials = [];
+ public disableSaveChangesButton: boolean = true
   @ViewChild(IonInput) myInputVariable: IonInput;
+  @ViewChild(IonModal) modal: IonModal;
   productReference: AngularFirestoreDocument;
   sub;
   isdisabled: boolean = false;
+  materialEachElementReference: AngularFirestoreDocument
+  materialReference: AngularFirestoreCollection
+  sub2;
   constructor(
     private actRoute: ActivatedRoute,
     public http: HttpClient,
@@ -43,9 +51,11 @@ export class EditproductPage implements OnInit {
     public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
     private afstore: AngularFirestore
-  ) {
-    this.id = actRoute.snapshot.paramMap.get('id');
+  ) 
+  {
+    //Specific Product Reference//
 
+    this.id = actRoute.snapshot.paramMap.get('id');
     this.productReference = this.afstore.doc(`Products/${this.id}`);
     this.sub = this.productReference.valueChanges().subscribe((data) => {
       this.productname = data.ProductName;
@@ -60,7 +70,29 @@ export class EditproductPage implements OnInit {
       this.gramsperordermedium = data.MediumGramsPerOrder;
       this.gramsperorderlarge = data.LargeGramsPerOrder;
       this.gramsperorder = data.GramsPerOrder;
+
+      var materialsStringId = data.Materials.length <= 0 ? '' : data.Materials.map(function(e) {return e.itemId})
+      this.existingMaterials = data.Materials
+      this.registerForm.controls.materials.setValue(materialsStringId)
     });
+    
+    //END OF Specific Product Reference //
+  
+    //Get the specific product materials//
+
+    this.materialReference = this.afstore.collection(`Materials`, ref => ref.orderBy('Itemname'))
+    this.sub2 = this.materialReference.snapshotChanges()
+      .pipe(map(actions => actions.map(a => {
+        return {
+          id: a.payload.doc.id,
+          ...a.payload.doc.data() as any
+        }
+      }))).subscribe(data => {
+        console.log("triggered", data)
+        this.materialArray = data
+      })
+    
+      //END OF Get the specific product materials //
   }
 
   ngOnInit() {
@@ -270,6 +302,9 @@ export class EditproductPage implements OnInit {
           msg: 'Period is not allowed',
         }),
       ]),
+      materials: new FormControl('', [
+        Validators.required,
+        ]),
     });
   }
   customPatternValid(config: any): ValidatorFn {
@@ -469,7 +504,42 @@ export class EditproductPage implements OnInit {
     } 
     else 
     {
-      var loadingForUpdatingProduct = await this.loadingCtrl.create({
+      this.openModaltosetMaterials()
+    }
+  }
+  async editFunction() {
+    
+    var StockChanges = parseInt(this.currentstock) == parseInt(this.registerForm.value.stock)
+    var datetime = await moment(new Date()).format('MM-DD-YYYY hh:mm A');
+    await this.productReference
+      .update({
+        // GramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt(this.registerForm.value.gramsperorder) : parseInt("0"),
+        // ImageUrl: this.photoLink,
+        // LargeGramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt("0") : parseInt(this.registerForm.value.gramsperorderlarge),
+        // LargePrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.largeprice,
+        // MediumGramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt("0") : parseInt(this.registerForm.value.gramsperordermedium),
+        // MediumPrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.mediumprice,
+        // ProductName: this.registerForm.value.productname,
+        // Quantity: 1,
+        // Stock: parseInt(this.registerForm.value.stock),
+        // UnitPrice: this.registerForm.value.category == 'Slushee' ? this.registerForm.value.unitprice : "0"
+        //GramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt(this.registerForm.value.gramsperorder) : parseInt("0"),
+        
+        //this is my latest changes editing 04302023
+        GramsPerOrder: parseInt("0"),
+        ImageUrl: this.photoLink,
+        LargeGramsPerOrder: parseInt("0"),
+        LargePrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.largeprice,
+        MediumGramsPerOrder: parseInt("0"),
+        MediumPrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.mediumprice,
+        ProductName: this.registerForm.value.productname,
+        Quantity: 1,
+        Stock: parseInt("0"),
+        UnitPrice: this.registerForm.value.category == 'Slushee' ? this.registerForm.value.unitprice : "0",
+        Materials: this.arrayForMaterial
+      }).then(async el => 
+        {
+           var loadingForUpdatingProduct = await this.loadingCtrl.create({
         message: 'Updating product...',
         spinner: 'bubbles',
       });
@@ -488,139 +558,281 @@ export class EditproductPage implements OnInit {
       setTimeout(async () => {
         await loadingForUpdatingProduct.dismiss()
         await alertForUpdatingProduct.present()
-        await this.editFunction()
       }, 4000);
+        }).catch(err => 
+          {
+            alert(JSON.stringify(err))
+          })
+      //END
+ 
     }
-  }
-  async editFunction() {
-    
-    var StockChanges = parseInt(this.currentstock) == parseInt(this.registerForm.value.stock)
-    var datetime = await moment(new Date()).format('MM-DD-YYYY hh:mm A');
-    await this.productReference
-      .update({
-        //Category: this.registerForm.value.category,
-        GramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt(this.registerForm.value.gramsperorder) : parseInt("0"),
-        ImageUrl: this.photoLink,
-        LargeGramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt("0") : parseInt(this.registerForm.value.gramsperorderlarge),
-        LargePrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.largeprice,
-        MediumGramsPerOrder: this.registerForm.value.category == 'Slushee' ? parseInt("0") : parseInt(this.registerForm.value.gramsperordermedium),
-        MediumPrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.mediumprice,
-        ProductName: this.registerForm.value.productname,
-        Quantity: 1,
-        Stock: parseInt(this.registerForm.value.stock),
-        UnitPrice: this.registerForm.value.category == 'Slushee' ? this.registerForm.value.unitprice : "0"
-      })
-      
-      if (StockChanges == false) {
-        await this.afstore.collection('Inventory').add({
-          Datetime: datetime,
-          Category: this.registerForm.value.category,
-          ProductName: this.registerForm.value.productname,
-          Quantity: parseInt(this.registerForm.value.stock),
-          ImageUrl: this.photoLink,
-          DatetimeToSort: new Date(),
-          ProductId: this.id,
-          Destination: 'Admin'
+
+    setMaterials()
+  {
+    this.arrayForMaterial = this.registerForm.value.materials
+    //assigned object for material list string
+    this.arrayForMaterial = this.arrayForMaterial.map((i, index) => {
+      return Object.assign(
+        {},
+        {
+          itemId: i,
+          gramsperorderlarge : this.existingMaterials.filter(f => f.itemId === i).length > 0 ? 
+          parseInt(this.existingMaterials.filter(f => f.itemId === i).map(function (e) {return e.gramsperorderlarge}).toString())
+          : 0,
+          gramsperordermedium : this.existingMaterials.filter(f => f.itemId === i).length > 0 ? 
+          parseInt(this.existingMaterials.filter(f => f.itemId === i).map(function (e) {return e.gramsperordermedium}).toString())
+          : 0,
+          gramsperorder :  this.existingMaterials.filter(f => f.itemId === i).length > 0 ? 
+          parseInt(this.existingMaterials.filter(f => f.itemId === i).map(function (e) {return e.gramsperorder}).toString())
+          : 0,   
+        }
+      );
+    });
+    //get the itemname of materials by using their uniqueidentifier ID
+    this.arrayForMaterial.map((i, index) => {
+      this.materialEachElementReference = this.afstore.doc(
+        `Materials/${i.itemId}`
+      );
+
+      this.materialEachElementReference
+        .get()
+        .pipe(
+          map((actions) => {
+            return actions.data() as any;
+          })
+        )
+        .subscribe((data) => {
+          i.itemName =  data.Itemname;
         });
-      }
+   
+        
+      });
+    //console.log("the final array", this.arrayForMaterial)
+    console.log("the category", this.category)
   }
 
-  validation() {
-    var categoryvalidationiserror = this.registerForm.controls.category.invalid;
-    var productnamevalidationiserror =
-      this.registerForm.controls.productname.invalid;
-    var stockvalidationiserror = this.registerForm.controls.stock.invalid;
-    var unitpricevalidationiserror =
-      this.registerForm.controls.unitprice.invalid;
-    var mediumpricevalidationiserror =
-      this.registerForm.controls.mediumprice.invalid;
-    var largepricevalidationiserror =
-      this.registerForm.controls.largeprice.invalid;
-    var gramsperordermediumvalidationiserror =
-      this.registerForm.controls.gramsperordermedium.invalid;
-    var gramsperorderlargevalidationiserror =
-      this.registerForm.controls.gramsperorderlarge.invalid;
-    var gramsperordervalidationiserror =
-      this.registerForm.controls.gramsperorder.invalid;
+  // validation() {
+  //   var categoryvalidationiserror = this.registerForm.controls.category.invalid;
+  //   var productnamevalidationiserror =
+  //     this.registerForm.controls.productname.invalid;
+  //   var stockvalidationiserror = this.registerForm.controls.stock.invalid;
+  //   var unitpricevalidationiserror =
+  //     this.registerForm.controls.unitprice.invalid;
+  //   var mediumpricevalidationiserror =
+  //     this.registerForm.controls.mediumprice.invalid;
+  //   var largepricevalidationiserror =
+  //     this.registerForm.controls.largeprice.invalid;
+  //   var gramsperordermediumvalidationiserror =
+  //     this.registerForm.controls.gramsperordermedium.invalid;
+  //   var gramsperorderlargevalidationiserror =
+  //     this.registerForm.controls.gramsperorderlarge.invalid;
+  //   var gramsperordervalidationiserror =
+  //     this.registerForm.controls.gramsperorder.invalid;
 
-    if (
-      this.registerForm.value.category == '' ||
-      this.registerForm.value.category == null ||
-      this.registerForm.value.category == undefined
-    ) {
-      this.errMsg = '';
-      this.isValid = false;
-      this.errMsg += categoryvalidationiserror === true ? '• Category<br>' : '';
-      this.errMsg +=
-        productnamevalidationiserror === true ? '• Product Name<br>' : '';
-      this.errMsg += stockvalidationiserror === true ? '• Stock<br>' : '';
-      this.errMsg +=
-        unitpricevalidationiserror === true ? '• Unit Price<br>' : '';
-      this.errMsg +=
-        gramsperordervalidationiserror === true ? '• Grams Per Order<br>' : '';
-    } else if (this.registerForm.value.category == 'Slushee') {
-      if (
-        categoryvalidationiserror === true ||
-        productnamevalidationiserror === true ||
-        stockvalidationiserror === true ||
-        unitpricevalidationiserror === true
-      ) {
-        this.errMsg = '';
-        this.isValid = false;
-        this.errMsg +=
-          categoryvalidationiserror === true ? '• Category<br>' : '';
-        this.errMsg +=
-          productnamevalidationiserror === true ? '• Product Name<br>' : '';
-        this.errMsg += stockvalidationiserror === true ? '• Stock<br>' : '';
-        this.errMsg +=
-          unitpricevalidationiserror === true ? '• Unit Price<br>' : '';
-        this.errMsg +=
-          gramsperordervalidationiserror === true
-            ? '• Grams Per Order<br>'
-            : '';
-      } else {
-        this.isValid = true;
-        this.errMsg = '';
-      }
-    } else {
-      if (
-        categoryvalidationiserror === true ||
-        productnamevalidationiserror === true ||
-        stockvalidationiserror === true ||
-        mediumpricevalidationiserror === true ||
-        largepricevalidationiserror === true ||
-        gramsperordermediumvalidationiserror === true ||
-        gramsperorderlargevalidationiserror === true
-      ) {
-        this.errMsg = '';
-        this.isValid = false;
-        this.errMsg +=
-          categoryvalidationiserror === true ? '• Category<br>' : '';
-        this.errMsg +=
-          productnamevalidationiserror === true ? '• Product Name<br>' : '';
-        this.errMsg += stockvalidationiserror === true ? '• Stock<br>' : '';
-        this.errMsg +=
-          mediumpricevalidationiserror === true ? '• Medium Price<br>' : '';
-        this.errMsg +=
-          largepricevalidationiserror === true ? '• Large Price<br>' : '';
-        this.errMsg +=
-          gramsperordermediumvalidationiserror === true
-            ? '• Grams Per Order Medium<br>'
-            : '';
-        this.errMsg +=
-          gramsperorderlargevalidationiserror === true
-            ? '• Grams Per Order Large<br>'
-            : '';
-      } else {
-        this.isValid = true;
-        this.errMsg = '';
-      }
+  //   if (
+  //     this.registerForm.value.category == '' ||
+  //     this.registerForm.value.category == null ||
+  //     this.registerForm.value.category == undefined
+  //   ) {
+  //     this.errMsg = '';
+  //     this.isValid = false;
+  //     this.errMsg += categoryvalidationiserror === true ? '• Category<br>' : '';
+  //     this.errMsg +=
+  //       productnamevalidationiserror === true ? '• Product Name<br>' : '';
+  //     this.errMsg += stockvalidationiserror === true ? '• Stock<br>' : '';
+  //     this.errMsg +=
+  //       unitpricevalidationiserror === true ? '• Unit Price<br>' : '';
+  //     this.errMsg +=
+  //       gramsperordervalidationiserror === true ? '• Grams Per Order<br>' : '';
+  //   } else if (this.registerForm.value.category == 'Slushee') {
+  //     if (
+  //       categoryvalidationiserror === true ||
+  //       productnamevalidationiserror === true ||
+  //       stockvalidationiserror === true ||
+  //       unitpricevalidationiserror === true
+  //     ) {
+  //       this.errMsg = '';
+  //       this.isValid = false;
+  //       this.errMsg +=
+  //         categoryvalidationiserror === true ? '• Category<br>' : '';
+  //       this.errMsg +=
+  //         productnamevalidationiserror === true ? '• Product Name<br>' : '';
+  //       this.errMsg += stockvalidationiserror === true ? '• Stock<br>' : '';
+  //       this.errMsg +=
+  //         unitpricevalidationiserror === true ? '• Unit Price<br>' : '';
+  //       this.errMsg +=
+  //         gramsperordervalidationiserror === true
+  //           ? '• Grams Per Order<br>'
+  //           : '';
+  //     } else {
+  //       this.isValid = true;
+  //       this.errMsg = '';
+  //     }
+  //   } else {
+  //     if (
+  //       categoryvalidationiserror === true ||
+  //       productnamevalidationiserror === true ||
+  //       stockvalidationiserror === true ||
+  //       mediumpricevalidationiserror === true ||
+  //       largepricevalidationiserror === true ||
+  //       gramsperordermediumvalidationiserror === true ||
+  //       gramsperorderlargevalidationiserror === true
+  //     ) {
+  //       this.errMsg = '';
+  //       this.isValid = false;
+  //       this.errMsg +=
+  //         categoryvalidationiserror === true ? '• Category<br>' : '';
+  //       this.errMsg +=
+  //         productnamevalidationiserror === true ? '• Product Name<br>' : '';
+  //       this.errMsg += stockvalidationiserror === true ? '• Stock<br>' : '';
+  //       this.errMsg +=
+  //         mediumpricevalidationiserror === true ? '• Medium Price<br>' : '';
+  //       this.errMsg +=
+  //         largepricevalidationiserror === true ? '• Large Price<br>' : '';
+  //       this.errMsg +=
+  //         gramsperordermediumvalidationiserror === true
+  //           ? '• Grams Per Order Medium<br>'
+  //           : '';
+  //       this.errMsg +=
+  //         gramsperorderlargevalidationiserror === true
+  //           ? '• Grams Per Order Large<br>'
+  //           : '';
+  //     } else {
+  //       this.isValid = true;
+  //       this.errMsg = '';
+  //     }
+  //   }
+
+  //   this.validationMessageObject = {
+  //     isValid: this.isValid,
+  //     errMessage: this.errMsg,
+  //   };
+  //   return this.validationMessageObject;
+  // }
+  validation() 
+  {
+    var categoryvalidationiserror =  this.registerForm.controls.category.invalid
+    var productnamevalidationiserror =  this.registerForm.controls.productname.invalid
+    //var stockvalidationiserror =  this.registerForm.controls.stock.invalid
+    var unitpricevalidationiserror =  this.registerForm.controls.unitprice.invalid
+    var mediumpricevalidationiserror =  this.registerForm.controls.mediumprice.invalid
+    var largepricevalidationiserror =  this.registerForm.controls.largeprice.invalid
+    //var gramsperordermediumvalidationiserror =  this.registerForm.controls.gramsperordermedium.invalid
+    //var gramsperorderlargevalidationiserror =  this.registerForm.controls.gramsperorderlarge.invalid
+    //var gramsperordervalidationiserror =  this.registerForm.controls.gramsperorder.invalid
+    var materialvalidationiserror = this.registerForm.controls.materials.invalid
+    if (this.registerForm.value.category == '' || this.registerForm.value.category == null 
+    || this.registerForm.value.category == undefined) 
+    {
+        this.errMsg = ''
+        this.isValid = false
+        this.errMsg += categoryvalidationiserror === true ? "• Category<br>" : ""
+        this.errMsg += productnamevalidationiserror === true ? "• Product Name<br>" : ""
+        //this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
+        this.errMsg += materialvalidationiserror === true ? "• Materials<br>" : ""
+        this.errMsg += unitpricevalidationiserror === true ? "• Unit Price<br>" : ""
+        //this.errMsg += gramsperordervalidationiserror === true ? "• Grams Per Order<br>" : ""
+
+    }
+     else if (this.registerForm.value.category == 'Slushee')
+    {
+      if (categoryvalidationiserror === true || productnamevalidationiserror === true ||
+         unitpricevalidationiserror === true || materialvalidationiserror === true 
+         )
+        {
+          this.errMsg = ''
+          this.isValid = false
+          this.errMsg += categoryvalidationiserror === true ? "• Category<br>" : ""
+          this.errMsg += productnamevalidationiserror === true ? "• Product Name<br>" : ""
+          //this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
+          this.errMsg += materialvalidationiserror === true ? "• Materials<br>" : ""
+          this.errMsg += unitpricevalidationiserror === true ? "• Unit Price<br>" : ""
+          //this.errMsg += gramsperordervalidationiserror === true ? "• Grams Per Order<br>" : ""
+        }
+        else 
+        {
+          this.isValid =  true
+          this.errMsg = ''
+        }
+    }
+    else 
+    {
+      if (categoryvalidationiserror === true || productnamevalidationiserror === true 
+        ||  mediumpricevalidationiserror === true
+        || largepricevalidationiserror === true || materialvalidationiserror === true)
+        {
+          this.errMsg = ''
+          this.isValid = false
+          this.errMsg += categoryvalidationiserror === true ? "• Category<br>" : ""
+          this.errMsg += productnamevalidationiserror === true ? "• Product Name<br>" : ""
+          this.errMsg += materialvalidationiserror === true ? "• Materials<br>" : ""
+          //this.errMsg += stockvalidationiserror === true ? "• Stock<br>" : ""
+          this.errMsg += mediumpricevalidationiserror === true ? "• Medium Price<br>" : ""
+          this.errMsg += largepricevalidationiserror === true ? "• Large Price<br>" : ""
+          //this.errMsg += gramsperordermediumvalidationiserror === true ? "• Grams Per Order Medium<br>" : ""
+          //this.errMsg += gramsperorderlargevalidationiserror === true ? "• Grams Per Order Large<br>" : ""
+        }
+        else 
+        {
+          this.isValid =  true
+          this.errMsg = ''
+        }
     }
 
-    this.validationMessageObject = {
-      isValid: this.isValid,
-      errMessage: this.errMsg,
-    };
-    return this.validationMessageObject;
-  }
+this.validationMessageObject = {
+  isValid: this.isValid,
+  errMessage: this.errMsg
 }
+    return this.validationMessageObject
+  }
+ 
+  updateGramsPerOrderEvent(event, mat)
+      {
+        mat.gramsperorder = parseInt(event.target.value)
+        this.validationForGramsPerOrder()
+      }
+      updateGramsPerOrderLargeEvent(event, mat)
+      {
+        mat.gramsperorderlarge = parseInt(event.target.value)
+        this.validationForGramsPerOrder() 
+      }
+      updateGramsPerOrderMediumEvent(event, mat)
+      {
+        mat.gramsperordermedium = parseInt(event.target.value) 
+        this.validationForGramsPerOrder()
+      }
+      validationForGramsPerOrder()
+      {
+        var filterNanValues;
+      
+        if (this.registerForm.value.category != 'Slushee')
+        {
+          filterNanValues = this.arrayForMaterial.filter(f =>  f.gramsperorderlarge == 0  || 
+          f.gramsperordermedium == 0 || isNaN(parseInt(f.gramsperorderlarge))
+          || isNaN(parseInt(f.gramsperordermedium)))
+        }
+        else 
+        {
+          filterNanValues = this.arrayForMaterial.filter
+          (f => f.gramsperorder == 0 || isNaN(parseInt(f.gramsperorder)))
+        }
+          
+          if (filterNanValues.length >= 1)
+          {
+            this.disableSaveChangesButton = true
+          }
+          else 
+          {
+            this.disableSaveChangesButton = false
+          } 
+      }
+      close() {
+        this.modal.dismiss()  
+    }
+    openModaltosetMaterials()
+    {
+      this.setMaterials()
+      this.modal.present();
+    }
+    }
+
