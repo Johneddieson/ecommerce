@@ -229,36 +229,64 @@ async OrderNow() {
                 }
                 else 
                 {
-                  els.present()
-                  var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
-              this.afstore.collection('Orders').add({
-                OrderDetails: this.getCartDetails,
-                BillingFirstname: this.myInformation.FirstName,
-                BillingLastname: this.myInformation.LastName,
-                BillingAddress1: this.myInformation.Address1,
-                BillingAddress2: this.myInformation.Address2,
-                BillingPhonenumber: this.myInformation.PhoneNumber,
-                Billingemail: this.myInformation.Email,
-                BillingIndexId: this.myInformation.Uid,
-                Status: 'Open',
-                Datetime: datetime,
-                TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-                DatetimeToSort: new Date(),
-                Discount: 'None',
-                PaymentMethod: this.paymentMethod
-              }).then(el => {
-                this.meReference.update({
-                  pendingorder: true
-                })
-                this.removeall()
-                this.paymentMethod = ''
-                this.meReference.update({
-                  Address1: '',
-                  Address2: ''
-                })
-              }).catch(err => {
-                alert(err)
-              })
+                  var notealert = await this.alertCtrl.create
+                  ({
+                    header: 'Write note for the admin, if none, just click order button',
+                    backdropDismiss: false,
+                    inputs: 
+                    [
+                      {
+                        type: 'textarea',
+                        label: 'note',
+                        placeholder: 'Write your note here'
+                      }
+                    ],
+                    buttons: 
+                    [
+                      {
+                        text: 'Order',
+                        handler: (notevalue) => 
+                        {
+                          els.present()
+                          var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
+                      this.afstore.collection('Orders').add({
+                        OrderDetails: this.getCartDetails,
+                        BillingFirstname: this.myInformation.FirstName,
+                        BillingLastname: this.myInformation.LastName,
+                        BillingAddress1: this.myInformation.Address1,
+                        BillingAddress2: this.myInformation.Address2,
+                        BillingPhonenumber: this.myInformation.PhoneNumber,
+                        Billingemail: this.myInformation.Email,
+                        BillingIndexId: this.myInformation.Uid,
+                        Status: 'Open',
+                        Datetime: datetime,
+                        TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+                        DatetimeToSort: new Date(),
+                        Discount: 'None',
+                        PaymentMethod: this.paymentMethod,
+                        Note: notevalue[0] == '' ? 'NONE' : notevalue[0]
+                      }).then(el => {
+                        this.meReference.update({
+                          pendingorder: true
+                        })
+                        this.removeall()
+                        this.paymentMethod = ''
+                        this.meReference.update({
+                          Address1: '',
+                          Address2: ''
+                        })
+                      }).catch(err => {
+                        alert(err)
+                      })
+                        }
+                      },
+                      {
+                        text: 'Close',
+                        role: 'cancel'
+                      }
+                    ]
+                  })
+                  await notealert.present();
                 }
           }
           })

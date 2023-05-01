@@ -182,7 +182,7 @@ this.alertCtrl.create({
                 }
                 else 
                 {
-                  this.router.navigateByUrl('home')
+                  this.router.navigateByUrl('/tabs/tab1')
                 }
                 sessionStorage.setItem('user', JSON.stringify(success.user));
                 

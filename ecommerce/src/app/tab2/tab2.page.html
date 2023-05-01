@@ -36,9 +36,14 @@
     
 
       <!-- (click)="update(data)" -->
-      <ion-button *ngIf="!data.read" (click)="sendFeedBack(data)">
+      <ion-button (click)="sendFeedBack(data)">
         <!-- <ion-icon name="book"></ion-icon> -->
         <p>Send Feedback</p>
+      </ion-button>
+
+      <ion-button color="success" *ngIf="!data.read" (click)="update(data)">
+        <!-- <ion-icon name="book"></ion-icon> -->
+        <p>Mark as read</p>
       </ion-button>
 
       <!-- <ion-item button (click)="delete(item.key)">

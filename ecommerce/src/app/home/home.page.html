@@ -54,7 +54,7 @@
           <span style="float: right; ">
             <button id="btn" (click)="AddtoCart(data)"> Add</button> 
            </span>
-          <p class="rate" style="font-weight: 1000; color: black;"> {{data.Stock}} grams remaining stock</p>
+          <!-- <p class="rate" style="font-weight: 1000; color: black;"> {{data.Stock}} grams remaining stock</p> -->
           <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category == 'Slushee'">₱ {{data.UnitPrice}}</p>
           <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category != 'Slushee'">(MD): ₱ {{data.MediumPrice}}</p>
           <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category != 'Slushee'">(LG): ₱ {{data.LargePrice}}</p>

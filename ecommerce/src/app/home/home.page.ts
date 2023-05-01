@@ -275,7 +275,8 @@ this.loadCart()
                 Quantity: dataProducts.Quantity,
                 Stock: dataProducts.Stock,
                 UnitPrice: data == 'Medium' ?  dataProducts.MediumPrice : dataProducts.LargePrice,
-                id: dataProducts.id
+                id: dataProducts.id,
+                Materials: dataProducts.Materials
               }
               await this.addToCartFunction(orderObject)
               dataProducts.Quantity = 1

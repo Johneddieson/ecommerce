@@ -13,6 +13,7 @@ import { AuthGuard } from './auth.guard';
 import {HttpClientModule } from '@angular/common/http';
 import { AuthForLoginSignupGuard } from './auth-for-login-signup.guard';
 import { CurrencyPipe } from '@angular/common';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -28,7 +29,7 @@ import { CurrencyPipe } from '@angular/common';
     }),
     AngularFirestoreModule,
   HttpClientModule,],
-  providers: [CurrencyPipe, AuthForLoginSignupGuard, AuthGuard, AuthServiceService,{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [Geolocation, CurrencyPipe, AuthForLoginSignupGuard, AuthGuard, AuthServiceService,{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

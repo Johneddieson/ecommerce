@@ -99,6 +99,11 @@ const routes: Routes = [
     loadChildren: () => import('./viewmaterials/viewmaterials.module').then( m => m.ViewmaterialsPageModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'vieworderbyid/:id',
+    loadChildren: () => import('./vieworderbyid/vieworderbyid.module').then( m => m.VieworderbyidPageModule),
+    canActivate: [AuthGuard]
+  },
   // {
   //   path: 'changepassword',
   //   loadChildren: () => import('./changepassword/changepassword.module').then( m => m.ChangepasswordPageModule)

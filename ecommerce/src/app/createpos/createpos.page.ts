@@ -64,7 +64,7 @@ private unsubscriber : Subject<void> = new Subject<void>();
           //     Stock: 20000
           //   })
           // })
-          data = data.filter(f => f.Stock > 0)
+          //data = data.filter(f => f.Stock > 0)
           data = data.sort(function(a, b) {
             if (a.ProductName < b.ProductName) {
               return -1
@@ -220,61 +220,134 @@ this.loadCart()
       }
 
       
- async AddtoCart(dataProducts) 
+//  async AddtoCart(dataProducts) 
+//  {
+//     if (dataProducts.Category != 'Slushee')
+//     {
+//       var alertMilkteaAndFruitTeaCategory = await this.alertCtrl.create({
+//         header: 'Choose Size',
+//         inputs: [
+//           {
+//             type:'radio',
+//             label: 'Medium',
+//             value: 'Medium',
+//             name: 'Medium'
+//           },
+//           {
+//             type:'radio',
+//             label: 'Large',
+//             value: 'Large',
+//             name: 'Large'
+//           },
+//         ],
+//         buttons: [
+//           {
+//             text: 'Add to cart',
+//             handler: async (data) => {
+//               var orderObject = {
+//                 Category: dataProducts.Category,
+//                 GramsPerOrder: data == 'Medium' ? dataProducts.MediumGramsPerOrder : dataProducts.LargeGramsPerOrder,
+//                 ImageUrl: dataProducts.ImageUrl,
+//                 LargeGramsPerOrder: dataProducts.LargeGramsPerOrder,
+//                 LargePrice: dataProducts.LargePrice,
+//                 MediumGramsPerOrder: dataProducts.MediumGramsPerOrder,
+//                 MediumPrice: dataProducts.MediumPrice,
+//                 ProductName: data == 'Medium' ? `${dataProducts.ProductName} Medium` : `${dataProducts.ProductName} Large`,
+//                 Quantity: dataProducts.Quantity,
+//                 Stock: dataProducts.Stock,
+//                 UnitPrice: data == 'Medium' ?  dataProducts.MediumPrice : dataProducts.LargePrice,
+//                 id: dataProducts.id
+//               }
+//               await this.addToCartFunction(orderObject)
+//               dataProducts.Quantity = 1
+//             }
+//           },
+//           {
+//             text: 'Cancel',
+//             role: 'cancel'
+//           }
+//         ]      
+//       })
+//       await alertMilkteaAndFruitTeaCategory.present();
+//     }
+//     else 
+//     {
+//       await this.addToCartFunction(dataProducts)
+//     }
+//  }
+
+
+async AddtoCart(dataProducts) 
+{
+  if(dataProducts.Materials.length <=0)
  {
-    if (dataProducts.Category != 'Slushee')
-    {
-      var alertMilkteaAndFruitTeaCategory = await this.alertCtrl.create({
-        header: 'Choose Size',
-        inputs: [
-          {
-            type:'radio',
-            label: 'Medium',
-            value: 'Medium',
-            name: 'Medium'
-          },
-          {
-            type:'radio',
-            label: 'Large',
-            value: 'Large',
-            name: 'Large'
-          },
-        ],
-        buttons: [
-          {
-            text: 'Add to cart',
-            handler: async (data) => {
-              var orderObject = {
-                Category: dataProducts.Category,
-                GramsPerOrder: data == 'Medium' ? dataProducts.MediumGramsPerOrder : dataProducts.LargeGramsPerOrder,
-                ImageUrl: dataProducts.ImageUrl,
-                LargeGramsPerOrder: dataProducts.LargeGramsPerOrder,
-                LargePrice: dataProducts.LargePrice,
-                MediumGramsPerOrder: dataProducts.MediumGramsPerOrder,
-                MediumPrice: dataProducts.MediumPrice,
-                ProductName: data == 'Medium' ? `${dataProducts.ProductName} Medium` : `${dataProducts.ProductName} Large`,
-                Quantity: dataProducts.Quantity,
-                Stock: dataProducts.Stock,
-                UnitPrice: data == 'Medium' ?  dataProducts.MediumPrice : dataProducts.LargePrice,
-                id: dataProducts.id
-              }
-              await this.addToCartFunction(orderObject)
-              dataProducts.Quantity = 1
-            }
-          },
-          {
-            text: 'Cancel',
-            role: 'cancel'
-          }
-        ]      
-      })
-      await alertMilkteaAndFruitTeaCategory.present();
-    }
-    else 
-    {
-      await this.addToCartFunction(dataProducts)
-    }
+   alert("This product has no condiments. Please order it soon.")
  }
+ else 
+ {
+  // dataProducts.Materials = dataProducts.Materials.map((i, index) => 
+  // {
+  //   return Object.assign({}, i, 
+  //     {
+  //       Quantity: dataProducts.Quantity
+  //     })
+  // })
+
+   if (dataProducts.Category != 'Slushee')
+   {
+     var alertMilkteaAndFruitTeaCategory = await this.alertCtrl.create({
+       header: 'Choose Size',
+       inputs: [
+         {
+           type:'radio',
+           label: 'Medium',
+           value: 'Medium',
+           name: 'Medium'
+         },
+         {
+           type:'radio',
+           label: 'Large',
+           value: 'Large',
+           name: 'Large'
+         },
+       ],
+       buttons: [
+         {
+           text: 'Add to cart',
+           handler: async (data) => {
+             var orderObject = {
+               Category: dataProducts.Category,
+               GramsPerOrder: data == 'Medium' ? dataProducts.MediumGramsPerOrder : dataProducts.LargeGramsPerOrder,
+               ImageUrl: dataProducts.ImageUrl,
+               LargeGramsPerOrder: dataProducts.LargeGramsPerOrder,
+               LargePrice: dataProducts.LargePrice,
+               MediumGramsPerOrder: dataProducts.MediumGramsPerOrder,
+               MediumPrice: dataProducts.MediumPrice,
+               ProductName: data == 'Medium' ? `${dataProducts.ProductName} Medium` : `${dataProducts.ProductName} Large`,
+               Quantity: dataProducts.Quantity,
+               Stock: dataProducts.Stock,
+               UnitPrice: data == 'Medium' ?  dataProducts.MediumPrice : dataProducts.LargePrice,
+               id: dataProducts.id,
+               Materials: dataProducts.Materials
+             }
+             await this.addToCartFunction(orderObject)
+             dataProducts.Quantity = 1
+           }
+         },
+         {
+           text: 'Cancel',
+           role: 'cancel'
+         }
+       ]      
+     })
+     await alertMilkteaAndFruitTeaCategory.present();
+   }
+   else 
+   {
+     await this.addToCartFunction(dataProducts)
+   }
+ }
+}
 
  async addToCartFunction(data)
  {
@@ -288,7 +361,9 @@ this.loadCart()
       sessionStorage.setItem('cart', JSON.stringify(storageDataGet)) 
      
       //data.Quantity = 1
-  } else {
+  } 
+  else 
+  {
     var id = data.id
     var productName = data.ProductName
     let index: number = -1

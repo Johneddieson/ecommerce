@@ -5,6 +5,7 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firest
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { first, last } from 'rxjs/operators';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 @Component({
   selector: 'app-tab3',
@@ -27,7 +28,8 @@ forcheckout: any
   constructor(private actRoute: ActivatedRoute, private afstore: AngularFirestore, private afauth: AngularFireAuth,
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController, private router: Router,
-    private msg: MessengerService) {
+    private msg: MessengerService,
+    private geo: Geolocation) {
       this.name = this.actRoute.snapshot.paramMap.get('name')
     this.afauth.authState.subscribe(data => {
       if (data && data.uid) {
@@ -135,7 +137,8 @@ forcheckout: any
       spinner: 'bubbles'
     })
     await loading.present()
- navigator.geolocation.getCurrentPosition((success) => {
+ this.geo.getCurrentPosition().then((success) => 
+ {
   this.msg.myLoc(success.coords.latitude, success.coords.longitude).subscribe(async data  => 
     {
       var myaddress = data.Response.View[0].Result[0].Location.Address
@@ -158,7 +161,7 @@ forcheckout: any
         await alertIfAddressIsWrong.present();
         this.isDisabled = false
       })
-})
+ })
   }
 
   async Edit() {

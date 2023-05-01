@@ -4,7 +4,7 @@ import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/fire
 import { map } from 'rxjs/operators';
 import * as moment from 'moment';
 import { Router } from '@angular/router';
-import { AlertController, IonAccordionGroup } from '@ionic/angular';
+import { AlertController, IonAccordionGroup, IonModal } from '@ionic/angular';
 import { CurrencyPipe } from '@angular/common';
 import * as firebase from 'firebase/app'
 import { Button } from 'protractor';
@@ -25,6 +25,10 @@ export class Admintab1Page implements OnInit {
   sub2
   allPendingOrders: any[] = []
   currentStock: any[] = []
+  public dataMaterials = []
+comments: string = ''
+public disabledSaveChanges: boolean = false
+@ViewChild(IonModal) modal: IonModal;
   constructor(private afstore: AngularFirestore, private afauth: AngularFireAuth,
     private router: Router,
     private currencyPipe: CurrencyPipe,
@@ -200,63 +204,97 @@ export class Admintab1Page implements OnInit {
           buttons: [
             {
               text: 'Yes',
-              handler: () => {
-                var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
-    
-                //Update order to Approved
-                this.afstore.doc(`Orders/${data.id}`).update({
-                  Status: 'Approved'
-                })
-    
-                //User Notification Approved
-                var totalAmount = this.currencyPipe.transform(data.TotalAmount, "", "")
-                var items = data.OrderDetails.map(function (e) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
-                var confirmed = `Your order has been approved by the admin. ${items}. Total amount of ₱${totalAmount}`
-                this.afstore.collection(`users/${data.BillingIndexId}/notifications`).add({
-                  Message: confirmed,
-                  Datetime: datetime,
-                  read: false,
-                  remarks: "Your order has been approved",
-                  DatetimeToSort: new Date(),
-                  OrderId: data.id
-                })
-    
-    
-    
-                //History Saving
-                this.afstore.collection('History').add({
-                  BillingAddress1: data.BillingAddress1,
-                  BillingAddress2: data.BillingAddress2,
-                  BillingFirstname: data.BillingFirstname,
-                  BillingIndexId: data.BillingIndexId,
-                  BillingLastname: data.BillingLastname,
-                  BillingPhonenumber: data.BillingPhonenumber,
-                  Billingemail: data.Billingemail,
-                  Datetime: data.Datetime,
-                  Status: "Approved",
-                  TotalAmount: data.TotalAmount,
-                  id: data.id,
-                  OrderDetails: data.OrderDetails,
-                  read: false,
-                  DatetimeToSort: new Date(),
-                  Discount: 'None',
-                  PaymentMethod: data.PaymentMethod
-                })
-                this.alertCtrl.create({
-                  header: 'Success',
-                  message: 'This order approved successfully',
+              handler: async () => {
+                var name = [ 'john', 'dixy', 'tom', 'jared']; 
+
+                var options = {
+                  title: 'Choose the name',
+                  message: 'Which name do you like?',
                   buttons: [
                     {
+                      text: 'Cancel',
+                      role: 'cancel',
+                      handler: () => {
+                        console.log('Cancel clicked');
+                      }
+                    },
+                    {
                       text: 'Ok',
-                      role: 'cancel'
+                      handler: data => {
+                        console.log(data);
+                      }
                     }
-                  ]
+                  ],
+                  inputs: []
+                };
+            
+            
+                // Now we add the radio buttons
+                for(let i=0; i< name.length; i++) {
+                  options.inputs.push({ name : 'options', value: name[i], label: name[i], type: 'radio' });
+                }
+            
+                // Create the alert with the options
+                let alert = await this.alertCtrl.create(options);
+                alert.present();
+                
+                  
+              //   var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
     
-                }).then(els2 => {
-                  els2.present()
-                })   
+              //   //Update order to Approved
+              //   this.afstore.doc(`Orders/${data.id}`).update({
+              //     Status: 'Approved'
+              //   })
+    
+              //   //User Notification Approved
+              //   var totalAmount = this.currencyPipe.transform(data.TotalAmount, "", "")
+              //   var items = data.OrderDetails.map(function (e) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
+              //   var confirmed = `Your order has been approved by the admin. ${items}. Total amount of ₱${totalAmount}`
+              //   this.afstore.collection(`users/${data.BillingIndexId}/notifications`).add({
+              //     Message: confirmed,
+              //     Datetime: datetime,
+              //     read: false,
+              //     remarks: "Your order has been approved",
+              //     DatetimeToSort: new Date(),
+              //     OrderId: data.id
+              //   })
+    
+    
+    
+              //   //History Saving
+              //   this.afstore.collection('History').add({
+              //     BillingAddress1: data.BillingAddress1,
+              //     BillingAddress2: data.BillingAddress2,
+              //     BillingFirstname: data.BillingFirstname,
+              //     BillingIndexId: data.BillingIndexId,
+              //     BillingLastname: data.BillingLastname,
+              //     BillingPhonenumber: data.BillingPhonenumber,
+              //     Billingemail: data.Billingemail,
+              //     Datetime: data.Datetime,
+              //     Status: "Approved",
+              //     TotalAmount: data.TotalAmount,
+              //     id: data.id,
+              //     OrderDetails: data.OrderDetails,
+              //     read: false,
+              //     DatetimeToSort: new Date(),
+              //     Discount: 'None',
+              //     PaymentMethod: data.PaymentMethod
+              //   })
+              //   this.alertCtrl.create({
+              //     header: 'Success',
+              //     message: 'This order approved successfully',
+              //     buttons: [
+              //       {
+              //         text: 'Ok',
+              //         role: 'cancel'
+              //       }
+              //     ]
+    
+              //   }).then(els2 => {
+              //     els2.present()
+              //   })   
               
-              this.decreaseStock(data.OrderDetails)
+              // this.decreaseStock(data.OrderDetails)
               }
             },
             {
@@ -393,4 +431,80 @@ updateStocks(itemId, Quantity, gramsperorder)
     //console.log("error edit stock", err)
   })
 }
+
+getMaterialOfProducts(Data)
+      {
+        
+        
+          this.dataMaterials = []
+          this.dataMaterials = Data
+          this.modal.present(); 
+        
+      }
+
+      editMaterialQuantity(event, mat)
+    {
+      var value = event.target.value
+      //console.log("quantity value", value)
+      //console.log("material", mat)
+      mat.Quantity = parseInt(value)
+      //console.log("this order", this.orders)
+      this.condimentsQuantityValidation()
+    }
+    condimentsQuantityValidation()
+    {
+      var mapMaterials = this.dataMaterials.map(function(e) {return e.Materials})
+    var flattenMaterialsArray =  _.flatten(mapMaterials)
+      var filterInvalid = flattenMaterialsArray.filter(f => isNaN(f.Quantity))
+      if (filterInvalid.length > 0)
+      {
+        this.disabledSaveChanges = true
+      }
+      else 
+      {
+        this.disabledSaveChanges = false
+      }
+    }
+    async saveQuantityChanged()
+{
+//this.updateMaterial()
+  this.close()
+}
+close()
+{
+  this.modal.dismiss();
+}
+// updateMaterial()
+//     {
+//       this.afstore.doc(`Orders/${this.id}`).update
+//       ({
+//         OrderDetails: this.orders
+//       }).then(async (success) => 
+//       {
+//         var successAlert = await this.alertCtrl.create
+//         ({
+//           message: 'Updated materials successfully!',
+//           backdropDismiss: false,
+//           buttons: 
+//           [
+//             {
+//               text: 'Close',
+//               role: 'cancel'
+//             }
+//           ]
+//         })
+//         await successAlert.present();
+//       }).catch((err) => 
+//       {
+//         //console.log("error updating quantity")
+//         alert(JSON.stringify(err))
+//       })
+//     }
+
+url(id)
+{
+  var url = `${window.location.origin}/vieworderbyid/${id}`
+  window.open(url, '_blank');
+}
+
 }
