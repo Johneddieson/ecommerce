@@ -1,0 +1,76 @@
+
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons  slot="start">
+     <!-- <ion-back-button></ion-back-button> -->
+     <ion-icon name="arrow-back-outline" slot="icon-only" style="cursor: pointer;" routerLink="/adminpage/atab1"></ion-icon>
+    
+    </ion-buttons>
+    <ion-title>POS</ion-title>
+
+    <ion-buttons  slot="end">
+      <ion-button #productbtn (mouseenter)="dropdown=true" (mouseleave)="hideDropdown($event)" fill="clear" color="dark"
+      class="dropdown-btn"  routerDirection="root" routerLinkActive="active-item">
+      <ion-title>Categories</ion-title>
+      
+      <ion-icon slot="end" [name]="dropdown ? 'chevron-down' : 'chevron-up'"></ion-icon>
+    </ion-button>
+      
+      <ion-button *ngIf="numbers != 0" (click)="checkout()"><ion-badge color="danger">{{numbers}}</ion-badge>Checkout</ion-button>
+      </ion-buttons>
+    
+  </ion-toolbar>
+  <div *ngIf="dropdown" class="dropdown" (mouseleave)="dropdown = false" #dropdownbox>
+    <ion-item button routerLink="/createpos"  (click)="dropdown = false"  routerDirection="root"  lines="none">
+      All
+    </ion-item>
+    <ion-item button routerLink="/createpos"  (click)="dropdown = false"  [queryParams]="{category: 'Milktea'}" lines="none"
+    routerDirection="root">
+    Milktea
+    </ion-item>
+    <ion-item button routerLink="/createpos"  (click)="dropdown = false"  [queryParams]="{category: 'Fruit tea'}" lines="none"
+    routerDirection="root">
+    Fruit Tea
+    </ion-item>
+    <ion-item button routerLink="/createpos" (click)="dropdown = false"  [queryParams]="{category: 'Slushee'}" lines="none"
+    routerDirection="root">
+    Slushee
+    </ion-item>
+  </div>
+</ion-header>
+
+<ion-content>
+<div class="container">
+<ion-grid>
+  <ion-row>
+    <ion-col>
+    <ion-list class="bg-transparent">
+      <ion-item *ngFor="let data of productList" color="none" lines="none">
+        <ion-thumbnail slot="start" class="transparent">
+         <img src="{{data.ImageUrl}}" />  
+        </ion-thumbnail>
+        <ion-label style="font-weight: bolder;">
+          <h2 style="font-weight: 1000; color: black;">{{data.ProductName}} ({{data.Category}}) 
+            </h2>
+            <span style="float: right; ">
+              <button id="btn" (click)="AddtoCart(data)"> Add</button> 
+             </span>
+       
+          <!-- <p class="rate" style="font-weight: 1000; color: black;"> {{data.Stock}} grams remaining stock</p> -->
+          <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category == 'Slushee'">₱ {{data.UnitPrice}}</p>
+          <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category != 'Slushee'">(MD): ₱ {{data.MediumPrice}}</p>
+          <p class="rate" style="font-weight: 1000; color: black;" *ngIf="data.Category != 'Slushee'">(LG): ₱ {{data.LargePrice}}</p>
+       
+          <div id="qty">
+            <span (click)="Decrease(data)" class="minus"> - </span>  {{data.Quantity}}
+            <span (click)="Increase(data)" class="plus"> + </span>  
+          </div>
+        </ion-label>
+      </ion-item>
+     
+    </ion-list>      
+    </ion-col>
+  </ion-row>
+</ion-grid>
+</div>
+</ion-content>

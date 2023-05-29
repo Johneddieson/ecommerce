@@ -1,0 +1,90 @@
+.discount {
+    content:url("https://cdn-icons-png.flaticon.com/512/272/272535.png");
+   // background-repeat: no-repeat;
+   // background-position: 50%;
+    width: 1.5rem;
+    //height: 100%;
+}
+.paymentMethod {
+    content:url("https://cdn-icons-png.flaticon.com/512/671/671517.png");
+   // background-repeat: no-repeat;
+   // background-position: 50%;
+    width: 1.5rem;
+    //height: 100%;
+}
+.toolbar {
+    height: 84px;
+    --background: #69A03A;
+    color: #fff;
+    font-size: 20px;
+    line-height: 84px;
+}
+.buttonsactive:active {
+    background-color: red;
+    font-weight: 500;
+}
+.container {
+    width: 100%;
+    ion-thumbnail {
+        width: 100px !important;
+        height: 100px !important;
+        img {
+            border-radius: 10px;
+        }
+    }
+    .rate {
+        color: #ccc;
+    }
+    #qty {
+        margin-top: 5px;
+        .minus {
+            font-weight: 600;
+            padding: 5px;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+        .plus {
+            margin-left: 20px;
+            font-weight: 600;
+            padding:  5px;
+            cursor: pointer;
+            
+        }
+        // .plus:active {
+        //     background-color: #69a03a;
+        // }
+        // .minus:active {
+        //     background-color: red;
+            
+        // }
+        #btn {
+            padding: 10px 20px;
+            color: #fff;
+            background-color: red;
+            
+        }
+        #btn:active {
+            background-color: rgb(5, 21, 66);
+        }
+    }
+    ion-label {
+        ion-icon {
+            margin: 10px;
+            color: #69A03A;
+        }
+    }
+}
+
+
+ion-footer {
+    --background: #69a03a;
+    ion-row {
+        background: #69a03a;
+        color: white;
+        ion-col {
+            &:last-child {
+                text-align: end;
+            }
+        }
+    }
+}

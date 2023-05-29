@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons  slot="start">
+      <ion-icon name="arrow-back-outline" slot="icon-only" style="cursor: pointer;" routerLink="/tabs/tab1"></ion-icon>
+    </ion-buttons>
+
+    <ion-buttons  slot="end">
+      <ion-button color="light" (click)="selectPaymentMethod()">
+        <img class="paymentMethod" />
+      </ion-button>
+      </ion-buttons>
+    
+      <ion-title>Check Out</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<div class="container">
+<ion-grid>
+  <ion-row>
+    <ion-col>
+    <ion-list class="bg-transparent">
+      <ion-item *ngFor="let data of getCartDetails" color="none" lines="none">
+        <ion-thumbnail slot="start">
+         <img src="{{data.ImageUrl}}" />  
+        </ion-thumbnail>
+        <ion-label>
+          <h2 style="font-weight: bolder;">{{data.ProductName}} <span style="float: right; font-weight: bolder;">{{data.UnitPrice | currency: '₱'}}</span>
+          </h2>
+          <h3>
+            <!-- <ion-icon name="star-outline"></ion-icon>
+            <ion-icon name="star-outline"></ion-icon>
+            <ion-icon name="star-outline"></ion-icon>
+            <ion-icon name="star-outline"></ion-icon> -->
+          </h3>
+          <!-- <p  style="font-weight: bolder;"> {{data.Stock}} remaining stock</p> -->
+          <div id="qty">
+            <span style="font-weight: bolder;"> Quantity: {{data.Quantity}} </span>  
+            <span  class="plus">  </span>  
+            <span style="float: right; ">
+             <button id="btn" (click)="singleDelete(data)"> Remove</button> 
+            </span>
+          </div>
+        </ion-label>
+      </ion-item>
+    </ion-list>      
+    </ion-col>
+  </ion-row>
+</ion-grid>
+</div>
+</ion-content>  
+<ion-footer>
+  <ion-row>
+    <ion-col size="7">
+      <ion-text style="font-weight: bolder;">
+        <h4>Total :  {{total | currency: '₱'}} </h4>
+        <h4>Payment Method :  {{paymentMethod}} </h4>
+      </ion-text>
+    </ion-col>
+    <ion-col size="5">
+      <ion-button *ngIf="total > 0" color="light" (click)="OrderNow()">Confirm Order</ion-button>
+    </ion-col>
+  </ion-row>
+</ion-footer>

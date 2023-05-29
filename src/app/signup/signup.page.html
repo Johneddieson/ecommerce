@@ -1,0 +1,91 @@
+<!-- 
+<ion-content>
+  <div class="wrapper">
+    <h3>Sign Up</h3>
+    <ion-item lines="none">
+      <ion-label position="floating">First Name</ion-label>
+      <ion-input [(ngModel)]="firstname" type="text" placeholder="First Name"></ion-input>
+    </ion-item>
+   
+    <ion-item lines="none">
+      <ion-label position="floating">Last Name</ion-label>
+      <ion-input type="text" [(ngModel)]="lastname" placeholder="Last Name"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label position="floating">Address1</ion-label>
+      <ion-input [(ngModel)]="address1" type="text" placeholder="Address 1"></ion-input>
+    </ion-item>
+
+    
+    <ion-item lines="none">
+      <ion-label position="floating">Address2</ion-label>
+      <ion-input type="text" [(ngModel)]="address2" placeholder="Address 2"></ion-input>
+    </ion-item>
+   
+    <ion-item lines="none">
+      <ion-label position="floating">Phone Number</ion-label>
+      <ion-input type="number" [(ngModel)]="phonenumber" placeholder="Phone Number"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input [(ngModel)]="email" type="text" placeholder="Email"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label position="floating">Password</ion-label>
+      <ion-input [(ngModel)]="password" type="password" placeholder="password"></ion-input>
+    </ion-item>
+    
+    <ion-button (click)="SignUp()">Sign Up</ion-button>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div id="clickable" class="text"(click)="gotosignin()">
+Already a member? Sign In
+  </div>
+</ion-footer> -->
+
+
+
+
+<ion-content>
+  <head>
+   <meta charset="utf-8">
+ </head>
+ <body>
+   <div class="center">
+     <h1>Sign Up</h1>
+     <h5 [hidden]="ishide" >Already a member? <a class="link" (click)="gotosignin()">Sign In</a></h5>
+     <form method="post">
+       <div class="txt_field">
+         <input type="text" [disabled]="ishide"  [(ngModel)]="Email1" required [ngModelOptions]="{standalone: true}"  #email>
+         <span></span>
+         <label>Email</label>
+       </div>
+       <div class="txt_field">
+         <input type="password" [disabled]="ishide" [(ngModel)]="Password1" required [ngModelOptions]="{standalone: true}" #password>
+         <span></span>
+         <label>Password</label>
+       </div>
+       <div *ngIf="!ishide" class="pass" (click)="ResetPassword()">Forgot Password?</div>
+       <button class="button" *ngIf="!ishide" (click)="SignUp()">Sign Up</button>
+       <button class="button" *ngIf="ishide && isthisadmin" (click)="navigateadmin()"  >Continue as Admin</button>
+       <button class="button" *ngIf="ishide && !isthisadmin" (click)="navigatecustomer()" >Continue as Customer</button>
+     
+     
+       <div class="signup_link">
+         <!-- Not a member? <a href="#">Signup</a> -->
+       </div>
+
+       
+     </form>
+   </div>
+
+ </body>
+</ion-content>
+
+
+
+
+

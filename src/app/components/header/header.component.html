@@ -1,0 +1,61 @@
+<ion-header class="mobile-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="categories()" fill="clear" color="dark"
+      class="dropdown-btn">
+      Categories
+       </ion-button>
+    </ion-buttons>
+    <!-- <ion-title>{{title}}</ion-title> -->
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="cart"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-row class="header ion-align-items-center">
+  <ion-col size="2">
+    <img src="https://ucarecdn.com/b4223107-fa83-4409-9ca9-b80e6ef36a5d/mixologistremovebgpreview.png" width="50px">
+  </ion-col>
+  <ion-col size="8" class="ion-text-left">
+    <!-- <ion-button fill="clear" color="dark" routerLink="/" routerDirection="root" routerLinkActive="active-item"
+      [routerLinkActiveOptions]="{exact: true}">
+      Home
+    </ion-button> -->
+    <ion-button #productbtn (mouseenter)="dropdown=true" (mouseleave)="hideDropdown($event)" fill="clear" color="dark"
+      class="dropdown-btn"  routerDirection="root" routerLinkActive="active-item">
+      Categories
+      <ion-icon slot="end" [name]="dropdown ? 'chevron-down' : 'chevron-up'"></ion-icon>
+    </ion-button>
+
+    <div *ngIf="dropdown" class="dropdown" (mouseleave)="dropdown = false" #dropdownbox>
+      <ion-item button routerLink="/tabs/product"  (click)="dropdown = false"  routerDirection="root"  lines="none">
+        All
+      </ion-item>
+      <ion-item button routerLink="/tabs/product"  (click)="dropdown = false"  [queryParams]="{category: 'Milktea'}" lines="none"
+      routerDirection="root">
+      Milktea
+      </ion-item>
+      <ion-item button routerLink="/tabs/product"  (click)="dropdown = false"  [queryParams]="{category: 'Fruit tea'}" lines="none"
+      routerDirection="root">
+      Fruit Tea
+      </ion-item>
+      <ion-item button routerLink="/tabs/product" (click)="dropdown = false"  [queryParams]="{category: 'Slushee'}" lines="none"
+      routerDirection="root">
+      Slushee
+      </ion-item>
+    </div>
+    <!-- <ion-button fill="clear" color="dark" routerLink="/tabs" routerDirection="root" routerLinkActive="active-item">
+      Buy Products
+    </ion-button> -->
+  </ion-col>
+
+  <ion-col size="2" class="ion-text-right">
+    <ion-button fill="clear" color="dark">
+      <ion-icon slot="icon-only" name="cart"></ion-icon>
+    </ion-button>
+  </ion-col>
+
+</ion-row>

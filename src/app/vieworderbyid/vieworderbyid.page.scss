@@ -1,0 +1,61 @@
+.responsive-img {
+    max-width: 100%;
+    height: auto;
+  }
+
+
+  
+.form {
+    margin-top: -20px;
+    ion-item {
+        border-radius: 5px;
+        border-color: grey;
+        border-width: 2px;
+        border-style: solid;
+        margin-bottom: 10px;
+
+    }
+}
+ion-button {
+    text-transform:  none;
+}
+
+// ion-content {
+//    background: linear-gradient(120deg,#2980b9, #8e44ad);
+// }
+ion-content {
+    --background:  url('../../assets/milktea4.jpg') no-repeat center center / cover;
+   // background-color: #654c05;
+   // background: linear-gradient(120deg,#2980b9, #8e44ad);
+   background: linear-gradient(120deg,#2980b9, #8e44ad);
+  }
+  ion-back-button {
+    display: block;
+  }
+
+  ion-card {
+    margin-top: 30px;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .item {
+    margin-bottom: 20px;
+  }
+  ion-label {
+    font-weight: bolder;
+  }
+  
+  ion-button[type="submit"] {
+    margin-top: 20px;
+  }
+
+  @media (min-width: 768px) {
+    ion-col {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  }

@@ -1,0 +1,91 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons  slot="start">
+      <ion-icon name="arrow-back-outline" slot="icon-only" style="cursor: pointer;" routerLink="/createpos"></ion-icon>    
+    </ion-buttons>
+
+    <ion-title>Check Out</ion-title>
+    <ion-buttons  slot="end">
+      <ion-button color="light" (click)="selectDiscount()">
+        <img class="discount" />
+        </ion-button>
+        <ion-button color="light" (click)="selectPaymentMethod()">
+          <img class="paymentMethod" />
+          </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-modal  mode="sm" [backdropDismiss]="false"
+  class="example-modal">
+    <ng-template>
+      <ion-content color="light">
+        <h1 style="margin: 10px 15px 10px 15px; font-weight: bolder;">Item : {{specificProduct}}</h1>
+        <!-- <h5 style="margin: 10px 15px 10px 15px;">Note : {{note}}</h5> -->
+        <ion-item *ngFor="let mat of dataMaterials">
+          <!-- <h1>mat.ProductName</h1> -->
+          <ion-label text-wrap>{{mat.itemName}} :</ion-label>
+          <ion-input value="{{mat.Quantity}}"
+          placeholder="Enter Quantity" type="number"
+          (ionChange)="editMaterialQuantity($event, mat)"></ion-input>
+      </ion-item>
+        <ion-item lines="none">
+         <ion-buttons slot="end">
+          <!-- <ion-button color="danger" (click)="close()">Close</ion-button> -->
+          <ion-button [disabled]="disabledSaveChanges" color="success" (click)="saveQuantityChanged()">Save Changes</ion-button>
+         </ion-buttons>
+        </ion-item> 
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+
+<div class="container">
+<ion-grid>
+  <ion-row>
+    <ion-col>
+    <ion-list>
+      <ion-item *ngFor="let data of getCartDetails">
+        <ion-thumbnail slot="start">
+         <img src="{{data.ImageUrl}}"  (click)="getMaterialOfProducts(data.Materials, data.ProductName)"  style="cursor: pointer;"/>   
+        </ion-thumbnail>
+        <ion-label>
+          <h2 style="font-weight: bolder;">{{data.ProductName}} <span style="float: right; color: #69a03a;">{{data.UnitPrice | currency: '₱'}}</span>
+          </h2>
+          <h3>
+            <!-- <ion-icon name="star-outline"></ion-icon>
+            <ion-icon name="star-outline"></ion-icon>
+            <ion-icon name="star-outline"></ion-icon>
+            <ion-icon name="star-outline"></ion-icon> -->
+          </h3>
+          <!-- <p class="rate"> {{data.Stock}} remaining stock</p> -->
+          <div id="qty">
+            <span style="font-weight: bolder;"> Quantity: {{data.Quantity}} </span>
+            <span  class="plus">  </span>  
+            <span style="float: right; ">
+             <button id="btn" (click)="singleDelete(data)"> Remove</button> 
+            </span>
+          </div>
+        </ion-label>
+      </ion-item>
+    </ion-list>      
+    </ion-col>
+  </ion-row>
+</ion-grid>
+</div>
+</ion-content>  
+<ion-footer>
+  <ion-row>
+    <ion-col size="7">
+      <ion-text>
+        <h4>Total :  {{total | currency: '₱'}} </h4>
+        <h4>Payment Method :  {{paymentMethod}} </h4>
+      </ion-text>
+    </ion-col>
+  
+    <ion-col size="5">
+      <ion-button *ngIf="total > 0" color="light" (click)="OrderNow()">Confirm Order</ion-button>
+    </ion-col>
+  </ion-row>
+</ion-footer>

@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons  slot="end">
+      <ion-button (click)="addproduct()" class="addproduct">
+        <ion-icon size="large" name="settings"></ion-icon>
+      </ion-button>
+      <ion-button hidden  class="addproduct">
+        <ion-icon size="large" name="text-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Customer Feedback</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <!-- *ngFor="let data of notificationsList" -->
+  <ion-card  class="ion-margin" *ngFor="let data of feedBacksData">
+    <ion-card-header class="ion-header">
+      <!-- [style.color]="item.value.itemPriority === 'high' ? 'red' : (item.value.itemPriority === 'low' ? 'green' : 'orange')" -->
+      <ion-card-subtitle class="ion-subtitle" style="font-weight: 900;  color: black;">
+        <!-- {{data.remarks}} -->
+        Email: {{data.Email}}
+      </ion-card-subtitle>
+
+      <ion-card-subtitle class="ion-subtitle" style="font-weight: 900;  color: black;" *ngFor="let dataOrder of data.Orders">
+         {{dataOrder.Quantity}} {{dataOrder.ProductName}}
+      </ion-card-subtitle> 
+      <br>
+      <ion-item color="none" lines="none">
+        <!-- <ion-icon *ngIf="item.value.itemPriority === 'high'" color="danger" size="small" name="ellipse"></ion-icon>
+        <ion-icon *ngIf="item.value.itemPriority === 'low'" color="success" size="small" name="ellipse"></ion-icon>
+        <ion-icon *ngIf="item.value.itemPriority === 'middle'" color="warning" size="small" name="ellipse"></ion-icon> -->
+        <!-- {{data.Message}} -->
+        <ion-label text-wrap class="label" style="font-weight: 900;  color: black;">
+            <!-- Message -->
+            {{data.Message[0]}}
+        </ion-label>
+      </ion-item>
+
+    </ion-card-header>
+
+  
+    <ion-card-content style="font-weight: bolder;">
+      <!-- {{item.value.itemDueDate | date:'fullDate'}} -->
+      <!-- {{data.Datetime}} -->
+      <ion-label style="font-weight: bolder; color: black;">Due {{data.DateTime}}</ion-label>
+    </ion-card-content>
+
+    <ion-row>
+    
+
+      <!-- (click)="update(data)" -->
+      <!-- *ngIf="!data.read" -->
+      <ion-button *ngIf="!data.Read" button color="danger" (click)="markAsRead(data)">
+        <!-- <ion-icon name="book"></ion-icon> -->
+        <p>Mark as read</p>
+      </ion-button>
+
+      <!-- <ion-item button (click)="delete(item.key)">
+        <ion-icon name="trash-outline"></ion-icon>
+        <p>Cancel</p>
+      </ion-item> -->
+    </ion-row>
+
+  </ion-card>
+</ion-content>

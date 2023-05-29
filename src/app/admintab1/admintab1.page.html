@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons  slot="end">   
+      <ion-button (click)="morecategories()" class="addproduct">
+        <ion-icon size="large" name="settings"></ion-icon>
+      </ion-button>
+      <ion-button hidden  class="addproduct">
+        <ion-icon size="large" name="text-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>All Orders</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+<ion-accordion-group multiple="true">
+  <ion-accordion *ngFor="let data of allPendingOrders">
+    <ion-item slot="header" lines="none">
+      <ion-label class="labelname" style="font-weight: 1000; color: black;" text-wrap>
+        Fullname : {{data.BillingFirstname}} {{data.BillingLastname}}
+        <br>
+        Email : {{data.Billingemail}}
+        <br>
+        Address : {{data.BillingAddress1}}
+        <br>
+        Phone Number: {{data.BillingPhonenumber}}
+        <br>
+        Date Ordered : {{data.Datetime}}
+      <br>
+      Discount : {{data.Discount}}
+      <br>
+      Payment : {{data.PaymentMethod}}
+      <br>
+      Total Amount : {{data.TotalAmount | currency: '₱'}}
+    </ion-label> 
+      
+    </ion-item>
+    <ion-list slot="content" class="bg-transparent">
+     
+      <ion-item color="none" lines="none" *ngFor="let datadetails of data.OrderDetails" style="cursor: pointer;"
+      (click)="getMaterialOfProducts(datadetails)">
+        <ion-avatar slot="start">
+          <img src="{{datadetails.ImageUrl}}">
+        </ion-avatar>
+        <ion-label style="font-weight: bolder;">
+          <h2 style="font-weight: 1000; color: white;">Product Name: {{datadetails.ProductName}}</h2>
+          <p style="font-weight: 1000; color: white;">Quantity: {{datadetails.Quantity}}</p>
+          <p style="font-weight: 1000; color: white;">Unit Price: {{datadetails.UnitPrice | currency: '₱'}}</p>
+        </ion-label>
+    </ion-item> 
+    <!-- (click)="approveOrder(data)" -->
+    <ion-button size="small" (click)="url(data.id)"  color="success">View</ion-button>
+      <!-- <ion-button (click)="cancelOrder(data)" size="small"   color="danger">Cancel Order</ion-button> -->
+    </ion-list>
+  </ion-accordion>
+
+</ion-accordion-group>
+<ion-modal  mode="sm" [backdropDismiss]="false"
+  class="example-modal">
+    <ng-template>
+      <ion-content color="light">
+        <ion-item *ngFor="let mat of dataMaterials">
+          <ion-label text-wrap>{{mat.itemName}} :</ion-label>
+          <ion-input value="{{mat.Quantity}}"
+          placeholder="Enter Quantity" type="number"
+          (ionChange)="editMaterialQuantity($event, mat)"></ion-input>
+      </ion-item>
+        <ion-item lines="none">
+         <ion-buttons slot="end">
+          <!-- <ion-button color="danger" [disabled]="disabledSaveChanges" (click)="close()">Close</ion-button> -->
+
+          <ion-button [disabled]="disabledSaveChanges" color="success" (click)="saveQuantityChanged()">Save Changes</ion-button>
+         </ion-buttons>
+        </ion-item> 
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

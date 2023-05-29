@@ -1,0 +1,39 @@
+ion-back-button {
+    display: block;
+}
+.toolbar {
+    height: 84px;
+    --background: #69A03A;
+    color: #fff;
+    font-size: 20px;
+    line-height: 84px;
+}
+
+.camera {
+    width: 200px;
+    height: 128px;
+    margin: 0 auto;
+    // background-color: black;
+}
+
+.logo {
+    margin-top: 6%;
+    img {
+        height: 100px;
+    }
+}
+
+.form {
+    margin-top: -20px;
+    ion-item {
+        border-radius: 5px;
+        border-color: grey;
+        border-width: 2px;
+        border-style: solid;
+        margin-bottom: 10px;
+
+    }
+}
+ion-button {
+    text-transform:  none;
+}

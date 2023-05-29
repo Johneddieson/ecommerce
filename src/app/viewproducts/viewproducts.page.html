@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons  slot="start">
+      <ion-icon name="arrow-back-outline" slot="icon-only" style="cursor: pointer;" routerLink="/adminpage/atab1"></ion-icon>    
+    </ion-buttons>
+    <ion-title>View Products</ion-title>
+<ion-buttons slot="end">
+  
+  <ion-button #productbtn (mouseenter)="dropdown=true" (mouseleave)="hideDropdown($event)" fill="clear" color="dark"
+  class="dropdown-btn"  routerDirection="root" routerLinkActive="active-item">
+  <ion-title>Categories</ion-title>
+  <ion-icon slot="end" [name]="dropdown ? 'chevron-down' : 'chevron-up'"></ion-icon>
+</ion-button>
+</ion-buttons>
+    
+  </ion-toolbar>
+  <div *ngIf="dropdown" class="dropdown" (mouseleave)="dropdown = false" #dropdownbox>
+   
+    <!-- <ion-item button routerLink="/viewproducts"  (click)="dropdown = false"  [queryParams]="{category: 'Milktea'}" lines="none"
+    routerDirection="root">
+    All
+    </ion-item> -->
+    <ion-item button routerLink="/viewproducts"  (click)="dropdown = false"  lines="none"
+    routerDirection="root">
+    All
+    </ion-item>
+    <ion-item button routerLink="/viewproducts"  (click)="dropdown = false"  [queryParams]="{category: 'Milktea'}" lines="none"
+    routerDirection="root">
+    Milktea
+    </ion-item>
+    <ion-item button routerLink="/viewproducts" (click)="dropdown = false"  [queryParams]="{category: 'Fruit tea'}" lines="none"
+    routerDirection="root">
+    Fruit Tea
+    </ion-item>
+    <ion-item button routerLink="/viewproducts" (click)="dropdown = false"  [queryParams]="{category: 'Slushee'}" lines="none"
+    routerDirection="root">
+    Slushee
+    </ion-item>
+  </div>
+</ion-header>
+<ion-content>
+  <div class="container">
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+      <ion-list class="bg-transparent">
+        <ion-item *ngFor="let data of products" color="none" lines="none" style="cursor: pointer;" (click)="clickProducts(data)">
+          <ion-thumbnail slot="start">
+           <img src="{{data.ImageUrl}}" />  
+          </ion-thumbnail>
+          <ion-label style="font-weight: 1000; color: white;">
+            <h2 style="font-weight: 1000; color: white;">
+              {{data.ProductName}} 
+          
+              </h2>
+            <!-- <p class="rate" style="font-weight: 1000; color: white;"> {{data.Stock}} remaining stock</p> -->
+            <span *ngIf="data.Category == 'Slushee'" style="font-weight: 1000; color: white;"> {{data.UnitPrice | currency: '₱'}}</span>
+            <span *ngIf="data.Category != 'Slushee'" style="font-weight: 1000; color: white;">(MD) : {{data.MediumPrice | currency: '₱'}}</span>
+           <br>
+            <span *ngIf="data.Category != 'Slushee'" style="font-weight: 1000; color: white;">(LG) : {{data.LargePrice | currency: '₱'}}</span> 
+      
+            <!-- <div id="qty">
+              <span style="float: right;">
+               <button id="btn2" (click)="DeleteProduct(data)"> Delete</button> 
+             
+              </span>
+              <span style="float: right; ">
+                <button id="btn" (click)="EditProduct(data)"> Edit</button> 
+              
+               </span>
+               
+            </div> -->
+          </ion-label>
+        </ion-item>
+       
+      </ion-list>      
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  </div>
+  </ion-content>

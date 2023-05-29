@@ -1,0 +1,24 @@
+
+
+
+
+<ion-content color="medium">
+    <ion-grid>
+        <ion-row class="ion-justify-content-center">
+            <ion-col size="12" size-sm="6" size-md="4" size-lg="3" size-xl="2" 
+            *ngFor="let p of products">
+
+            <ion-card>
+                <img [src]="p.ImageUrl">
+                <ion-card-content>
+                    <h1>{{p.Category}}</h1>
+                    <ion-label>
+                        {{p.ProductName}}
+                        <!-- <p>{{p.UnitPrice | currency: '₱'}}</p> -->
+                    </ion-label>
+                </ion-card-content>
+            </ion-card>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-content>
