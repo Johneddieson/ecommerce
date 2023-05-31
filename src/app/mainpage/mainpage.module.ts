@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { MainpagePageRoutingModule } from './mainpage-routing.module';
 
 import { MainpagePage } from './mainpage.page';
+import { DbserviceService } from '../services/dbservice.service';
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { MainpagePage } from './mainpage.page';
     IonicModule,
     MainpagePageRoutingModule
   ],
-  declarations: [MainpagePage]
+  declarations: [MainpagePage],
+  providers: []
 })
 export class MainpagePageModule {}

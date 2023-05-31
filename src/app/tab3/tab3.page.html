@@ -1,42 +1,35 @@
 
 <ion-content>
   <div class="wrapper">
-    <h3 style="font-weight: bolder;" *ngIf="forcheckout == false">My Information</h3>
-    
-    <ion-item lines="none" *ngIf="forcheckout == false">
-      <ion-label position="floating">First Name</ion-label>
-      <ion-input  [(ngModel)]="firstname" type="text" placeholder="First Name"></ion-input>
-    </ion-item>
-   
-    <ion-item lines="none" *ngIf="forcheckout == false">
-      <ion-label position="floating">Last Name</ion-label>
-      <ion-input type="text" [(ngModel)]="lastname" placeholder="Last Name"></ion-input>
-    </ion-item>
-    <ion-item lines="none" *ngIf="forcheckout == true">
-      <ion-label position="floating">Address</ion-label>
-      <ion-input [disabled]="isDisabled" [(ngModel)]="address1" type="text" placeholder="Address 1"></ion-input>
-    </ion-item>
-
-    
-    <ion-item lines="none" hidden>
-      <ion-label position="floating">Address2</ion-label>
-      <ion-input type="text" [(ngModel)]="address2" placeholder="Address 2"></ion-input>
-    </ion-item>
-   
-    <ion-item lines="none" *ngIf="forcheckout == false">
-      <ion-label position="floating">Phone Number</ion-label>
-      <ion-input type="number" [(ngModel)]="phonenumber" placeholder="Phone Number"></ion-input>
-    </ion-item>
-
-    
-    
-    
-    <ion-button (click)="Edit()" *ngIf="forcheckout == false">Edit</ion-button>
-    <ion-button (click)="Edit()" *ngIf="forcheckout == true">Proceed to checkout</ion-button>
+    <h3 style="font-weight: bolder;">My Information</h3>
+    <form [formGroup]="aFormGroup">
+      <ion-item lines="none">
+        <ion-label position="floating">First Name</ion-label>
+        <ion-input  formControlName="firstname" type="text" placeholder="First Name"></ion-input>
+      </ion-item>
+      <p style="color: red;" *ngIf="f['firstname'].errors && f['firstname'].errors['required']">Shouldn't be empty.</p>   
+      <p style="color: red;" *ngIf="f['firstname'].errors && f['firstname'].errors['pattern']">This format is not allowed</p> 
+      
+      <ion-item lines="none">
+        <ion-label position="floating">Last Name</ion-label>
+        <ion-input type="text" formControlName="lastname" placeholder="Last Name"></ion-input>
+      </ion-item>
+      <p style="color: red;" *ngIf="f['lastname'].errors && f['lastname'].errors['required']">Shouldn't be empty.</p>   
+      <p style="color: red;" *ngIf="f['lastname'].errors && f['lastname'].errors['pattern']">This format is not allowed</p> 
+      
+      <ion-item lines="none">
+        <ion-label position="floating">Phone Number</ion-label>
+        <ion-input type="text" formControlName="phonenumber" placeholder="Phone Number"></ion-input>
+      </ion-item>
+      <p style="color: red;" *ngIf="f['phonenumber'].errors && f['phonenumber'].errors['required']">Shouldn't be empty.</p>   
+      <p style="color: red;" *ngIf="f['phonenumber'].errors && f['phonenumber'].errors['pattern']">Format(11 Digits): '09XXXXXXXXX.'</p>  
+    </form>    
+    <ion-button (click)="Edit()" [disabled]="!aFormGroup.valid">Edit</ion-button>
+    <!-- <ion-button (click)="Edit()" *ngIf="forcheckout == true">Proceed to checkout</ion-button> -->
   </div>
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!isEdit" (click)="getCurrentLocation()">  
+  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!isEdit" (click)="getCurrentLocation()">  
     <ion-fab-button>  
       <ion-icon  name="location-outline"></ion-icon>  
     </ion-fab-button>  
-  </ion-fab>
+  </ion-fab> -->
 </ion-content>

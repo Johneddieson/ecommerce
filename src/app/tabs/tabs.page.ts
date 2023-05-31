@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
 import * as moment from 'moment';
+import { AuthserviceService } from '../services/authservice.service';
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
@@ -16,14 +17,14 @@ notifCounts = 0
 subDocument: any;
 myid: string = ''
   constructor(private router: Router, 
-    //private afstore: AngularFirestore,
-    //private afauth: AngularFireAuth, 
     private loadingCtrl: LoadingController,
     private locationStrategy: LocationStrategy, 
-    //private auth: AuthServiceService,
     private alertCtrl: AlertController,
     private applicationRef: ApplicationRef,
-    private zone: NgZone) {
+    private zone: NgZone,
+    private auth: AuthserviceService
+    ) 
+    {
     // this.afauth.authState.subscribe(data => {
     //   if (data && data.uid) {
     //     this.myid = data.uid
@@ -92,28 +93,28 @@ myid: string = ''
     //   })
     // })
   }
-  logout() {
-    // this.alertCtrl.create({
-    //   message: 'Are you sure want to logout?',
-    //   buttons: [
-    //     {
-    //       text: 'Yes',
-    //       handler: () => {
-
-    //         this.auth.SignOut()
-    //         this.meReference.update({
-    //           Address1: '',
-    //           Address2: ''
-    //         })
-    //       }
-    //     },
-    //     {
-    //       text: 'No',
-    //       role: 'cancel'
-    //     }
-    //   ]
-    // }).then(el => {
-    //   el.present()
-    // })
+  async logout() 
+  {
+    var alertLogout = await this.alertCtrl.create
+    ({
+      message: 'Are you sure you want to logout?',
+      buttons: 
+      [
+        {
+          text: 'Yes',
+          handler: () => 
+          { 
+              this.auth.SignOut();
+              sessionStorage.removeItem('user');
+              this.router.navigateByUrl('/login')
+            }
+        },
+        {
+          text: 'No',
+          role: 'cancel'
+        }
+      ]
+    })
+    await alertLogout.present();
   }
 }

@@ -12,7 +12,7 @@ const routes: Routes = [
   {
     path: 'tabs',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'login',
@@ -27,38 +27,38 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./home/home.module').then( m => m.HomePageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'add-product',
     loadChildren: () => import('./add-product/add-product.module').then( m => m.AddProductPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'checkout',
     loadChildren: () => import('./checkout/checkout.module').then( m => m.CheckoutPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'adminpage',
     loadChildren: () => import('./adminpage/adminpage.module').then( m => m.AdminpagePageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'viewproducts',
     loadChildren: () => import('./viewproducts/viewproducts.module').then( m => m.ViewproductsPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
  
   },
   {
     path: 'editproduct/:id',
     loadChildren: () => import('./editproduct/editproduct.module').then( m => m.EditproductPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'createpos',
     loadChildren: () => import('./createpos/createpos.module').then( m => m.CreateposPageModule),
-   // canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'category',
@@ -67,7 +67,7 @@ const routes: Routes = [
   {
     path: 'admincheckout',
     loadChildren: () => import('./admincheckout/admincheckout.module').then( m => m.AdmincheckoutPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
 
   {
@@ -77,22 +77,22 @@ const routes: Routes = [
   {
     path: 'inventory',
      loadChildren: () => import("./admintab3/admintab3.module").then(m => m.Admintab3PageModule),
-     //canActivate: [AuthGuard]
+     canActivate: [AuthGuard]
   },
   {
     path: 'addmaterial',
     loadChildren: () => import('./addmaterial/addmaterial.module').then( m => m.AddmaterialPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'viewmaterials',
     loadChildren: () => import('./viewmaterials/viewmaterials.module').then( m => m.ViewmaterialsPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'vieworderbyid/:id',
     loadChildren: () => import('./vieworderbyid/vieworderbyid.module').then( m => m.VieworderbyidPageModule),
-    //canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
  
 ];

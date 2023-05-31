@@ -88,8 +88,9 @@
 //.container {
   //width: 100%;
   ion-content {
-    --background:  url('../../assets/icon/backgroundimage.jpg') no-repeat center center / cover;
+    // --background:  url('/src/assets/icon/backgroundimage.jpg') no-repeat center center / cover;
    // background-color: #654c05;
    // background: linear-gradient(120deg,#2980b9, #8e44ad);
-   background: linear-gradient(120deg,#2980b9, #8e44ad);
-  }
+   //background: linear-gradient(120deg,#2980b9, #8e44ad);
+   --background:  url('../../assets/icon/backgroundimage.jpg') no-repeat center center / cover;
+}

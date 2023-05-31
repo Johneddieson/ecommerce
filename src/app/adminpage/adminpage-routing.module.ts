@@ -10,7 +10,8 @@ const routes: Routes = [
     children: [
       {
         path: 'atab1',
-        loadChildren: () => import("../admintab1/admintab1.module").then(m => m.Admintab1PageModule)
+        loadChildren: () => import("../admintab1/admintab1.module").then(m => m.Admintab1PageModule),
+        pathMatch: 'full'
       },
       {
         path: 'atab2',
@@ -27,7 +28,8 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/adminpage/atab1'
+        redirectTo: '/adminpage/atab1',
+        pathMatch: 'full'
       }
     ]
   }

@@ -1,9 +1,17 @@
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { MessengerService } from './../messenger.service';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { first, last } from 'rxjs/operators';
-
+import { DbserviceService } from '../services/dbservice.service';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormControl,
+  ValidatorFn,
+} from '@angular/forms';
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
@@ -21,28 +29,53 @@ isDisabled = true;
 isEdit = false
 name: any;
 forcheckout: any
+public aFormGroup!: FormGroup;
+currentuserid: string = ''
   constructor(private actRoute: ActivatedRoute, 
     //private afstore: AngularFirestore, 
-    //private afauth: AngularFireAuth,
+    private afauth: AngularFireAuth,
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController, private router: Router,
     private msg: MessengerService,
-    //private geo: Geolocation
+    private dbservice: DbserviceService,
+    private formBuilder: FormBuilder
     ) 
     {
-    //   this.name = this.actRoute.snapshot.paramMap.get('name')
-    // this.afauth.authState.subscribe(data => {
-    //   if (data && data.uid) {
-    //     this.meReference = this.afstore.doc(`users/${data.uid}`)
-    //     this.sub = this.meReference.valueChanges().subscribe(data => {
-    //         this.firstname = data.FirstName
-    //         this.lastname = data.LastName
-    //         this.address1 = data.Address1
-    //         this.address2 = data.Address2
-    //         this.phonenumber = `${data.PhoneNumber}`
-    //     })
-    //   }
-    // })
+    this.afauth.authState.subscribe((data: any) => 
+    {
+      if (data.uid)
+      {
+        this.currentuserid = data.uid
+        this.dbservice.getDataById('users', data.uid).subscribe((data: any) => 
+        {
+          this.aFormGroup.controls['firstname'].setValue(data.FirstName);
+          this.aFormGroup.controls['lastname'].setValue(data.LastName);  
+          this.aFormGroup.controls['phonenumber'].setValue(data.PhoneNumber);
+        });
+      }
+    })
+  this.formUserValidation()
+  }
+  formUserValidation()
+  {
+    this.aFormGroup = this.formBuilder.group
+    ({
+      firstname: ['', [Validators.required, Validators.pattern(/^[a-zA-Z ]+$/)]],
+      lastname: ['', [Validators.required, Validators.pattern(/^[a-zA-Z ]+$/)]],
+      phonenumber: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(
+            /^(09|63)[\d]{9}$/
+          ),
+          ],
+      ]
+    })
+  }
+  get f() {
+    //console.log(this.aFormGroup.controls)
+    return this.aFormGroup.controls;
   }
 
   // Edit() {
@@ -88,40 +121,40 @@ forcheckout: any
   
   // }
 
-  async ngOnInit() {
-
-    setInterval(() => 
-    {
-      if (this.name == "forcheckout")
-      {
-        this.forcheckout = true
-      }
-      else 
-      {
-        this.forcheckout = false
-      }
-    }, 0)
-    if (this.name == 'edit')
-    {
-      this.isEdit = true
-    }
-    else 
-    {
-      this.isEdit = false
-      var alertCtrl = await this.alertCtrl.create
-      ({
-        header: 'Warning!',
-        message: 'Kindly strictly check your location if correct, Once your are done finalizing your location, after confirming your order, dont move to the location where you located until your order is delivered thanks!.',
-        buttons: 
-        [
-          {
-            text: 'Ok!',
-            role: 'cancel'
-          }
-        ]
-      })
-      await alertCtrl.present();
-    }
+  async ngOnInit() 
+  {
+    // setInterval(() => 
+    // {
+    //   if (this.name == "forcheckout")
+    //   {
+    //     this.forcheckout = true
+    //   }
+    //   else 
+    //   {
+    //     this.forcheckout = false
+    //   }
+    // }, 0)
+    // if (this.name == 'edit')
+    // {
+    //   this.isEdit = true
+    // }
+    // else 
+    // {
+    //   this.isEdit = false
+    //   var alertCtrl = await this.alertCtrl.create
+    //   ({
+    //     header: 'Warning!',
+    //     message: 'Kindly strictly check your location if correct, Once your are done finalizing your location, after confirming your order, dont move to the location where you located until your order is delivered thanks!.',
+    //     buttons: 
+    //     [
+    //       {
+    //         text: 'Ok!',
+    //         role: 'cancel'
+    //       }
+    //     ]
+    //   })
+    //   await alertCtrl.present();
+    // }
   }
 
   async getCurrentLocation()
@@ -159,84 +192,107 @@ forcheckout: any
 //  })
   }
 
-  async Edit() {
-    if (this.name != 'forcheckout')
-    {
-      var cartArray = JSON.parse(sessionStorage.getItem('cart') as any);
+  // async Edit() 
+  // {
+  //   if (this.name != 'forcheckout')
+  //   {
+  //     var cartArray = JSON.parse(sessionStorage.getItem('cart') as any);
       
-      var loadingCtrl = await this.loadingCtrl.create
+  //     var loadingCtrl = await this.loadingCtrl.create
+  //     ({
+  //       message: 'Please Wait...',
+  //       spinner: 'bubbles'
+  //     })
+  //     await loadingCtrl.present();
+  //     var alertSuccess = await this.alertCtrl.create
+  //     ({
+  //       message: 'You edited your information successfully',
+  //       buttons: 
+  //       [
+  //         {
+  //           text: 'Ok',
+  //           role: 'cancel'
+  //         }
+  //       ]
+  //     })
+  //     }
+  //   else 
+  //   {
+  //     if (this.address1 === '')
+  //     {
+  //         var errAlert = await this.alertCtrl.create
+  //         ({
+  //           message: `Address should'nt be empty`,
+  //           buttons: [
+  //             {
+  //               text: 'Ok',
+  //               role: 'cancel'
+  //             }
+  //           ]
+  //         })
+  //         await errAlert.present()
+  //     }
+  //     else
+  //     {
+  //       this.loadingCtrl.create({
+  //         message: 'Please Wait...'
+  //       }).then(loading => {
+  //         loading.present()
+  //        setTimeout(() => {
+  //         loading.dismiss()
+  //         this.router.navigateByUrl('/checkout')
+  //        }, 3000)
+  //       }).catch(loadingerr => {
+    
+  //       })
+  //     }
+  //   }
+  // }
+
+   Edit()
+  {
+    var specificdataobject = 
+    {
+      FirstName: this.aFormGroup.controls['firstname'].value,
+      LastName: this.aFormGroup.controls['lastname'].value,
+      PhoneNumber: this.aFormGroup.controls['phonenumber'].value,
+    }
+    this.dbservice.updateData(this.currentuserid, specificdataobject, 'users').then(async (success) => 
+    {
+      var alertEditSuccess = await this.alertCtrl.create
       ({
-        message: 'Please Wait...',
-        spinner: 'bubbles'
-      })
-      await loadingCtrl.present();
-      var alertSuccess = await this.alertCtrl.create
-      ({
-        message: 'You edited your information successfully',
-        buttons: 
+        message: 'You edited your information successfully.',
+        buttons:
         [
           {
-            text: 'Ok',
-            role: 'cancel'
+            text: 'Close',
+            handler: () => 
+            {
+              var cartItem = sessionStorage.getItem('cart');
+
+              if (cartItem != null)
+              {
+                this.router.navigateByUrl('/checkout')
+              }
+            }
           }
         ]
       })
-      // setTimeout(async () => {
-      //   await loadingCtrl.dismiss();
-      //       this.meReference.update({
-      //         FirstName: this.firstname,
-      //         LastName: this.lastname,
-      //         Address1: this.address1,
-      //         Address2: this.address2,
-      //         PhoneNumber: this.phonenumber,
-      //       }).then(async success => {
-      //         await alertSuccess.present();
-      //         if (cartArray.length > 0) 
-      //         {
-      //           this.router.navigateByUrl('/checkout'); 
-      //         }  
-      //       })
-      // }, 2000);
-      }
-    else 
+      await alertEditSuccess.present();
+    }).catch(async (err) => 
     {
-      if (this.address1 === '')
-      {
-          var errAlert = await this.alertCtrl.create
-          ({
-            message: `Address should'nt be empty`,
-            buttons: [
-              {
-                text: 'Ok',
-                role: 'cancel'
-              }
-            ]
-          })
-          await errAlert.present()
-      }
-      else
-      {
-        this.loadingCtrl.create({
-          message: 'Please Wait...'
-        }).then(loading => {
-          loading.present()
-         setTimeout(() => {
-          loading.dismiss()
-          // this.meReference.update({
-          //   FirstName: this.firstname,
-          //   LastName: this.lastname,
-          //   Address1: this.address1,
-          //   Address2: this.address2,
-          //   PhoneNumber: this.phonenumber
-          // })
-          this.router.navigateByUrl('/checkout')
-         }, 3000)
-          
-         
-        }).catch(loadingerr => {
-    
-        })
-      }
-    }
+       var alertEditError = await this.alertCtrl.create
+    ({
+      message: JSON.stringify(err),
+      buttons: 
+      [
+        {
+          text: 'Close',
+          role: 'cancel'
+        }
+      ]
+    })
+    await alertEditError.present();
+    })
   }
 }

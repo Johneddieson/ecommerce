@@ -7,6 +7,7 @@ import { fromEvent, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LocationStrategy } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DbserviceService } from '../services/dbservice.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -29,7 +30,9 @@ pendingorder: any
     private router: Router,
     private applicationRef: ApplicationRef,
     private zone: NgZone,
-    private actRoute: ActivatedRoute) 
+    private actRoute: ActivatedRoute,
+    private dbservice: DbserviceService
+    ) 
     {
 
       router.events.subscribe(() => {
@@ -77,6 +80,34 @@ pendingorder: any
 //        })  
 //       }
 //     })
+     
+this.getProducts()
+   }
+   getProducts()
+   {
+    this.actRoute.queryParams.subscribe((params: any) => 
+    {
+      this.dbservice.getData('Products').subscribe((data) => 
+      {
+                  data = data.sort(function(a, b) {
+                    if (a.ProductName < b.ProductName) {
+                      return -1
+                    }
+                    if (a.ProductName > b.ProductName) {
+                      return 1
+                    }
+                    return 0
+                  })
+                  if (params.category == undefined)
+                  {
+                    this.productList = data;
+                  }
+                  else 
+                  {
+                    this.productList = data.filter(f => f.Category == params.category);
+                  }
+      })
+    })
    }
 
   ngOnInit(): void {
@@ -322,5 +353,10 @@ this.loadCart()
   }
   this.loadCart()
   data.Quantity = 1 
+}
+async queryProducts(params: any)
+{
+  console.log("params", params)
+  this.productList = this.productList.filter(f => f.Category == params);
 }
 }

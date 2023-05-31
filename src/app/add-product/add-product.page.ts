@@ -11,6 +11,8 @@ import {
 import { AlertController, IonInput, IonModal, LoadingController } from '@ionic/angular';
 import { loadingController } from '@ionic/core';
 import * as moment from 'moment';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { DbserviceService } from '../services/dbservice.service';
 @Component({
   selector: 'app-add-product',
   templateUrl: './add-product.page.html',
@@ -40,8 +42,27 @@ export class AddProductPage implements OnInit {
     public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
     //private afstore: AngularFirestore
+    private afauth: AngularFireAuth,
+    private dbservice: DbserviceService
   ) 
   {
+    this.afauth.authState.subscribe((data) => 
+    {
+      if (data?.uid)
+      {
+          this.dbservice.getData('Materials')
+          .subscribe((datamaterials) => 
+          {
+            datamaterials =  datamaterials.sort((a, b) => 
+           {
+            var textA = a.Itemname.toUpperCase();
+            var textB = b.Itemname.toUpperCase();
+            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+           })
+           this.materialArray = datamaterials
+          })
+      }
+    })
     // this.materialReference = this.afstore.collection(`Materials`, ref => ref.orderBy('Itemname'))
     // this.sub2 = this.materialReference.snapshotChanges()
     //   .pipe(map(actions => actions.map(a => {

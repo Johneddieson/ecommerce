@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
+import { DbserviceService } from '../services/dbservice.service';
 
 @Component({
   selector: 'app-mainpage',
@@ -16,16 +17,20 @@ export class MainpagePage implements OnInit {
   istrue: any;
   iconName = "chevron-up"
   @ViewChild('productbtn', {read: ElementRef}) productbtn!: ElementRef;
-
-products: any[] = []
+public products: any[] = []
 public category: any
   constructor(
     //private afauth: AngularFireAuth, 
     //private afstore: AngularFirestore,
     private actRoute: ActivatedRoute,
     private router : Router,
-    private alertCtrl: AlertController) 
+    private alertCtrl: AlertController,
+    private dbservice: DbserviceService) 
     {
+      this.dbservice.getData('Products').subscribe((data) => 
+      {
+          this.products = data;
+      })
         // this.actRoute.queryParams.subscribe(params => {
         //   if (params.category == undefined) {
         //   this.productCollection = this.afstore.collection('Products')

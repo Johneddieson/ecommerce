@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { AlertController, IonAccordionGroup, IonModal } from '@ionic/angular';
 import { CurrencyPipe } from '@angular/common';
 import * as _ from 'lodash'
+import { DbserviceService } from '../services/dbservice.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 @Component({
   selector: 'app-admintab1',
   templateUrl: './admintab1.page.html',
@@ -20,11 +22,45 @@ public disabledSaveChanges: boolean = false
 @ViewChild(IonModal) modal!: IonModal;
   constructor(
     //private afstore: AngularFirestore, 
-    //private afauth: AngularFireAuth,
+    private afauth: AngularFireAuth,
     private router: Router,
-    private currencyPipe: CurrencyPipe,
+    //private currencyPipe: CurrencyPipe,
+    private dbservice: DbserviceService,
     private alertCtrl: AlertController) 
     {
+      this.afauth.authState.subscribe((data: any) => 
+      {
+        if (data.uid)
+        {
+          this.dbservice.getData('Orders')
+          .subscribe((dataorders) => 
+          {
+            dataorders = dataorders.map((i: any, index: any) => 
+                    {
+                      return Object.assign({
+                        BillingAddress1: i.BillingAddress1,
+                        BillingAddress2: i.BillingAddress2,
+                        BillingFirstname: i.BillingFirstname,
+                        BillingIndexId: i.BillingIndexId,
+                        BillingLastname: i.BillingLastname,
+                        BillingPhonenumber: i.BillingPhonenumber,
+                        Billingemail: i.Billingemail,
+                        Datetime: i.Datetime,
+                        Status: i.Status,
+                        TotalAmount: i.TotalAmount,
+                        id: i.id,
+                        DatetimeToSort: i.DatetimeToSort,
+                        OrderDetails: i.OrderDetails,
+                        Discount: i.Discount,
+                        PaymentMethod: i.PaymentMethod
+                      })
+                    })
+                    dataorders = dataorders.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
+                    dataorders = dataorders.filter(f => f.Status == "Approved");
+                    this.allPendingOrders = dataorders
+          })
+        }
+      })
     // this.afauth.authState.subscribe(data => {
     //   if (data && data.uid) {
     //     this.productReference = this.afstore.collection('Orders', ref => ref.where("Status", "==", "Open"))

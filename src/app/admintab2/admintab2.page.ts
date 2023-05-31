@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import * as moment from 'moment';
 import { map } from 'rxjs/operators';
+import { DbserviceService } from '../services/dbservice.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 @Component({
   selector: 'app-admintab2',
   templateUrl: './admintab2.page.html',
@@ -14,11 +16,43 @@ export class Admintab2Page implements OnInit {
   
   constructor(
     //private afstore: AngularFirestore, 
-    //private afauth: AngularFireAuth,
+    private afauth: AngularFireAuth,
     private router: Router,
-    private currencyPipe: CurrencyPipe,
+    //private currencyPipe: CurrencyPipe,
+    private dbservice: DbserviceService,
     private alertCtrl: AlertController) 
     {
+      this.afauth.authState.subscribe((data: any) => 
+      {
+        if (data.uid)
+        {
+          this.dbservice.getData('History')
+          .subscribe((dataHistory) => 
+          {
+            dataHistory = dataHistory.map((i, index) => {
+                      return Object.assign({
+                        BillingAddress1: i.BillingAddress1,
+                        BillingAddress2: i.BillingAddress2,
+                        BillingFirstname: i.BillingFirstname,
+                        BillingIndexId: i.BillingIndexId,
+                        BillingLastname: i.BillingLastname,
+                        BillingPhonenumber: i.BillingPhonenumber,
+                        Billingemail: i.Billingemail,
+                        Datetime: i.Datetime,
+                        Status: i.Status,
+                        TotalAmount: i.TotalAmount,
+                        id: i.id,
+                        DatetimeToSort: i.DatetimeToSort,
+                        OrderDetails: i.OrderDetails,
+                        Discount: i.Discount,
+                        PaymentMethod: i.PaymentMethod
+                      })
+                    })
+                    dataHistory = dataHistory.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
+                    this.allPendingOrders = dataHistory
+          })
+        }
+      })
     // this.afauth.authState.subscribe(data => {
     //   if (data && data.uid) {
     //     this.productReference = this.afstore.collection('History')

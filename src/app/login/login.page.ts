@@ -1,7 +1,10 @@
 import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController, NavController } from '@ionic/angular';
-
+import { DbserviceService } from '../services/dbservice.service';
+import { catchError, pipe, throwError, Subject } from 'rxjs';
+import firebase from 'firebase/compat/app';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -21,8 +24,10 @@ export class LoginPage implements OnInit {
     private alertCtrl: AlertController, 
     private router: Router,
     private applicationRef: ApplicationRef,
-    private zone: NgZone
-    ) {}
+    private zone: NgZone,
+    private dbservice: DbserviceService,
+    ) 
+    {}
 
   ngOnInit() 
   {
@@ -51,7 +56,7 @@ export class LoginPage implements OnInit {
     })
   }
   ResetPassword() {
-this.alertCtrl.create({
+  this.alertCtrl.create({
   header: 'Reset Password',
   inputs: [
     {
@@ -89,9 +94,8 @@ this.alertCtrl.create({
 
    
   }
-  
   navigateadmin() {
-    this.router.navigateByUrl('adminpage')
+    this.router.navigateByUrl('/adminpage/atab1')
   }
   navigatecustomer() {
     this.router.navigateByUrl('tabs')
@@ -126,6 +130,19 @@ this.alertCtrl.create({
   // }
   LogIn()
     {
+    //   this.auth.signInWithEmailAndPassword
+    //   (
+    //     this.Email1,
+    //     this.Password1
+    //   )
+    // ).pipe
+    // (
+    //   catchError
+    //   (
+    //     (error: FirebaseError) => 
+    //   throwError(() => new Error(this.translateFirebaseErrorMessage(error)))
+    //   )
+
         // this.auth.SignIn(this.Email1, this.Password1)
         // .then(async (success) => 
         // {
@@ -186,6 +203,73 @@ this.alertCtrl.create({
         //       })
         //       await alertError.present();
         //   })      
-    }
+        this.dbservice.signIn({
+          email: this.Email1,
+          password: this.Password1
+        }).subscribe({
+          next: async (success) => 
+          {
+            //console.log("success", success)
+            
+            if(success.user.emailVerified == false)
+            {
+                var alertemailnotyetverified = await this.alertCtrl.create
+                ({
+                  message: 'Your email is not yet verified, Please verify it to your email box before proceeding.',
+                  buttons: 
+                  [
+                    {
+                      text: 'Ok',
+                      role: 'cancel'
+                    }
+                  ]
+                })
+                await alertemailnotyetverified.present();
+            }
+            else 
+            {
+              var successLoading = await this.loadingCtrl.create
+              ({
+                message: 'Logging in...',
+                spinner: 'lines-sharp'
+              })   
+              await successLoading.present();
+
+              setTimeout(async () => {
+                await successLoading.dismiss();
+                if (success.user.displayName == 'admin')
+                {
+                  this.router.navigateByUrl('/adminpage')
+                }
+                else 
+                {
+                  this.router.navigateByUrl('/tabs/tab1')
+                }
+                sessionStorage.setItem('user', JSON.stringify(success.user));
+                
+                //email = '';
+                //password = ''
+                this.Email1 = ''
+                this.Password1 = ''
+              }, 3000);
+            }  
+          },
+          error: async error => {
+            //console.log("error", error.message)
+            var alertError = await this.alertCtrl.create
+            ({
+              message: error.message,
+              buttons: 
+              [
+                {
+                  text: 'Close',
+                  role:'cancel'
+                }
+              ]
+            })
+            await alertError.present();
+          }
+        });
+      }
 
 }

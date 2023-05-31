@@ -1,9 +1,11 @@
 import { LocationStrategy } from '@angular/common';
 import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
 import * as moment from 'moment';
 import { buffer, map } from 'rxjs/operators';
+import { DbserviceService } from '../services/dbservice.service';
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
@@ -17,65 +19,44 @@ myid: any
 subMeReference: any;
 email: any;
   constructor(private router: Router, 
-    //private afstore: AngularFirestore,
-    //private afauth: AngularFireAuth, 
     private loadingCtrl: LoadingController,
     private locationStrategy: LocationStrategy, 
-    //private auth: AuthServiceService,
     private alertCtrl: AlertController,
     private applicationRef: ApplicationRef,
-    private zone: NgZone) 
+    private zone: NgZone,
+    private afauth: AngularFireAuth,
+    private dbservice: DbserviceService) 
     {
-    // this.afauth.authState.subscribe(data => {
-    //   if (data && data.uid) {
-    //     this.myid = data.uid
-    //     this.notificationsReference = this.afstore.collection(`users/${data.uid}/notifications`)
-
-    //     this.sub = this.notificationsReference.snapshotChanges()
-    //       .pipe(map(actions => actions.map(a => {
-    //         return {
-    //           id: a.payload.doc.id,
-    //           ...a.payload.doc.data() as any
-    //         }
-    //       }))).subscribe(async data => {
-    //         data = data.map((i, index) => {
-    //           return Object.assign({
-    //             id: i.id,
-    //             Datetime: i.Datetime,
-    //             DatetimeToSort: i.DatetimeToSort,
-    //             read: i.read,
-    //             remarks: i.remarks,
-    //             Message: i.Message,
-    //             OrderId: i.OrderId
-    //           })
-    //         })
-    //         data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-    //         this.notificationsList = data
-
-    //         var filterOnlyNotRead = data.filter(f => f.read != true)
-    //           this.notifCounts = filterOnlyNotRead.length
-    //       })
-      
-      
-    //   this.meReference = this.afstore.doc(`users/${data.uid}`)
-
-    //   this.subMeReference = this.meReference.valueChanges().subscribe(data => {
-    //       this.email = data.Email;
-    //   })
-    //     }
-    // })
-  }
-  async ngOnInit() {
-    var alertControllerSendFeedBack = await this.alertCtrl.create({
-      message: 'You can send your feedback to us, we will appreciate your comments thanks!',
-      buttons: [
+        this.afauth.authState.subscribe((dataAuth: any) => 
         {
-          text: 'Ok',
-          role: 'cancel'
-        }
-      ]
-    })
-    await alertControllerSendFeedBack.present()
+          if (dataAuth.uid)
+          {
+              this.dbservice.getData('Orders').subscribe((data) => 
+              {
+                  var currentuserAllOrders = data.filter(f => f.BillingIndexId == dataAuth.uid);
+                  //console.log("current user all orders", currentuserAllOrders)
+                  var currentuserAllOrderDetails = currentuserAllOrders.map((data: any) => {return data.OrderDetails});
+                  // console.log("current user all orderdetails", currentuserAllOrderDetails)
+                  currentuserAllOrderDetails.forEach(fe => 
+                    {
+                      console.log("order details", fe)
+                    })
+                })
+          }
+        })
+    }
+  async ngOnInit() 
+  {
+    // var alertControllerSendFeedBack = await this.alertCtrl.create({
+    //   message: 'You can send your feedback to us, we will appreciate your comments thanks!',
+    //   buttons: [
+    //     {
+    //       text: 'Ok',
+    //       role: 'cancel'
+    //     }
+    //   ]
+    // })
+    // await alertControllerSendFeedBack.present()
   }
   update(item: any) 
   {

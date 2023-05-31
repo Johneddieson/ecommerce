@@ -17,7 +17,7 @@ feedBacksData: any[] = []
     //private afstore: AngularFirestore, 
     //private afauth: AngularFireAuth,
     private router: Router,
-    private currencyPipe: CurrencyPipe,
+    //private currencyPipe: CurrencyPipe,
     private alertCtrl: AlertController) 
     {
         // this.afauth.authState.subscribe(data => {

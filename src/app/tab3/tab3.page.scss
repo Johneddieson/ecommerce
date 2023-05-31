@@ -26,8 +26,9 @@ ion-footer {
 // }
 
 ion-content {
-    --background:  url('../../assets/icon/backgroundimage3.jpg') no-repeat center center / cover;
+    // --background:  url('/src/assets/icon/backgroundimage3.jpg') no-repeat center center / cover;
    // background-color: #654c05;
    // background: linear-gradient(120deg,#2980b9, #8e44ad);
+   --background:  url('../../assets/icon/backgroundimage3.jpg') no-repeat center center / cover;
    background: linear-gradient(120deg,#2980b9, #8e44ad);
   }

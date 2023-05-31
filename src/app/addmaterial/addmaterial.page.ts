@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AlertController } from '@ionic/angular';
+import { DbserviceService } from '../services/dbservice.service';
 
 @Component({
   selector: 'app-addmaterial',
@@ -11,19 +13,22 @@ public itemName: string = ''
 public gramsOnHand: string = ''
   constructor(
     //private afstore: AngularFirestore,
-    //private afauth: AngularFireAuth,
-    private alertController: AlertController) 
+    private afauth: AngularFireAuth,
+    private alertController: AlertController,
+    private dbservice: DbserviceService
+    ) 
     {
-      // this.afauth.authState.subscribe(user => 
-      //   {
-      //     if (user && user.uid)
-      //     {
+      this.afauth.authState.subscribe(user => 
+        {
+          if (user?.uid)
+          {
 
-      //     }
-      //   })
+          }
+        })
      }
 
-  ngOnInit() {
+  ngOnInit() 
+  {
   }
 containsOnlyNumbers(str: any) {
     return /^[0-9]+$/.test(str);
@@ -88,6 +93,43 @@ containsOnlyNumbers(str: any) {
     }
     else 
     {
+      var specificObject = 
+      {
+        Itemname: itemname.value,
+        Stock: parseInt(gramsonhand.value)   
+      }
+      this.dbservice.postData('Materials', specificObject)
+      .then(async (success) => 
+      {
+        var materialsavedalert = await this.alertController.create
+        ({
+          message: 'Material added successfully',
+          backdropDismiss: false,
+          buttons: 
+          [
+            {
+              text: 'Close',
+              role: 'cancel'
+            }
+          ]
+        })
+        await materialsavedalert.present();
+      }).catch(async (err) => 
+      {
+        var materialerrorsavedalert = await this.alertController.create
+        ({
+          message: JSON.stringify(err),
+          backdropDismiss: false,
+          buttons: 
+          [
+            {
+              text: 'Close',
+              role: 'cancel'
+            }
+          ]
+        })
+        await materialerrorsavedalert.present();
+      })
       // this.afstore
       // .collection('Materials')
       // .add({

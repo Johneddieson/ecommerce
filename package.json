@@ -23,6 +23,7 @@
     "@angular/platform-browser-dynamic": "^16.0.0",
     "@angular/router": "^16.0.0",
     "@ionic/angular": "^7.0.0",
+    "firebase": "^9.22.1",
     "ionicons": "^7.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
