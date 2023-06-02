@@ -105,8 +105,6 @@ myid: string = ''
           handler: () => 
           { 
               this.auth.SignOut();
-              sessionStorage.removeItem('user');
-              this.router.navigateByUrl('/login')
             }
         },
         {

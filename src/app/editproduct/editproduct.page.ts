@@ -1,10 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController, AlertController, IonInput, IonModal } from '@ionic/angular';
 import * as moment from 'moment';
 import { map } from 'rxjs/operators';
+import { DbserviceService } from '../services/dbservice.service';
 
 @Component({
   selector: 'app-editproduct',
@@ -45,12 +47,50 @@ export class EditproductPage implements OnInit {
     public formBuilder: FormBuilder,
     public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
+    private afauth: AngularFireAuth,
+    private dbservice: DbserviceService
     //private afstore: AngularFirestore
   ) 
   {
     //Specific Product Reference//
 
     this.id = actRoute.snapshot.paramMap.get('id');
+    this.afauth.authState.subscribe((user) => 
+    {
+      if (user?.uid)
+      {
+        dbservice.getDataById('Products', this.id).subscribe
+        ((data) => 
+        {
+            this.productname = data.ProductName;
+            this.stock = data.Stock.toString();
+            this.price = data.UnitPrice;
+            this.photoLink = data.ImageUrl;
+            this.withPhoto = true;
+            this.currentstock = data.Stock.toString();
+            this.category = data.Category;
+            this.mediumprice = data.MediumPrice;
+            this.largeprice = data.LargePrice;
+            this.gramsperordermedium = data.MediumGramsPerOrder;
+            this.gramsperorderlarge = data.LargeGramsPerOrder;
+            this.gramsperorder = data.GramsPerOrder;
+            var materialsStringId = data.Materials.length <= 0 ? '' : data.Materials.map(function(e: any) {return e.itemId})
+            this.existingMaterials = data.Materials
+            this.registerForm.controls['materials'].setValue(materialsStringId)
+        });
+
+        dbservice.getData('Materials').subscribe((datamaterials) => 
+        {
+          datamaterials =  datamaterials.sort((a, b) => 
+          {
+           var textA = a.Itemname.toUpperCase();
+           var textB = b.Itemname.toUpperCase();
+           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+          })
+          this.materialArray = datamaterials
+        })
+      }
+    })
     // this.productReference = this.afstore.doc(`Products/${this.id}`);
     // this.sub = this.productReference.valueChanges().subscribe((data) => {
     //   this.productname = data.ProductName;
@@ -91,216 +131,379 @@ export class EditproductPage implements OnInit {
   }
 
   ngOnInit() {
-    this.registerForm = new FormGroup({
-      category: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({
-          pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/,
-          msg: 'Always Starts With Capital Letter',
-        }),
-        this.customPatternValid({
-          pattern: /^([^0-9]*)$/,
-          msg: 'Numbers is not allowed',
-        }),
-      ]),
-      productname: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({
-          //pattern:  /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/,
-          pattern: /^[_A-zA-Z]*((-|\s)*[_A-zA-Z])*$/g,
-          msg: 'Numbers or Special Characters are not allowed.',
-        }),
-      ]),
-      stock: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({
-          pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
-          msg: 'This format is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^?!-]*)$/,
-          msg: 'Negative is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^?!_]*)$/,
-          msg: 'Under Score is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^?!=]*)$/,
-          msg: 'Equal is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^?!+]*)$/,
-          msg: 'Plus is not allowed',
-        }),
-        // this.customPatternValid({
-        //   pattern: /^([^.?!.]*)$/,
-        //   msg: 'Period is not allowed',
-        // }),
-      ]),
-      unitprice: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({
-          pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
-          msg: 'This format is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^-]*)$/,
-          msg: 'Negative is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^?!_]*)$/,
-          msg: 'Under Score is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^?!=]*)$/,
-          msg: 'Equal is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^?!+]*)$/,
-          msg: 'Plus is not allowed',
-        }),
-      ]),
+    // this.registerForm = new FormGroup({
+    //   category: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       pattern: /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/,
+    //       msg: 'Always Starts With Capital Letter',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^0-9]*)$/,
+    //       msg: 'Numbers is not allowed',
+    //     }),
+    //   ]),
+    //   productname: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       //pattern:  /^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/,
+    //       pattern: /^[_A-zA-Z]*((-|\s)*[_A-zA-Z])*$/g,
+    //       msg: 'Numbers or Special Characters are not allowed.',
+    //     }),
+    //   ]),
+    //   stock: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+    //       msg: 'This format is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^?!-]*)$/,
+    //       msg: 'Negative is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^?!_]*)$/,
+    //       msg: 'Under Score is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^?!=]*)$/,
+    //       msg: 'Equal is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^?!+]*)$/,
+    //       msg: 'Plus is not allowed',
+    //     }),
+    //     // this.customPatternValid({
+    //     //   pattern: /^([^.?!.]*)$/,
+    //     //   msg: 'Period is not allowed',
+    //     // }),
+    //   ]),
+    //   unitprice: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+    //       msg: 'This format is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^-]*)$/,
+    //       msg: 'Negative is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^?!_]*)$/,
+    //       msg: 'Under Score is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^?!=]*)$/,
+    //       msg: 'Equal is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^?!+]*)$/,
+    //       msg: 'Plus is not allowed',
+    //     }),
+    //   ]),
 
-      mediumprice: new FormControl('', [
+    //   mediumprice: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+    //       msg: 'This format is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!-]*)$/,
+    //       msg: 'Negative is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!_]*)$/,
+    //       msg: 'Under Score is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!=]*)$/,
+    //       msg: 'Equal is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!+]*)$/,
+    //       msg: 'Plus is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!.]*)$/,
+    //       msg: 'Period is not allowed',
+    //     }),
+    //   ]),
+    //   largeprice: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+    //       msg: 'This format is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!-]*)$/,
+    //       msg: 'Negative is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!_]*)$/,
+    //       msg: 'Under Score is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!=]*)$/,
+    //       msg: 'Equal is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!+]*)$/,
+    //       msg: 'Plus is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!.]*)$/,
+    //       msg: 'Period is not allowed',
+    //     }),
+    //   ]),
+    //   gramsperordermedium: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+    //       msg: 'This format is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!-]*)$/,
+    //       msg: 'Negative is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!_]*)$/,
+    //       msg: 'Under Score is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!=]*)$/,
+    //       msg: 'Equal is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!+]*)$/,
+    //       msg: 'Plus is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!.]*)$/,
+    //       msg: 'Period is not allowed',
+    //     }),
+    //   ]),
+    //   gramsperorderlarge: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+    //       msg: 'This format is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!-]*)$/,
+    //       msg: 'Negative is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!_]*)$/,
+    //       msg: 'Under Score is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!=]*)$/,
+    //       msg: 'Equal is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!+]*)$/,
+    //       msg: 'Plus is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!.]*)$/,
+    //       msg: 'Period is not allowed',
+    //     }),
+    //   ]),
+    //   gramsperorder: new FormControl('', [
+    //     Validators.required,
+    //     this.customPatternValid({
+    //       pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+    //       msg: 'This format is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!-]*)$/,
+    //       msg: 'Negative is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!_]*)$/,
+    //       msg: 'Under Score is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!=]*)$/,
+    //       msg: 'Equal is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!+]*)$/,
+    //       msg: 'Plus is not allowed',
+    //     }),
+    //     this.customPatternValid({
+    //       pattern: /^([^.?!.]*)$/,
+    //       msg: 'Period is not allowed',
+    //     }),
+    //   ]),
+    //   materials: new FormControl('', [
+    //     Validators.required,
+    //     ]),
+    // });
+  
+    this.formvalidation();
+    this.validationForGramsPerOrder();
+  }
+  formvalidation()
+  {
+    this.registerForm = this.formBuilder.group({
+      category: 
+      [
+        '', 
+        [
         Validators.required,
-        this.customPatternValid({
-          pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
-          msg: 'This format is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!-]*)$/,
-          msg: 'Negative is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!_]*)$/,
-          msg: 'Under Score is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!=]*)$/,
-          msg: 'Equal is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!+]*)$/,
-          msg: 'Plus is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!.]*)$/,
-          msg: 'Period is not allowed',
-        }),
-      ]),
-      largeprice: new FormControl('', [
+        Validators.pattern(/^([A-Z][a-z]*((\s[A-Za-z])?[a-z]*)*)$/),
+        Validators.pattern(/^([^0-9]*)$/)
+        ]
+      ],
+      productname: 
+      [
+        '',
+        [
         Validators.required,
-        this.customPatternValid({
-          pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
-          msg: 'This format is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!-]*)$/,
-          msg: 'Negative is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!_]*)$/,
-          msg: 'Under Score is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!=]*)$/,
-          msg: 'Equal is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!+]*)$/,
-          msg: 'Plus is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!.]*)$/,
-          msg: 'Period is not allowed',
-        }),
-      ]),
-      gramsperordermedium: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({
-          pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
-          msg: 'This format is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!-]*)$/,
-          msg: 'Negative is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!_]*)$/,
-          msg: 'Under Score is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!=]*)$/,
-          msg: 'Equal is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!+]*)$/,
-          msg: 'Plus is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!.]*)$/,
-          msg: 'Period is not allowed',
-        }),
-      ]),
-      gramsperorderlarge: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({
-          pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
-          msg: 'This format is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!-]*)$/,
-          msg: 'Negative is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!_]*)$/,
-          msg: 'Under Score is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!=]*)$/,
-          msg: 'Equal is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!+]*)$/,
-          msg: 'Plus is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!.]*)$/,
-          msg: 'Period is not allowed',
-        }),
-      ]),
-      gramsperorder: new FormControl('', [
-        Validators.required,
-        this.customPatternValid({
-          pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
-          msg: 'This format is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!-]*)$/,
-          msg: 'Negative is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!_]*)$/,
-          msg: 'Under Score is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!=]*)$/,
-          msg: 'Equal is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!+]*)$/,
-          msg: 'Plus is not allowed',
-        }),
-        this.customPatternValid({
-          pattern: /^([^.?!.]*)$/,
-          msg: 'Period is not allowed',
-        }),
-      ]),
-      materials: new FormControl('', [
-        Validators.required,
-        ]),
+        Validators.pattern(/^[a-zA-Z\s]*$/)
+        ]
+      ],
+      unitprice: 
+      [
+        '',
+        [
+          Validators.required,
+          // this.customPatternValid({
+          //   pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+          //   msg: 'This format is not allowed',
+          // }),
+          Validators.pattern(/^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/),
+          
+          // this.customPatternValid({
+          //   pattern: /^([^-]*)$/,
+          //   msg: 'Negative is not allowed',
+          // }),
+          Validators.pattern(/^([^-]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!_]*)$/,
+          //   msg: 'Under Score is not allowed',
+          // }),
+          Validators.pattern(/^([^?!_]*)$/),
+  
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!=]*)$/,
+          //   msg: 'Equal is not allowed',
+          // }),
+          Validators.pattern(/^([^?!=]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!+]*)$/,
+          //   msg: 'Plus is not allowed',
+          // }),
+          Validators.pattern(/^([^?!+]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^.?!.]*)$/,
+          //   msg: 'Period is not allowed',
+          // }),
+          Validators.pattern(/^([^.?!.]*)$/),
+        ]
+      ],
+      mediumprice: 
+      [
+        '',
+        [        
+          Validators.required,
+          // this.customPatternValid({
+          //   pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+          //   msg: 'This format is not allowed',
+          // }),
+          Validators.pattern(/^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/),
+          
+          // this.customPatternValid({
+          //   pattern: /^([^-]*)$/,
+          //   msg: 'Negative is not allowed',
+          // }),
+          Validators.pattern(/^([^-]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!_]*)$/,
+          //   msg: 'Under Score is not allowed',
+          // }),
+          Validators.pattern(/^([^?!_]*)$/),
+  
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!=]*)$/,
+          //   msg: 'Equal is not allowed',
+          // }),
+          Validators.pattern(/^([^?!=]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!+]*)$/,
+          //   msg: 'Plus is not allowed',
+          // }),
+          Validators.pattern(/^([^?!+]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^.?!.]*)$/,
+          //   msg: 'Period is not allowed',
+          // }),
+          Validators.pattern(/^([^.?!.]*)$/),]
+      ],
+      largeprice: 
+      [
+        '',
+        
+        [
+          Validators.required,
+          // this.customPatternValid({
+          //   pattern: /^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/,
+          //   msg: 'This format is not allowed',
+          // }),
+          Validators.pattern(/^[+-]?(?:\d*[1-9]\d*(?:\.\d+)?|0+\.\d*[1-9]\d*)$/),
+          
+          // this.customPatternValid({
+          //   pattern: /^([^-]*)$/,
+          //   msg: 'Negative is not allowed',
+          // }),
+          Validators.pattern(/^([^-]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!_]*)$/,
+          //   msg: 'Under Score is not allowed',
+          // }),
+          Validators.pattern(/^([^?!_]*)$/),
+  
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!=]*)$/,
+          //   msg: 'Equal is not allowed',
+          // }),
+          Validators.pattern(/^([^?!=]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^?!+]*)$/,
+          //   msg: 'Plus is not allowed',
+          // }),
+          Validators.pattern(/^([^?!+]*)$/),
+  
+          // this.customPatternValid({
+          //   pattern: /^([^.?!.]*)$/,
+          //   msg: 'Period is not allowed',
+          // }),
+          Validators.pattern(/^([^.?!.]*)$/),
+        ]
+      ],
+      materials: 
+      [
+        '',
+        [Validators.required]
+      ]
     });
+  }
+  get f() {
+    //console.log(this.aFormGroup.controls)
+    return this.registerForm.controls;
   }
   customPatternValid(config: any): ValidatorFn | any 
   {
@@ -335,7 +538,7 @@ export class EditproductPage implements OnInit {
       .subscribe((events: any) => {
         var json = { events } as any;
         for (var prop in json) {
-          console.log('wew', json[prop].file);
+          //console.log('wew', json[prop].file);
           for (const variables of files) {
             this.photoLink = `https://ucarecdn.com/${json[prop].file}/${variables.name}`;
           }
@@ -504,10 +707,55 @@ export class EditproductPage implements OnInit {
       this.openModaltosetMaterials()
     }
   }
-  async editFunction() {
-    
+  async editFunction()  
+  {
     var StockChanges = parseInt(this.currentstock) == parseInt(this.registerForm.value.stock)
     var datetime = await moment(new Date()).format('MM-DD-YYYY hh:mm A');
+    var specificobject = {
+          GramsPerOrder: parseInt("0"),
+          ImageUrl: this.photoLink,
+          LargeGramsPerOrder: parseInt("0"),
+          LargePrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.largeprice,
+          MediumGramsPerOrder: parseInt("0"),
+          MediumPrice: this.registerForm.value.category == 'Slushee' ? "0" : this.registerForm.value.mediumprice,
+          ProductName: this.registerForm.value.productname,
+          Quantity: 1,
+          Stock: parseInt("0"),
+          UnitPrice: this.registerForm.value.category == 'Slushee' ? this.registerForm.value.unitprice : "0",
+          Materials: this.arrayForMaterial
+    };
+    this.dbservice.updateData(this.id, specificobject, 'Products')
+    .then(async (successEditing) => 
+    {
+                 var loadingForUpdatingProduct = await this.loadingCtrl.create({
+                   message: 'Updating product...',
+                   spinner: 'bubbles',
+                 });
+
+                 await loadingForUpdatingProduct.present();
+
+                 var alertForUpdatingProduct = await this.alertCtrl.create({
+                   message: 'You updated this product successfully!',
+                   buttons: [
+                     {
+                       role: 'cancel',
+                       text: 'Ok',
+                     },
+                   ],
+                 });
+                 setTimeout(async () => {
+                   await loadingForUpdatingProduct.dismiss();
+                   await alertForUpdatingProduct.present();
+                 }, 4000);
+    })
+    .catch(async (err) => 
+    { 
+        var alertErrorEditingProduct = await this.alertCtrl.create
+        ({
+          message: JSON.stringify(err)
+        })
+        await alertErrorEditingProduct.present();  
+    })
     // await this.productReference
     //   .update({
     //     //this is my latest changes editing 04302023
@@ -554,7 +802,7 @@ export class EditproductPage implements OnInit {
 
     setMaterials()
   {
-    this.arrayForMaterial = this.registerForm.value.materials
+    this.arrayForMaterial = this.registerForm.controls['materials'].value
     //assigned object for material list string
     this.arrayForMaterial = this.arrayForMaterial.map((i, index) => {
       return Object.assign(
@@ -575,6 +823,10 @@ export class EditproductPage implements OnInit {
     });
     //get the itemname of materials by using their uniqueidentifier ID
     this.arrayForMaterial.map((i, index) => {
+          this.dbservice.getDataById('Materials', i.itemId).subscribe((data) => 
+          {
+            i.itemName =  data.Itemname;
+          })
       // this.materialEachElementReference = this.afstore.doc(
       //   `Materials/${i.itemId}`
       // );
@@ -786,7 +1038,7 @@ this.validationMessageObject = {
       {
         var filterNanValues;
       
-        if (this.registerForm.value.category != 'Slushee')
+        if (this.category != 'Slushee')
         {
           filterNanValues = this.arrayForMaterial.filter(f =>  f.gramsperorderlarge == 0  || 
           f.gramsperordermedium == 0 || isNaN(parseInt(f.gramsperorderlarge))
@@ -814,6 +1066,7 @@ this.validationMessageObject = {
     {
       this.setMaterials()
       this.modal.present();
+      this.validationForGramsPerOrder();
     }
     }
 

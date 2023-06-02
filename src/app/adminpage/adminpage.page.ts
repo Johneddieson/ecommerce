@@ -2,6 +2,7 @@ import { map } from 'rxjs/operators';
 import { LocationStrategy } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AlertButton, AlertController, Platform } from '@ionic/angular';
+import { AuthserviceService } from '../services/authservice.service';
 
 @Component({
   selector: 'app-adminpage',
@@ -15,6 +16,7 @@ feedbackLength: number = 0
     private alertCtrl: AlertController,
     //private auth: AuthServiceService,
     private plt: Platform,
+    private auth: AuthserviceService
     //private afstore: AngularFirestore,
     //private afauth: AngularFireAuth
     ) 
@@ -61,7 +63,7 @@ this.alertCtrl.create({
     {
       text: 'Yes',
       handler: () => {
-        //this.auth.SignOut()
+        this.auth.SignOut()
       }
     },
     {

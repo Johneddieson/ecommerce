@@ -12,36 +12,45 @@
 <ion-content class="ion-padding ion-text-center">
   
     <img src="{{photoLink}}" *ngIf="photoLink != ''" class="camera"/>
-    <ion-input type="file" (change)="fileChanged($event)" accept="image/*"></ion-input>
+    <!-- <ion-input type="file" (change)="fileChanged($event)" accept="image/*"></ion-input> -->
    <br>
    <br>
    
   <div class="form">
     <ion-input hidden class="uploadfile"  type="file" #inputFile (change)="fileChanged($event)" accept="image/*"></ion-input>
+    
     <ion-modal  mode="sm" [backdropDismiss]="false"
   class="example-modal">
-    <ng-template>
+    
+  <ng-template>
       <ion-content color="light">
-        <ion-item *ngFor="let mat of arrayForMaterial" [hidden]="category != 'Slushee'">
+        <div *ngIf="category == 'Slushee'">
+          <ion-item *ngFor="let mat of arrayForMaterial">
             <ion-label text-wrap>{{mat.itemName}} :</ion-label>
               <ion-input value="{{mat.gramsperorder}}"
             placeholder="Enter grams per order" type="number"
             (ionChange)="updateGramsPerOrderEvent($event, mat)"></ion-input>
         </ion-item>
-        
-        <ion-item *ngFor="let mat of arrayForMaterial" [hidden]="category == 'Slushee'">
+      </div>
+      
+      <div *ngIf="category != 'Slushee'">
+        <ion-item *ngFor="let mat of arrayForMaterial">
           <ion-label text-wrap>{{mat.itemName}} Large:</ion-label>
             <ion-input value="{{mat.gramsperorderlarge}}"
           placeholder="Enter grams per order large" type="number"
           (ionChange)="updateGramsPerOrderLargeEvent($event, mat)"></ion-input>
       </ion-item>
+      </div>
+  
+      <div *ngIf="category != 'Slushee'">
+        <ion-item *ngFor="let mat of arrayForMaterial">
+          <ion-label text-wrap>{{mat.itemName}} Medium:</ion-label>
+            <ion-input value="{{mat.gramsperordermedium}}"
+          placeholder="Enter grams per order medium" type="number"
+          (ionChange)="updateGramsPerOrderMediumEvent($event, mat)"></ion-input>
+      </ion-item>
+      </div>
 
-      <ion-item *ngFor="let mat of arrayForMaterial" [hidden]="category == 'Slushee'">
-        <ion-label text-wrap>{{mat.itemName}} Medium:</ion-label>
-          <ion-input value="{{mat.gramsperordermedium}}"
-        placeholder="Enter grams per order medium" type="number"
-        (ionChange)="updateGramsPerOrderMediumEvent($event, mat)"></ion-input>
-    </ion-item>
     
         <ion-item lines="none">
          <ion-buttons slot="end">
@@ -70,14 +79,16 @@
         <ion-label style="font-weight: 900;" text-wrap>Product Name :</ion-label>
         <ion-input  placeholder="Enter product name" formControlName="productname" [(ngModel)]="productname"></ion-input>
       </ion-item>
-      <!-- <ion-text type="text" style="font-weight: 1000;" color="danger" *ngIf="registerForm.get('productname').hasError('required') && registerForm.get('productname').touched">
-        Product Name shouldn't be empty 
-       </ion-text>
-       <div *ngIf="!registerForm.controls.productname.valid && (registerForm.controls.productname.dirty ||registerForm.controls.productname.touched)" class="error">
-         <ion-text color="danger" style="font-weight: 1000;" *ngIf="registerForm.controls.productname.errors.invalidMsg">
-           {{registerForm.controls.productname.errors.invalidMsg}}
-         </ion-text>
-       </div> -->
+      <ion-text type="text" style="font-weight: 1000;" color="danger"
+      *ngIf="f['productname'].errors && f['productname'].errors['required']">
+      Product Name shouldn't be empty
+    </ion-text>
+
+    <div class="error" *ngIf="f['productname'].errors && f['productname'].errors['pattern']">
+      <ion-text color="danger" style="font-weight: 1000;">
+        This format is not allowed
+      </ion-text>
+    </div>
       
       
 
@@ -90,14 +101,16 @@
     <ion-label style="font-weight: 900;" text-wrap>Unit Price :</ion-label>
     <ion-input type="tel"  placeholder="Enter Price" formControlName="unitprice" [(ngModel)]="price"></ion-input>
   </ion-item>
-  <!-- <ion-text color="danger" style="font-weight: 1000;" *ngIf="registerForm.get('unitprice').hasError('required') && registerForm.get('unitprice').touched">
-    Price of product shouldn't be empty
-   </ion-text> 
-   <div *ngIf="!registerForm.controls.unitprice.valid && (registerForm.controls.unitprice.dirty ||registerForm.controls.unitprice.touched)" class="error">
-    <ion-text color="danger" style="font-weight: 1000;" *ngIf="registerForm.controls.unitprice.errors.invalidMsg">
-      {{registerForm.controls.unitprice.errors.invalidMsg}}
-    </ion-text>
-  </div> -->
+  <ion-text type="text" style="font-weight: 1000;" color="danger"
+  *ngIf="f['unitprice'].errors && f['unitprice'].errors['required']">
+  Unit Price shouldn't be empty
+</ion-text>
+
+<div class="error" *ngIf="f['unitprice'].errors && f['unitprice'].errors['pattern']">
+  <ion-text color="danger" style="font-weight: 1000;">
+    This format is not allowed
+  </ion-text>
+</div>
 
 </div>
     
@@ -107,14 +120,18 @@
     <ion-label style="font-weight: 900;" text-wrap>Medium Price :</ion-label>
     <ion-input type="tel"  placeholder="Enter Medium Price" formControlName="mediumprice" [(ngModel)]="mediumprice"></ion-input>
   </ion-item>
-  <!-- <ion-text color="danger" style="font-weight: 1000;" *ngIf="registerForm.get('mediumprice').hasError('required') && registerForm.get('mediumprice').touched">
-    Medium Price of product shouldn't be empty
-   </ion-text> 
-   <div *ngIf="!registerForm.controls.mediumprice.valid && (registerForm.controls.mediumprice.dirty ||registerForm.controls.mediumprice.touched)" class="error">
-    <ion-text color="danger" style="font-weight: 1000;" *ngIf="registerForm.controls.mediumprice.errors.invalidMsg">
-      {{registerForm.controls.mediumprice.errors.invalidMsg}}
-    </ion-text>
-  </div> -->
+
+  <ion-text type="text" style="font-weight: 1000;" color="danger"
+  *ngIf="f['mediumprice'].errors && f['mediumprice'].errors['required']">
+  Medium Price shouldn't be empty
+</ion-text>
+
+<div class="error" *ngIf="f['mediumprice'].errors && f['mediumprice'].errors['pattern']">
+  <ion-text color="danger" style="font-weight: 1000;">
+    This format is not allowed
+  </ion-text>
+</div>
+
 </div>
   
 
@@ -124,14 +141,16 @@
           <ion-label style="font-weight: 900;" text-wrap>Large Price :</ion-label>
           <ion-input type="tel"  placeholder="Enter Large Price" formControlName="largeprice" [(ngModel)]="largeprice"></ion-input>
         </ion-item>
-        <!-- <ion-text color="danger" style="font-weight: 1000;" *ngIf="registerForm.get('largeprice').hasError('required') && registerForm.get('largeprice').touched">
-          Large Price of product shouldn't be empty
-         </ion-text> 
-         <div *ngIf="!registerForm.controls.largeprice.valid && (registerForm.controls.largeprice.dirty ||registerForm.controls.largeprice.touched)" class="error">
-          <ion-text color="danger" style="font-weight: 1000;" *ngIf="registerForm.controls.largeprice.errors.invalidMsg">
-            {{registerForm.controls.largeprice.errors.invalidMsg}}
-          </ion-text>
-        </div>   -->
+        <ion-text type="text" style="font-weight: 1000;" color="danger"
+        *ngIf="f['largeprice'].errors && f['largeprice'].errors['required']">
+        Large Price shouldn't be empty
+      </ion-text>
+      
+      <div class="error" *ngIf="f['largeprice'].errors && f['largeprice'].errors['pattern']">
+        <ion-text color="danger" style="font-weight: 1000;">
+          This format is not allowed
+        </ion-text>
+      </div>
       </div>
   
       <ion-item counter="true">
@@ -142,9 +161,10 @@
           </ion-select-option>
     </ion-select>
        </ion-item>
-       <!-- <ion-text color="danger" *ngIf="registerForm.get('materials').hasError('required') && registerForm.get('materials').touched">
-        Materials shouldn't be empty
-       </ion-text>  -->
+       <ion-text type="text" style="font-weight: 1000;" color="danger"
+       *ngIf="f['materials'].errors && f['materials'].errors['required']">
+       Materials shouldn't be empty
+     </ion-text>
 
       
     </form>

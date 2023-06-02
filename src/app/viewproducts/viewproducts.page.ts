@@ -5,6 +5,8 @@ import { LoadingController, AlertController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
 import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { DbserviceService } from '../services/dbservice.service';
 @Component({
   selector: 'app-viewproducts',
   templateUrl: './viewproducts.page.html',
@@ -21,8 +23,42 @@ export class ViewproductsPage implements OnInit {
     public loadingCtrl: LoadingController, 
     public alertCtrl: AlertController,
     private router: Router,
-    private actRoute: ActivatedRoute) 
+    private actRoute: ActivatedRoute,
+    private afauth: AngularFireAuth,
+    private dbservice: DbserviceService
+    ) 
     {
+      this.afauth.authState.subscribe((user) => 
+      {
+        if (user?.uid)
+        {
+          this.dbservice.getData('Products').subscribe((data) => 
+          {
+                  data = data.sort(function(a, b) {
+                    if (a.ProductName < b.ProductName) {
+                      return -1
+                    }
+                    if (a.ProductName > b.ProductName) {
+                      return 1
+                    }
+                    return 0
+                  })
+                  this.actRoute.queryParams.subscribe((params: any) => 
+                  {
+                    if (params.category == undefined)
+                    {
+                      this.products = data
+               
+                    }
+                    else 
+                    {
+                      this.products = data.filter(f => f.Category == params.category);
+                    }
+                         
+                  })
+                  })
+        }
+      })
     // this.afauth.authState.subscribe(data => {
     //   if (data && data.uid) {
     //     this.actRoute.queryParams.subscribe(params => {

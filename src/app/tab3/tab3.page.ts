@@ -60,8 +60,20 @@ currentuserid: string = ''
   {
     this.aFormGroup = this.formBuilder.group
     ({
-      firstname: ['', [Validators.required, Validators.pattern(/^[a-zA-Z ]+$/)]],
-      lastname: ['', [Validators.required, Validators.pattern(/^[a-zA-Z ]+$/)]],
+      firstname: [
+        '', 
+        [
+          Validators.required, 
+          Validators.pattern(/^[a-zA-Z ]+$/),
+        ]
+        ],
+      lastname: [
+        '', 
+        [
+          Validators.required, 
+          Validators.pattern(/^[a-zA-Z ]+$/)
+        ]
+      ],
       phonenumber: [
         '',
         [

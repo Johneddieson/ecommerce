@@ -1,6 +1,8 @@
 import { map } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { DbserviceService } from '../services/dbservice.service';
 
 @Component({
   selector: 'app-viewmaterials',
@@ -11,15 +13,32 @@ export class ViewmaterialsPage implements OnInit {
 public materialList: any[] = []
 public sub: any
   constructor(
-    private alertController: AlertController) 
+    private alertController: AlertController,
+    private afauth: AngularFireAuth,
+    private dbservice: DbserviceService
+    ) 
     {
-      this.retrieveMaterials('') 
+      this.afauth.authState.subscribe((user) => 
+      {
+        if (user?.uid)
+        {
+          this.retrieveMaterials('')
+        }
+      }) 
     }
 
   ngOnInit() {
   }
   retrieveMaterials(itemnamevalue: any)
   {
+    this.dbservice.getData('Materials').subscribe((data) => 
+    {
+                  if (itemnamevalue != '')
+                  {
+                    data = data.filter(f => f.Itemname.toLowerCase().includes(itemnamevalue.toLowerCase()))
+                  }
+                  this.materialList = data
+    })
     // this.afauth.authState.subscribe(user => 
     //   {
     //     if (user && user.uid)
@@ -66,6 +85,30 @@ public sub: any
            text: 'Save',
            handler: (datainput) => 
            {
+            var specificobject = 
+            {
+              Stock: parseInt(datainput[0])
+            }
+            this.dbservice.updateData(data.id, specificobject, 'Materials').then(async (el) => 
+            {
+                  var alertSuccessEditedSpecificMaterial = await this.alertController
+                  .create
+                  ({
+                    message: 'Updated successfully',
+                    backdropDismiss: false,
+                    buttons: 
+                    [
+                      {
+                        text: 'Close',
+                        role: 'cancel'
+                      }
+                    ]
+                  })
+                  await alertSuccessEditedSpecificMaterial.present();
+            }).catch((err) => 
+            {
+              alert(JSON.stringify(err));
+            })
             // this.afstore.doc(`Materials/${data.id}`).update
             // ({
             //   Stock: parseInt(datainput[0])
