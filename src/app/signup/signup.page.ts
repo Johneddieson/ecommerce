@@ -4,6 +4,9 @@ import * as firebase from 'firebase/auth';
 import { LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
+import { DbserviceService } from '../services/dbservice.service';
+import { AuthserviceService } from '../services/authservice.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -25,7 +28,9 @@ export class SignupPage implements OnInit {
     private alertCtrl: AlertController,
     private router: Router,
     private applicationRef: ApplicationRef,
-    private zone: NgZone
+    private zone: NgZone,
+    private dbservice: DbserviceService,
+    private afauth: AngularFireAuth
   ) {}
 
   ngOnInit() {
@@ -172,6 +177,72 @@ export class SignupPage implements OnInit {
 
   async SignUp()
   {
+    this.dbservice.signUp
+    ({
+      email: this.Email1,
+      password: this.Password1
+    })
+    .subscribe({
+      next: async (success) => 
+      {
+        success.user.updateProfile({
+          displayName: 'customer',
+        });
+        var specificDataObject = {
+          Email: this.Email1,
+          Uid: success.user.uid,
+          FirstName: '',
+          LastName: '',
+          Address1: '',
+          Address2: '',
+          PhoneNumber: '',
+          pendingorder: false,
+        };
+
+        this.dbservice
+          .postDatawithID(`users/${success.user.uid}`, specificDataObject)
+          .then((suc) => {})
+          .catch((err) => {
+            alert(JSON.stringify(err));
+          });
+
+        success.user.sendEmailVerification();
+
+          var alertController = await this.alertCtrl.create
+          ({
+            message: `We have sent you an email verification to ${this.Email1}, Once it is verified, you can go to login and use your account.`,
+            buttons:
+            [
+              {
+                text: 'Ok',
+                handler: () =>
+                {
+                  this.Email1 = '';
+                  this.Password1 = ''
+                  this.afauth.signOut();
+                }
+              }
+            ]
+          })
+          await alertController.present();
+      },
+      error: async error => 
+      {
+        //console.log("error", error.message)
+        var errorAlertRegister = await this.alertCtrl.create
+        ({
+          message: error.message,
+          buttons: 
+          [
+            {
+              text: 'Close',
+              role: 'cancel'
+            }
+          ]
+        })
+        await errorAlertRegister.present();
+      }
+    });
     // await this.auth.SignUp(this.Email1, this.Password1)
     // .then(async (success) => 
     // {

@@ -29,7 +29,17 @@ public category: any
     {
       this.dbservice.getData('Products').subscribe((data) => 
       {
-          this.products = data;
+        this.actRoute.queryParams.subscribe((params: any) => 
+        {
+          if (params.category == undefined)
+          {
+            this.products = data;
+          }
+          else 
+          {
+            this.products = data.filter((f) => f.Category == params.category);
+          }
+        })
       })
         // this.actRoute.queryParams.subscribe(params => {
         //   if (params.category == undefined) {

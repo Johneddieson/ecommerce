@@ -206,7 +206,8 @@ export class LoginPage implements OnInit {
         this.dbservice.signIn({
           email: this.Email1,
           password: this.Password1
-        }).subscribe({
+        })
+        .subscribe({
           next: async (success) => 
           {
             //console.log("success", success)

@@ -29,6 +29,11 @@ export class DbserviceService {
     let $postDataQuery = collection(this.firestore,`${parameter}`);
     return addDoc($postDataQuery, specificData)
   }
+  postDatawithID(parameter: any, specificData: any)
+  {
+    let $postDataQuery = doc(this.firestore,`${parameter}`);
+    return setDoc($postDataQuery, specificData)
+  }
   updateData(id:string, specificData:any, parameter: any)
   {
     let $updateDataQuery = doc(this.firestore,`${parameter}/${id}`);
@@ -52,6 +57,43 @@ export class DbserviceService {
       )
     );
   }
+  signUp(params: any): Observable<any>
+  {
+    return from
+    (
+      this.auth.createUserWithEmailAndPassword
+      (
+        params.email,
+        params.password
+      )
+    ).pipe
+    (
+      catchError
+      (
+        (error: FirebaseError) => 
+      throwError(() => new Error(this.translateFirebaseErrorMessageForSignUp(error)))
+      )
+    );
+  }
+
+  translateFirebaseErrorMessageForSignUp({code, message}: FirebaseError) {
+    if (code === "auth/admin-restricted-operation") {
+      return "Email is badly formatted.";
+    }
+    if (code === "auth/email-already-in-use") {
+      return "Email already in use.";
+    }
+    if (code === "auth/missing-email")
+    {
+      return "Missing email"
+    }
+    if (code === "auth/missing-password")
+    {
+      return "Missing password"
+    }
+    return message;
+  }
+
   translateFirebaseErrorMessage({code, message}: FirebaseError) {
     if (code === "auth/user-not-found") {
       return "User not found.";

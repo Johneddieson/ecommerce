@@ -1,3 +1,4 @@
+import { DbserviceService } from './../services/dbservice.service';
 import { LocationStrategy } from '@angular/common';
 import { ApplicationRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
@@ -6,6 +7,7 @@ import { LoadingController, AlertController } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MessengerService } from '../messenger.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-createpos',
@@ -31,7 +33,10 @@ private unsubscriber : Subject<void> = new Subject<void>();
     private router: Router,
     private applicationRef: ApplicationRef,
     private zone: NgZone,
-    private actRoute: ActivatedRoute) 
+    private actRoute: ActivatedRoute,
+    private afauth: AngularFireAuth,
+    private dbservice: DbserviceService
+    ) 
     {
       router.events.subscribe(() => {
         zone.run(() => {
@@ -40,6 +45,37 @@ private unsubscriber : Subject<void> = new Subject<void>();
             this.loadCart()
           }, 0)
         })
+      })
+      this.afauth.authState.subscribe((user) => 
+      {
+        if (user && user.uid)
+        {
+          this.actRoute.queryParams.subscribe((params: any) => 
+          {
+            this.dbservice.getData('Products')
+            .subscribe((data) => 
+            {
+                    data = data.sort(function(a, b) {
+                      if (a.ProductName < b.ProductName) {
+                        return -1
+                      }
+                      if (a.ProductName > b.ProductName) {
+                        return 1
+                      }
+                      return 0
+                    })
+
+              if (params.category == undefined) 
+              {
+                this.productList = data;
+              } 
+              else 
+              {
+                this.productList = data.filter(f => f.Category == params.category);
+              }
+            })
+          })
+        }
       })
     // this.afauth.authState.subscribe(user => {
     //   if (user && user.uid) {
@@ -83,8 +119,7 @@ private unsubscriber : Subject<void> = new Subject<void>();
         }, 0)
       })
     })
-var wew = sessionStorage.getItem('cart')
-console.log(wew)
+
   }
 loadCart() {
   if (sessionStorage.getItem('cart') != null) {
@@ -216,13 +251,13 @@ async AddtoCart(dataProducts: any)
  }
  else 
  {
-  // dataProducts.Materials = dataProducts.Materials.map((i, index) => 
-  // {
-  //   return Object.assign({}, i, 
-  //     {
-  //       Quantity: dataProducts.Quantity
-  //     })
-  // })
+  dataProducts.Materials = dataProducts.Materials.map((i: any, index: any) => 
+  {
+    return Object.assign({}, i, 
+      {
+        Quantity: dataProducts.Quantity
+      })
+  })
 
    if (dataProducts.Category != 'Slushee')
    {

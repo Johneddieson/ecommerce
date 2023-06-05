@@ -7,6 +7,11 @@ import { map } from 'rxjs/operators';
 import { MessengerService } from '../messenger.service';
 import * as firebase from 'firebase/app'
 import * as _ from 'lodash';
+import { DbserviceService } from '../services/dbservice.service';
+import { Firestore, collection, collectionData, doc, setDoc, updateDoc, 
+  increment, addDoc,
+getDoc, docData } from '@angular/fire/firestore';
+import { PaymongoService } from '../services/paymongo.service';
 @Component({
   selector: 'app-admincheckout',
   templateUrl: './admincheckout.page.html',
@@ -32,8 +37,10 @@ export class AdmincheckoutPage implements OnInit {
     private locationStrategy: LocationStrategy, 
     private router: Router, 
     //private afauth: AngularFireAuth, 
-    //private afstore: AngularFirestore, 
-    private msg: MessengerService
+    //private afstore: AngularFirestore,
+    private dbservice: DbserviceService, 
+    private msg: MessengerService,
+    private paymongoservice: PaymongoService
     ) 
     {
     // this.msg.cartSubject.next(this.CartDetails())
@@ -203,61 +210,105 @@ async OrderNow() {
                   else 
                   {
 
-              //       var commentAlertController = await this.alertCtrl.create
-              //       ({
-              //         header: 'Write Customer note. If none, just click order button',
-              //         inputs: 
-              //         [
-              //           {
-              //             type: 'textarea',
-              //             label: 'Note',
-              //             placeholder: 'Write some customer note here...'
-              //           }
-              //         ],
-              //         buttons: 
-              //         [
-              //           {
-              //             text: 'Order',
-              //             handler: (note) => 
-              //             {
+                    var commentAlertController = await this.alertCtrl.create
+                    ({
+                      header: 'Write Customer note. If none, just click order button',
+                      inputs: 
+                      [
+                        {
+                          type: 'textarea',
+                          label: 'Note',
+                          placeholder: 'Write some customer note here...'
+                        }
+                      ],
+                      buttons: 
+                      [
+                        {
+                          text: 'Order',
+                          handler: (note) => 
+                          {
                               
-              //         this.alertCtrl.create({
-              //   message:  `${data.Name} ${length} has been approved!`,
-              //   buttons: [
-              //     {
-              //       text: 'Ok',
-              //       role: 'cancel'
-              //     }
-              //   ]
-              // }).then(els => {
+                      this.alertCtrl.create({
+                message:  `${data.Name} ${length} has been approved!`,
+                buttons: [
+                  {
+                    text: 'Ok',
+                    role: 'cancel'
+                  }
+                ]
+              }).then(els => {
                
-              //       els.present()
-              //       //Orders Saving Walk In
-              //       var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
-              //   this.afstore.collection('Orders').add({
-              //     OrderDetails: this.getCartDetails,
-              //     BillingFirstname: data.Name,
-              //     BillingLastname: "Walk-In",
-              //     BillingAddress1: "Walk-In",
-              //     BillingAddress2: "Walk-In",
-              //     BillingPhonenumber: "Walk-In",
-              //     Billingemail: "Walk-In",
-              //     BillingIndexId: "",
-              //     Status: 'Approved',
-              //     Datetime: datetime,
-              //     TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-              //     DatetimeToSort: new Date(),
-              //     Discount: this.discount,
-              //     PaymentMethod: this.paymentMethod,
-              //     Note: note[0]
-              //   }).then(el => {
-              //     orderid = el.id
-              //   }).catch(err => {
-              //   })
+                    els.present()
+                    //Orders Saving Walk In
+                    var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
+                    var specificdataForOrderCollection = 
+                    {
+                        OrderDetails: this.getCartDetails,
+                        BillingFirstname: data.Name,
+                        BillingLastname: "Walk-In",
+                        BillingAddress1: "Walk-In",
+                        BillingAddress2: "Walk-In",
+                        BillingPhonenumber: "Walk-In",
+                        Billingemail: "Walk-In",
+                        BillingIndexId: "",
+                        Status: 'Delivered',
+                        Datetime: datetime,
+                        TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+                        DatetimeToSort: new Date(),
+                        Discount: this.discount,
+                        PaymentMethod: this.paymentMethod,
+                        Note: note[0]
+                    };
+                    this.dbservice.postData('Orders', specificdataForOrderCollection)
+                    .then((el) => 
+                    {
+                     
+                        if (this.paymentMethod != 'Cash')
+                        {
+                          //Paymongo Create Link
+                          this.createAPIPaymentLink(
+                            data.Name,
+                            datetime,
+                            orderid,
+                            note[0]
+                          );
+                          //End of Paymongo Create Link
+                        }
+                  //Decreasing Stocks
+                  this.decreaseStock()
+                  this.removeall()
+                  this.discount = 'None'
+                  this.paymentMethod = ''
+                  //End of Decreasing Stocks
+                    })
+                    .catch((err) => 
+                    {
+
+                    })
+                // this.afstore.collection('Orders').add({
+                //   OrderDetails: this.getCartDetails,
+                //   BillingFirstname: data.Name,
+                //   BillingLastname: "Walk-In",
+                //   BillingAddress1: "Walk-In",
+                //   BillingAddress2: "Walk-In",
+                //   BillingPhonenumber: "Walk-In",
+                //   Billingemail: "Walk-In",
+                //   BillingIndexId: "",
+                //   Status: 'Approved',
+                //   Datetime: datetime,
+                //   TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+                //   DatetimeToSort: new Date(),
+                //   Discount: this.discount,
+                //   PaymentMethod: this.paymentMethod,
+                //   Note: note[0]
+                // }).then((el: { id: any; }) => {
+                //   orderid = el.id
+                // }).catch((err: any) => {
+                // })
                            
      
 
-              // //History Saving
+              //History Saving
               // this.afstore.collection('History').add({
               //   BillingAddress1: "Walk-In",
               //   BillingAddress2: "Walk-In",
@@ -277,22 +328,16 @@ async OrderNow() {
               //   PaymentMethod: this.paymentMethod,
               //   Note: note[0]
               // })
-              
-              //     //Decreasing Stocks
-              //     this.decreaseStock()
-              // this.removeall()
-              // this.discount = 'None'
-              // this.paymentMethod = ''
-              // })
-              //             }
-              //           },
-              //           {
-              //             text: 'Close',
-              //             role: 'cancel'
-              //           }
-              //         ]  
-              //       })
-              //         await commentAlertController.present();
+              })
+                          }
+                        },
+                        {
+                          text: 'Close',
+                          role: 'cancel'
+                        }
+                      ]  
+                    })
+                      await commentAlertController.present();
                     }
                   }
                   },
@@ -434,11 +479,6 @@ decreaseStock()
 var getmaterial = this.getCartDetails.map(function (e: any) {return e.Materials})
 var ew = _.flatten(getmaterial)
 
-
-// ew.forEach(fe => 
-// {
-//   this.updateStocks(fe.itemId, fe.Quantity, fe.gramsperorder)
-// })
 ew.forEach((fe: any) => 
 {
   this.updateStocks(fe.itemId, fe.Quantity, fe.gramsperorder)
@@ -447,13 +487,24 @@ ew.forEach((fe: any) =>
 updateStocks(itemId: any, Quantity: any, gramsperorder: any)
 {
 //this.decreaseStocks()
-// var total = parseFloat(Quantity) * parseFloat(gramsperorder) 
-// this.afstore.doc(`Materials/${itemId}`).update({
+
+ var total = parseFloat(Quantity) * parseFloat(gramsperorder)
+
+var specificData = 
+{
+  Stock: increment(-total),
+};
+
+  this.dbservice
+  .updateData(itemId, specificData, 'Materials')
+  .then((success) => {})
+  .catch((err) => {});
+
+  // this.afstore.doc(`Materials/${itemId}`).update({
 // Stock: firebase.default.firestore.FieldValue.increment(-total),
 // }).then(el => {
 // }).catch(err => {
 // })
-
 }
 
 getMaterialOfProducts(Data: any, ProductName: any)
@@ -497,5 +548,41 @@ getMaterialOfProducts(Data: any, ProductName: any)
   close()
   {
     this.modal.dismiss();
+  }
+
+  createAPIPaymentLink(Name: any, datetime: any, orderid: any, note: any)
+  {
+    var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
+       var descriptionfinal = `${Name} WALK-IN : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
+       var totalForAPIPayment = parseInt(this.total + "00")
+    this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, note)
+    .subscribe((data) => 
+    {
+          //console.log("the data after creating payment api link", data.data.attributes.reference_number);
+           //History Saving
+           var specificDataObjectForHistoryCollection = 
+           {
+               BillingAddress1: "Walk-In",
+               BillingAddress2: "Walk-In",
+               BillingFirstname: Name,
+               BillingIndexId: "",
+               BillingLastname: "Walk-In",
+               BillingPhonenumber: "Walk-In",
+               Billingemail: "Walk-In",
+               Datetime: datetime,
+               Status: "Approved",
+               TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+               id: orderid,
+               OrderDetails: this.getCartDetails,
+               read: false,
+               DatetimeToSort: new Date(),
+               Discount: this.discount,
+               PaymentMethod: this.paymentMethod,
+               Note: note,
+               paymentReference: this.paymentMethod != 'Cash' ?  data.data.attributes.reference_number : 'COD'
+           };
+             this.dbservice.postData('History', specificDataObjectForHistoryCollection)
+             //End of History Saving
+    })
   }
 }
