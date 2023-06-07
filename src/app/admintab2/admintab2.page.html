@@ -36,6 +36,9 @@
       Total Amount : {{data.TotalAmount | currency: '₱'}}
       <br>
       Status : {{data.Status}}
+      <br>
+      <ion-text *ngIf="data.paymentStatus == 'COD' || data.paymentStatus == 'paid'">PAID</ion-text>
+      <ion-button href="{{data.paymentLink}}" target="_blank" *ngIf="data.paymentStatus == 'unpaid'">PAY NOW!</ion-button>
     </ion-label> 
       
     </ion-item>

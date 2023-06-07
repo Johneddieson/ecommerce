@@ -4,7 +4,7 @@
       <ion-icon name="arrow-back-outline" slot="icon-only" style="cursor: pointer;" routerLink="/tabs/tab1"></ion-icon>
     </ion-buttons>
 
-    <ion-buttons  slot="end">
+    <ion-buttons  slot="end" *ngIf="total > 0">
       <ion-button color="light" (click)="selectPaymentMethod()">
         <img class="paymentMethod" />
       </ion-button>
@@ -14,7 +14,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<!-- <ion-content>
 <div class="container">
 <ion-grid>
   <ion-row>
@@ -28,15 +28,11 @@
           <h2 style="font-weight: bolder;">{{data.ProductName}} <span style="float: right; font-weight: bolder;">{{data.UnitPrice | currency: '₱'}}</span>
           </h2>
           <h3>
-            <!-- <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon> -->
           </h3>
-          <!-- <p  style="font-weight: bolder;"> {{data.Stock}} remaining stock</p> -->
           <div id="qty">
             <span style="font-weight: bolder;"> Quantity: {{data.Quantity}} </span>  
-            <span  class="plus">  </span>  
+            <br>
+           <ion-text>Blue Berry</ion-text>
             <span style="float: right; ">
              <button id="btn" (click)="singleDelete(data)"> Remove</button> 
             </span>
@@ -48,8 +44,92 @@
   </ion-row>
 </ion-grid>
 </div>
-</ion-content>  
-<ion-footer>
+</ion-content>   -->
+
+
+
+
+<ion-content fullscreen="true">
+  <div class="cart-items">
+    <ion-card mode="ios" *ngFor="let data of getCartDetails">
+      <ion-card-content>
+        <div class="item-img">
+          <img src="{{data.ImageUrl}}" />
+        </div>
+
+        <div class="item-info">
+          <p style="font-weight: bolder;">{{data.ProductName}}</p>
+          <!-- <div *ngFor="let datamaterials of data.Materials">
+            <p>{{datamaterials.Quantity}}x {{datamaterials.itemName}}</p>
+          </div> -->
+          <p *ngFor="let datamaterials of data.Materials" style="color: #434343; font-weight: bolder; font-size: 15px;"><input style="width: 44px;" (change)="editQuantity($event, datamaterials)" type="number" value="{{datamaterials.Quantity}}" /> {{datamaterials.itemName}}</p>
+          <p style="color: var(--ion-color-primary); font-weight: bolder;">{{data.UnitPrice | currency: '₱'}}</p>
+          <div class="qty-selector">
+            <!-- <ion-button fill="clear">-</ion-button> -->
+            <ion-label>{{data.Quantity}}</ion-label>
+            <ion-button fill="clear" color="danger" (click)="singleDelete(data)"><ion-icon name="trash-outline" slot="icon-only" size="medium"></ion-icon></ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- <ion-card mode="ios">
+      <ion-card-content>
+        <div class="item-img">
+          <img src="https://ucarecdn.com/c77408cc-4f8c-44d8-b68b-4db01371cc3d/choc.jpg" />
+        </div>
+
+        <div class="item-info">
+          <p>Female t-shirt</p>
+          <p>Bata</p>
+          <p>$44.00</p>
+
+          <div class="qty-selector">
+            <ion-button fill="clear">-</ion-button>
+            <ion-label>1</ion-label>
+            <ion-button fill="clear">+</ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card> -->
+  </div>
+
+  <div class="address" *ngIf="total > 0">
+    <ion-item lines="none">
+      {{myaddress}}
+      <ion-badge slot="end">&nbsp;</ion-badge>
+    </ion-item>
+  </div>
+
+  <hr>
+
+  <div class="cart-total" *ngIf="total > 0">
+    <!-- <ion-item lines="none">
+      <ion-label>Sub Total</ion-label>
+      <ion-label slot="end" class="ion-text-right">₱160.00</ion-label>
+    </ion-item> -->
+    <!-- <ion-item lines="none">
+      <ion-label>Discount</ion-label>
+      <ion-label slot="end" class="ion-text-right">5%</ion-label>
+    </ion-item> -->
+    <ion-item>
+      <ion-label>Payment Method</ion-label>
+      <ion-label slot="end" class="ion-text-justify">{{paymentMethod}}</ion-label>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label>Total</ion-label>
+      <ion-label slot="end" class="ion-text-right">{{total | currency: '₱'}}</ion-label>
+    </ion-item>
+  </div>
+</ion-content>
+
+<ion-footer translucent="true" class="ion-no-border" mode="md">
+  <ion-toolbar color="translucent">
+    <ion-button *ngIf="total > 0" slot="end" class="main-button" color="danger" (click)="OrderAutoApprove()">Order!</ion-button>
+  </ion-toolbar>
+</ion-footer>
+
+<!-- <ion-footer>
   <ion-row>
     <ion-col size="7">
       <ion-text style="font-weight: bolder;">
@@ -61,4 +141,4 @@
       <ion-button *ngIf="total > 0" color="light" (click)="OrderNow()">Confirm Order</ion-button>
     </ion-col>
   </ion-row>
-</ion-footer>
+</ion-footer> -->

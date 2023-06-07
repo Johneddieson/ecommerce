@@ -6,6 +6,7 @@ import { CurrencyPipe } from '@angular/common';
 import * as _ from 'lodash'
 import { DbserviceService } from '../services/dbservice.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { PaymongoService } from '../services/paymongo.service';
 @Component({
   selector: 'app-admintab1',
   templateUrl: './admintab1.page.html',
@@ -26,7 +27,9 @@ public disabledSaveChanges: boolean = false
     private router: Router,
     //private currencyPipe: CurrencyPipe,
     private dbservice: DbserviceService,
-    private alertCtrl: AlertController) 
+    private alertCtrl: AlertController,
+    private paymongoservice: PaymongoService
+    ) 
     {
       this.afauth.authState.subscribe((data: any) => 
       {
@@ -35,29 +38,47 @@ public disabledSaveChanges: boolean = false
           this.dbservice.getData('Orders')
           .subscribe((dataorders) => 
           {
-            dataorders = dataorders.map((i: any, index: any) => 
-                    {
-                      return Object.assign({
-                        BillingAddress1: i.BillingAddress1,
-                        BillingAddress2: i.BillingAddress2,
-                        BillingFirstname: i.BillingFirstname,
-                        BillingIndexId: i.BillingIndexId,
-                        BillingLastname: i.BillingLastname,
-                        BillingPhonenumber: i.BillingPhonenumber,
-                        Billingemail: i.Billingemail,
-                        Datetime: i.Datetime,
-                        Status: i.Status,
-                        TotalAmount: i.TotalAmount,
-                        id: i.id,
-                        DatetimeToSort: i.DatetimeToSort,
-                        OrderDetails: i.OrderDetails,
-                        Discount: i.Discount,
-                        PaymentMethod: i.PaymentMethod
-                      })
-                    })
+            // dataorders = dataorders.map((i: any, index: any) => 
+            //         {
+            //           return Object.assign({
+            //             BillingAddress1: i.BillingAddress1,
+            //             BillingAddress2: i.BillingAddress2,
+            //             BillingFirstname: i.BillingFirstname,
+            //             BillingIndexId: i.BillingIndexId,
+            //             BillingLastname: i.BillingLastname,
+            //             BillingPhonenumber: i.BillingPhonenumber,
+            //             Billingemail: i.Billingemail,
+            //             Datetime: i.Datetime,
+            //             Status: i.Status,
+            //             TotalAmount: i.TotalAmount,
+            //             id: i.id,
+            //             DatetimeToSort: i.DatetimeToSort,
+            //             OrderDetails: i.OrderDetails,
+            //             Discount: i.Discount,
+            //             PaymentMethod: i.PaymentMethod
+            //           })
+            //         })
                     dataorders = dataorders.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
                     dataorders = dataorders.filter(f => f.Status == "Approved");
+                    dataorders.map((i: any, index: any) => 
+                    {
+                      if (i.PaymentMethod != 'Cash')
+                      {
+                        setInterval(() => 
+                        {
+                          this.paymongoservice.retrievePaymentLink(i.paymentReference).subscribe((data) => 
+                        {
+                          i.paymentStatus = data.data.attributes.status
+                        })
+                        }, 500)
+                      }
+                      else 
+                      {
+                        i.paymentStatus = 'unpaid'
+                      }
+                    })
                     this.allPendingOrders = dataorders
+                    //console.log("wew", this.allPendingOrders)
           })
         }
       })
@@ -489,6 +510,89 @@ url(id: any)
 {
   var url = `${window.location.origin}/vieworderbyid/${id}`
   window.open(url, '_blank');
+}
+async delivered(data: any)
+{
+  if(data.PaymentMethod != 'Cash' && data.paymentStatus == 'unpaid')
+  {
+    var cantDeliverAlert = await this.alertCtrl.create
+    ({
+      message: `Please wait until <b>${data.BillingFirstname} ${data.BillingLastname}</b>'s order is paid before marking it as delivered.`,
+      backdropDismiss: false,
+      buttons: 
+      [
+        {
+          text: 'Ok',
+          role: 'cancel'
+        }
+      ]
+    })
+    await cantDeliverAlert.present();
+  } 
+  else 
+  {
+    var markAsDelivered = 
+    {
+      Status: "Delivered"
+    }
+      this.dbservice.postData('History', data)
+      .then(async (success) => 
+      {
+        var deliveredAlert = await this.alertCtrl.create
+        ({
+          message: `<b>${data.BillingFirstname} ${data.BillingLastname}</b>'s order has been delivered`,
+          backdropDismiss: false,
+          buttons: 
+          [
+            {
+              text: 'Close',
+              role: 'cancel'
+            }
+          ]
+        })
+        await deliveredAlert.present();
+        this.dbservice.updateData(data.id, markAsDelivered, 'Orders')
+        .then((success) => 
+        {
+        }).catch((err) => 
+         {
+         })
+      }).catch((err) => 
+      {
+        alert(JSON.stringify(err))
+      })
+  }
+}
+
+deleteOrder(data: any)
+{
+  if (data.PaymentMethod != 'Cash')
+  {
+    this.paymongoservice.retrievePaymentLink(data.paymentReference).subscribe((data) => 
+    {
+      this.paymongoservice.archivePaymentLink(data.data.id).subscribe((data) => {})
+    })
+  }
+
+  this.dbservice.deleteData(data.id, 'Orders').then(async (el) => 
+    {
+        var orderDelete = await this.alertCtrl.create
+        ({
+          message: 'Order deleted',
+          backdropDismiss: false,
+          buttons: 
+          [
+            {
+              text: 'Ok',
+              role: 'cancel'
+            }
+          ]
+        })
+        await orderDelete.present();
+    })
+    .catch((err) => {
+      
+    })
 }
 
 }

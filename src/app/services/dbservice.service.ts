@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Firestore, collection, collectionData, doc, setDoc, updateDoc, 
   increment, addDoc,
-getDoc, docData } from '@angular/fire/firestore';
+getDoc, docData, deleteDoc } from '@angular/fire/firestore';
 import { Observable, catchError, from, throwError } from 'rxjs';
 @Injectable({
   providedIn: 'root'
@@ -38,6 +38,11 @@ export class DbserviceService {
   {
     let $updateDataQuery = doc(this.firestore,`${parameter}/${id}`);
     return updateDoc($updateDataQuery, specificData);    
+  }
+  deleteData(id:string, parameter: any)
+  {
+    let $productRef= doc(this.firestore,`${parameter}/${id}`);
+    return deleteDoc($productRef);
   }
   signIn(params: any): Observable<any>
   {
@@ -111,6 +116,7 @@ export class DbserviceService {
     }
     return message;
   }
+  
 }
 type SignIn = {
   email: string;

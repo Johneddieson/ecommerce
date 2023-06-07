@@ -40,5 +40,19 @@ export class PaymongoService {
     });
     return this.http.get<any>(`${this.RETRIEVE_PAYMENT_LINK_URL}/${id}`, {headers})
   }
+  archivePaymentLink(id: any)
+  {
+   // var apiLink = `https://api.paymongo.com/v1/links/${id}/archive`
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      //'Content-Type': 'application/json',
+       'Authorization': `Basic ${btoa(this.API_SECRET_KEY + ':')}`
+    });
+    const body = 
+    {
+      id: id
+    }
+    return this.http.post(`${this.PAYMENT_BASE_URL}/${id}/archive`, body,  { headers });
+  }
 
 }

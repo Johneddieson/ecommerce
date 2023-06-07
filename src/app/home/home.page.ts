@@ -254,6 +254,14 @@ this.loadCart()
   }
   else 
   {
+    dataProducts.Materials = dataProducts.Materials.map((i: any, index: any) => 
+  {
+    return Object.assign({}, i, 
+      {
+        Quantity: dataProducts.Quantity
+      })
+  })
+  
     if (dataProducts.Category != 'Slushee')
     {
       var alertMilkteaAndFruitTeaCategory = await this.alertCtrl.create({

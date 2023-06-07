@@ -6,6 +6,7 @@ import * as moment from 'moment';
 import { map } from 'rxjs/operators';
 import { DbserviceService } from '../services/dbservice.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { PaymongoService } from '../services/paymongo.service';
 @Component({
   selector: 'app-admintab2',
   templateUrl: './admintab2.page.html',
@@ -20,7 +21,9 @@ export class Admintab2Page implements OnInit {
     private router: Router,
     //private currencyPipe: CurrencyPipe,
     private dbservice: DbserviceService,
-    private alertCtrl: AlertController) 
+    private alertCtrl: AlertController,
+    private paymongoservice: PaymongoService
+    ) 
     {
       this.afauth.authState.subscribe((data: any) => 
       {
@@ -29,27 +32,56 @@ export class Admintab2Page implements OnInit {
           this.dbservice.getData('History')
           .subscribe((dataHistory) => 
           {
-            dataHistory = dataHistory.map((i, index) => {
-                      return Object.assign({
-                        BillingAddress1: i.BillingAddress1,
-                        BillingAddress2: i.BillingAddress2,
-                        BillingFirstname: i.BillingFirstname,
-                        BillingIndexId: i.BillingIndexId,
-                        BillingLastname: i.BillingLastname,
-                        BillingPhonenumber: i.BillingPhonenumber,
-                        Billingemail: i.Billingemail,
-                        Datetime: i.Datetime,
-                        Status: i.Status,
-                        TotalAmount: i.TotalAmount,
-                        id: i.id,
-                        DatetimeToSort: i.DatetimeToSort,
-                        OrderDetails: i.OrderDetails,
-                        Discount: i.Discount,
-                        PaymentMethod: i.PaymentMethod
-                      })
-                    })
+            //paymongoservice.retrievePaymentLink()
+            dataHistory.map((i, index) => 
+            {
+
+              if (i.PaymentMethod != 'Cash')
+                {
+                  i.paymentLink = `https://pm.link/Dmixologist/${i.paymentReference}`
+                  setInterval(() => 
+                  {
+                    paymongoservice.retrievePaymentLink(i.paymentReference).subscribe((paymentretrieve) => 
+                  {
+                    i.paymentStatus = paymentretrieve.data.attributes.status
+                     
+                  })
+                  },300)
+
+                }
+                else 
+                {
+                  i.paymentStatus = 'COD'
+                  i.paymentLink = 'COD'
+                }
+              
+      
+            })
+            
+            // dataHistory = dataHistory.map((i, index) => {
+
+            //           return Object.assign({
+            //             BillingAddress1: i.BillingAddress1,
+            //             BillingAddress2: i.BillingAddress2,
+            //             BillingFirstname: i.BillingFirstname,
+            //             BillingIndexId: i.BillingIndexId,
+            //             BillingLastname: i.BillingLastname,
+            //             BillingPhonenumber: i.BillingPhonenumber,
+            //             Billingemail: i.Billingemail,
+            //             Datetime: i.Datetime,
+            //             Status: i.Status,
+            //             TotalAmount: i.TotalAmount,
+            //             id: i.id,
+            //             DatetimeToSort: i.DatetimeToSort,
+            //             OrderDetails: i.OrderDetails,
+            //             Discount: i.Discount,
+            //             PaymentMethod: i.PaymentMethod,
+            //             paymentLink: i.paymentLink
+            //           })
+            //         })
                     dataHistory = dataHistory.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
                     this.allPendingOrders = dataHistory
+                    console.log("history", this.allPendingOrders)
           })
         }
       })

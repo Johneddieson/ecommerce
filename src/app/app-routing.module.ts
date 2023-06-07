@@ -94,6 +94,15 @@ const routes: Routes = [
     loadChildren: () => import('./vieworderbyid/vieworderbyid.module').then( m => m.VieworderbyidPageModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'historybyid/:id',
+    loadChildren: () => import('./historybyid/historybyid.module').then( m => m.HistorybyidPageModule),
+    canActivate: [AuthGuard]
+  },
+  // {
+  //   path: 'onlinepayment',
+  //   loadChildren: () => import('./onlinepayment/onlinepayment.module').then( m => m.OnlinepaymentPageModule)
+  // },
  
 ];
 @NgModule({

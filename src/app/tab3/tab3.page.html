@@ -23,6 +23,13 @@
       </ion-item>
       <p style="color: red;" *ngIf="f['phonenumber'].errors && f['phonenumber'].errors['required']">Shouldn't be empty.</p>   
       <p style="color: red;" *ngIf="f['phonenumber'].errors && f['phonenumber'].errors['pattern']">Format(11 Digits): '09XXXXXXXXX.'</p>  
+    
+      <ion-item lines="none">
+        <ion-label position="floating">Address</ion-label>
+        <ion-input type="text" formControlName="address" placeholder="Address"></ion-input>
+      </ion-item>
+      <p style="color: red;" *ngIf="f['address'].errors && f['address'].errors['required']">Shouldn't be empty.</p>   
+    
     </form>    
     <ion-button (click)="Edit()" [disabled]="!aFormGroup.valid">Edit</ion-button>
     <!-- <ion-button (click)="Edit()" *ngIf="forcheckout == true">Proceed to checkout</ion-button> -->

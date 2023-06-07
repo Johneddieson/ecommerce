@@ -179,6 +179,24 @@ async OrderNow() {
     }
     else
     {
+      if (this.paymentMethod != 'Cash' && this.total < 100)
+      {
+        var alertlessthanonehundred = await this.alertCtrl.create
+        ({
+            message: 'The total order should be 100 pesos minimum.',
+            backdropDismiss: false,
+            buttons: 
+            [
+              {
+                text: 'Close',
+                role: 'cancel'
+              }
+            ]
+        })
+        await alertlessthanonehundred.present();
+      }
+      else 
+      {
       this.alertCtrl.create({
         message: 'Are you sure you want to approve this order?',
         buttons: [
@@ -262,9 +280,8 @@ async OrderNow() {
                     this.dbservice.postData('Orders', specificdataForOrderCollection)
                     .then((el) => 
                     {
+                      orderid = el.id
                      
-                        if (this.paymentMethod != 'Cash')
-                        {
                           //Paymongo Create Link
                           this.createAPIPaymentLink(
                             data.Name,
@@ -273,14 +290,17 @@ async OrderNow() {
                             note[0]
                           );
                           //End of Paymongo Create Link
-                        }
+        
                   //Decreasing Stocks
-                  this.decreaseStock()
-                  this.removeall()
-                  this.discount = 'None'
-                  this.paymentMethod = ''
+                   this.decreaseStock()
                   //End of Decreasing Stocks
-                    })
+                  
+                            setTimeout(() => {
+                              this.removeall()
+                              this.discount = 'None'
+                              this.paymentMethod = ''
+                            }, 4000);
+                })
                     .catch((err) => 
                     {
 
@@ -363,6 +383,7 @@ async OrderNow() {
         el.present()
       })
     }
+    }
 }
 
 
@@ -434,9 +455,9 @@ async selectPaymentMethod()
     inputs: [
       {
         type: 'radio',
-        name: 'G-Cash',
-        value: 'G-Cash',
-        label: 'G-Cash'
+        name: 'Online Payment',
+        value: 'Online Payment',
+        label: 'Online Payment'
       },
       {
         type: 'radio',
@@ -450,7 +471,7 @@ async selectPaymentMethod()
       {
         text: 'Select',
         handler: (data) => {
-            if (data == 'G-Cash')
+            if (data == 'Online Payment')
             {
               this.paymentMethod = ''
               this.paymentMethod = data
@@ -555,34 +576,79 @@ getMaterialOfProducts(Data: any, ProductName: any)
     var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
        var descriptionfinal = `${Name} WALK-IN : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
        var totalForAPIPayment = parseInt(this.total + "00")
-    this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, note)
-    .subscribe((data) => 
-    {
-          //console.log("the data after creating payment api link", data.data.attributes.reference_number);
-           //History Saving
-           var specificDataObjectForHistoryCollection = 
-           {
-               BillingAddress1: "Walk-In",
-               BillingAddress2: "Walk-In",
-               BillingFirstname: Name,
-               BillingIndexId: "",
-               BillingLastname: "Walk-In",
-               BillingPhonenumber: "Walk-In",
-               Billingemail: "Walk-In",
-               Datetime: datetime,
-               Status: "Approved",
-               TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-               id: orderid,
-               OrderDetails: this.getCartDetails,
-               read: false,
-               DatetimeToSort: new Date(),
-               Discount: this.discount,
-               PaymentMethod: this.paymentMethod,
-               Note: note,
-               paymentReference: this.paymentMethod != 'Cash' ?  data.data.attributes.reference_number : 'COD'
-           };
-             this.dbservice.postData('History', specificDataObjectForHistoryCollection)
-             //End of History Saving
-    })
+       console.log("the payment", this.paymentMethod)
+       if (this.paymentMethod != 'Cash')
+       {
+        this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, note)
+        .subscribe((data) => 
+        {
+              //console.log("the data after creating payment api link", data.data.attributes.reference_number);
+               //History Saving
+               var specificDataObjectForHistoryCollection = 
+               {
+                   BillingAddress1: "Walk-In",
+                   BillingAddress2: "Walk-In",
+                   BillingFirstname: Name,
+                   BillingIndexId: "",
+                   BillingLastname: "Walk-In",
+                   BillingPhonenumber: "Walk-In",
+                   Billingemail: "Walk-In",
+                   Datetime: datetime,
+                   Status: "Delivered",
+                   TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+                   id: orderid,
+                   OrderDetails: this.getCartDetails,
+                   read: false,
+                   DatetimeToSort: new Date(),
+                   Discount: this.discount,
+                   PaymentMethod: this.paymentMethod,
+                   Note: note,
+                   paymentReference: this.paymentMethod != 'Cash' ?  data.data.attributes.reference_number : 'COD'
+               };
+                 this.dbservice.postData('History', specificDataObjectForHistoryCollection).then((el) => 
+                 {
+                  this.router.navigateByUrl(`/historybyid/${el.id}`)
+                 }).catch((err) => 
+                 {
+                  alert("Error posting history collection.");
+                 })
+                 //End of History Saving
+        })
+       }
+       else 
+       {
+        var specificDataObjectForHistoryCollection = 
+        {
+            BillingAddress1: "Walk-In",
+            BillingAddress2: "Walk-In",
+            BillingFirstname: Name,
+            BillingIndexId: "",
+            BillingLastname: "Walk-In",
+            BillingPhonenumber: "Walk-In",
+            Billingemail: "Walk-In",
+            Datetime: datetime,
+            Status: "Delivered",
+            TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+            id: orderid,
+            OrderDetails: this.getCartDetails,
+            read: false,
+            DatetimeToSort: new Date(),
+            Discount: this.discount,
+            PaymentMethod: this.paymentMethod,
+            Note: note,
+            paymentReference: 'COD'
+        };
+          this.dbservice.postData('History', specificDataObjectForHistoryCollection).then((el) => 
+          {
+            //  if (this.paymentMethod != 'Cash')
+            //  {
+            //    this.router.navigateByUrl(`/historybyid/${el.id}`)
+            //  }
+          }).catch((err) => 
+          {
+           alert("Error posting history collection.");
+          })
+       }
+  
   }
 }

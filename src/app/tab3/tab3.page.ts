@@ -51,6 +51,7 @@ currentuserid: string = ''
           this.aFormGroup.controls['firstname'].setValue(data.FirstName);
           this.aFormGroup.controls['lastname'].setValue(data.LastName);  
           this.aFormGroup.controls['phonenumber'].setValue(data.PhoneNumber);
+          this.aFormGroup.controls['address'].setValue(data.Address1);
         });
       }
     })
@@ -82,6 +83,13 @@ currentuserid: string = ''
             /^(09|63)[\d]{9}$/
           ),
           ],
+      ],
+      address: 
+      [
+        '',
+        [
+          Validators.required
+        ]
       ]
     })
   }
@@ -268,6 +276,7 @@ currentuserid: string = ''
       FirstName: this.aFormGroup.controls['firstname'].value,
       LastName: this.aFormGroup.controls['lastname'].value,
       PhoneNumber: this.aFormGroup.controls['phonenumber'].value,
+      Address1: this.aFormGroup.controls['address'].value
     }
     this.dbservice.updateData(this.currentuserid, specificdataobject, 'users').then(async (success) => 
     {

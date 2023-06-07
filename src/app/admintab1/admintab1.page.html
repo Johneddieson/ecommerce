@@ -8,14 +8,14 @@
         <ion-icon color="dark" size="large" name="text-outline"></ion-icon>
       </ion-button> -->
     </ion-buttons>
-    <ion-title>All Orders</ion-title>
+    <ion-title>Online Orders</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
 <ion-accordion-group multiple="true">
   <ion-accordion *ngFor="let data of allPendingOrders">
     <ion-item slot="header" lines="none">
-      <ion-label class="labelname" style="font-weight: 1000; color: black;" text-wrap>
+      <ion-label class="labelname" style="font-weight: bolder; color: rgb(22, 1, 1);" text-wrap>
         Fullname : {{data.BillingFirstname}} {{data.BillingLastname}}
         <br>
         Email : {{data.Billingemail}}
@@ -31,13 +31,15 @@
       Payment : {{data.PaymentMethod}}
       <br>
       Total Amount : {{data.TotalAmount | currency: '₱'}}
+      <br>
+      {{data.paymentStatus == 'unpaid' ? '(UNPAID)' : '(PAID)'}}
     </ion-label> 
       
     </ion-item>
     <ion-list slot="content" class="bg-transparent">
-     
-      <ion-item color="none" lines="none" *ngFor="let datadetails of data.OrderDetails" style="cursor: pointer;"
-      (click)="getMaterialOfProducts(datadetails)">
+      <!-- style="cursor: pointer;"
+      (click)="getMaterialOfProducts(datadetails)" -->
+      <ion-item color="none" lines="none" *ngFor="let datadetails of data.OrderDetails">
         <ion-avatar slot="start">
           <img src="{{datadetails.ImageUrl}}">
         </ion-avatar>
@@ -48,10 +50,11 @@
         </ion-label>
     </ion-item> 
     <!-- (click)="approveOrder(data)" -->
-    <ion-button size="small" (click)="url(data.id)"  color="success">View</ion-button>
-      <!-- <ion-button (click)="cancelOrder(data)" size="small"   color="danger">Cancel Order</ion-button> -->
+      <ion-button size="small"  color="success" (click)="delivered(data)">Delivered</ion-button>
+      <ion-button (click)="deleteOrder(data)" size="small"   color="danger">Cancel Order</ion-button>
     </ion-list>
   </ion-accordion>
+  
 
 </ion-accordion-group>
 <ion-modal  mode="sm" [backdropDismiss]="false"

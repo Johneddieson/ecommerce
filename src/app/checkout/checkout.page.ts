@@ -6,6 +6,13 @@ import { MessengerService } from '../messenger.service';
 import * as firebase from 'firebase/app'
 import { map } from 'rxjs/operators';
 import * as moment from 'moment';
+import { HttpClient } from '@angular/common/http';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { DbserviceService } from '../services/dbservice.service';
+import { PaymongoService } from '../services/paymongo.service';
+import * as _ from 'lodash';
+import {  increment } from '@angular/fire/firestore';
+declare var google: any;
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.page.html',
@@ -19,54 +26,125 @@ export class CheckoutPage implements OnInit {
   myInformation: any = {}
   paymentMethod: string = ''
   pendingorder: any
+  private geocoder: any;
+  myaddress: any;
+  firstname: any;
+  lastname: any;
+  phonenumber: any;
+  email: any;
+  uid: any;
   constructor(private applicationRef: ApplicationRef,
     private zone: NgZone,
     private alertCtrl: AlertController, 
     private locationStrategy: LocationStrategy, 
     private router: Router, 
-    //private afauth: AngularFireAuth, 
+    private afauth: AngularFireAuth, 
     //private afstore: AngularFirestore, 
     private msg: MessengerService,
-    private loadingController: LoadingController) 
+    private loadingController: LoadingController,
+    private httpClient: HttpClient,
+    private dbservice: DbserviceService,
+    private paymongoservice: PaymongoService
+    ) 
     {
-    // this.afauth.authState.subscribe(data => {
-    //   if (data && data.uid) {
-    //     this.meReference = afstore.doc(`users/${data.uid}`);
-    //     this.sub = this.meReference.valueChanges().subscribe(async data => {
-    //       this.myInformation = data
-    //       this.pendingorder = this.myInformation.pendingorder
-    //     })
-        
-    //   }
-    // })
-   }
+    this.afauth.authState.subscribe(data => {
+      this.email = data?.email;
+        this.uid = data?.uid;
+        this.dbservice.getDataById('users', data?.uid).subscribe((data) => 
+        {
+          this.myaddress = data.Address1;
+          this.firstname = data.FirstName;
+          this.lastname = data.LastName;
+          this.phonenumber = data.PhoneNumber;
 
+        })
+    })
+   }
+   currentlat(): void
+   {
+    this.msg.getCurrentLocation()
+    .then((coords: any) => console.log("the coords", coords))
+    .catch((error: any) => console.log(error));
+   }
+   loadUserInfo()
+   {
+    this.httpClient.get('https://ipapi.co/json/')
+    .subscribe((dataip: any) => 
+    {
+      //console.log("ip", dataip);
+      // this.msg.myLoc(dataip.latitude, dataip.longitude).subscribe(async data  => 
+      //   {
+      //     var myaddress = data.Response.View[0].Result[0].Location.Address
+      //     var myaddress2 = data.Response.View[0].Result[1].Location.Address
+      //       var address1 = `${myaddress.Label}`
+      //        var address2 = `${myaddress2.Label}`
+      //        console.log("address 1", address1)
+      //        console.log("address 2", address2)
+      //     })
+      this.getAddress(dataip.latitude, dataip.longitude)
+    })
+   }
+getlocation()
+{
+  this.msg.myLoc(14.5635423, 121.0908218).subscribe(async data  =>
+    {
+      var myaddress = data.Response.View[0].Result[0].Location.Address
+      var myaddress2 = data.Response.View[0].Result[1].Location.Address
+        var address1 = `${myaddress.Label}`
+         var address2 = `${myaddress2.Label}`
+         console.log("address 1", data.Response.View[0].Result[1])
+         console.log("address 2", data.Response.View[0].Result[0])
+         
+      })
+}
+getAddress(latitude: any, longitude: any) {
+  this.geocoder.geocode({ 'location': { lat: latitude, lng: longitude } }, (results: any, status: any) => {
+    if (status === 'OK') {
+      if (results[0]) {
+        //this.zoom = 12;
+        //this.address = results[0].formatted_address;
+        console.log("address", results[0].formatted_address)
+      } else {
+        console.log('No results found');
+      }
+    } else {
+      console.log('Geocoder failed due to: ' + status);
+    }
+  
+  });
+}
   async ngOnInit() {
+    //this.geocoder = new google.maps.Geocoder;
+   // this.loadUserInfo()
+    //this.currentlat()
+    //this.getlocation()
     this.msg.cartSubject.next(this.CartDetails())
     this.msg.cartSubject.next(this.loadCart())
   }
   CartDetails() {
     if (sessionStorage.getItem('cart')) {
-      this.getCartDetails = JSON.parse(sessionStorage.getItem('cart') as any)
-    
-       this.getCartDetails.map((i: any, index: any) => 
-      {
-        
-        i.Materials.map((iMat: any, index: any) => 
-        {
-          iMat.Quantity = i.Quantity
-          if (i.Category != "Slushee")
-          {
-            iMat.gramsperorder = i.ProductName.toLowerCase().includes('large') ? iMat.gramsperorderlarge : iMat.gramsperordermedium 
-          }
-          else 
-          {
-            iMat.gramsperorder = iMat.gramsperorder
-          }
-        })
-      })
+
       //console.log("product Details", this.getCartDetails)
+      this.getCartDetails = JSON.parse(sessionStorage.getItem('cart') as any)
     }
+
+    
+  //   this.getCartDetails.map((i: any, index: any) => 
+  //  {
+     
+  //    i.Materials.map((iMat: any, index: any) => 
+  //    {
+  //      iMat.Quantity = i.Quantity
+  //      if (i.Category != "Slushee")
+  //      {
+  //        iMat.gramsperorder = i.ProductName.toLowerCase().includes('large') ? iMat.gramsperorderlarge : iMat.gramsperordermedium 
+  //      }
+  //      else 
+  //      {
+  //        iMat.gramsperorder = iMat.gramsperorder
+  //      }
+  //    })
+  //  })
   }
   inc(id: any, quantity: any) 
   {
@@ -104,7 +182,25 @@ export class CheckoutPage implements OnInit {
       }, 0)
     }
   }
-
+refreshMaterials()
+{
+  this.getCartDetails.map((i: any, index: any) => 
+  {
+    
+    i.Materials.map((iMat: any, index: any) => 
+    {
+     // iMat.Quantity = i.Quantity
+      if (i.Category != "Slushee")
+      {
+        iMat.gramsperorder = i.ProductName.toLowerCase().includes('large') ? iMat.gramsperorderlarge : iMat.gramsperordermedium 
+      }
+      else 
+      {
+        iMat.gramsperorder = iMat.gramsperorder
+      }
+    })
+  })
+}
 
   removeall() {
      
@@ -280,9 +376,9 @@ async selectPaymentMethod()
     inputs: [
       {
         type: 'radio',
-        name: 'G-Cash',
-        value: 'G-Cash',
-        label: 'G-Cash'
+        name: 'Online Payment',
+        value: 'Online Payment',
+        label: 'Online Payment'
       },
       {
         type: 'radio',
@@ -296,7 +392,7 @@ async selectPaymentMethod()
       {
         text: 'Select',
         handler: (data) => {
-            if (data == 'G-Cash')
+            if (data == 'Online Payment')
             {
               this.paymentMethod = ''
               this.paymentMethod = data
@@ -316,5 +412,146 @@ async selectPaymentMethod()
     ]
   })
   await alertForPaymentMethod.present()
+}
+
+async OrderAutoApprove()
+{
+  if (this.paymentMethod == '')
+  {
+   
+    var nopaymentmethod = await this.alertCtrl.create
+    ({
+      message: 'Please select a payment method, click on the upper right icon to select',
+      backdropDismiss: false,
+      buttons: 
+      [
+        {
+          text: 'Close',
+          role: 'cancel'
+        }
+      ]
+    })
+    await nopaymentmethod.present();
+  }
+  else 
+  {
+    this.refreshMaterials()
+    var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
+
+    if (this.paymentMethod != 'Cash')
+    {
+      var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
+       var descriptionfinal = `${this.firstname} ${this.lastname} : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
+       var totalForAPIPayment = parseInt(this.total + "00")
+    
+       this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, '')
+       .subscribe((data) => 
+       {
+          
+      const specificdataForOrderCollection = 
+      {
+        OrderDetails: this.getCartDetails,
+        BillingFirstname: this.firstname,
+        BillingLastname: this.lastname,
+        BillingAddress1: this.myaddress,
+        BillingAddress2: '',
+        BillingPhonenumber: this.phonenumber,
+        Billingemail: this.email,
+        BillingIndexId: this.uid,
+        Status: 'Approved',
+        Datetime: datetime,
+        TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+        DatetimeToSort: new Date(),
+        Discount: "None",
+        PaymentMethod: this.paymentMethod,
+        Note: '',
+        paymentReference: data.data.attributes.reference_number
+      };
+      this.dbservice.postData('Orders', specificdataForOrderCollection);
+       })
+    }
+    else 
+    {
+      const specificdataForOrderCollectionForCash = 
+      {
+        OrderDetails: this.getCartDetails,
+        BillingFirstname: this.firstname,
+        BillingLastname: this.lastname,
+        BillingAddress1: this.myaddress,
+        BillingAddress2: '',
+        BillingPhonenumber: this.phonenumber,
+        Billingemail: this.email,
+        BillingIndexId: this.uid,
+        Status: 'Approved',
+        Datetime: datetime,
+        TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+        DatetimeToSort: new Date(),
+        Discount: "None",
+        PaymentMethod: this.paymentMethod,
+        Note: '',
+        paymentReference: 'COD'
+ 
+      };
+      this.dbservice.postData('Orders', specificdataForOrderCollectionForCash);
+    }
+  this.decreaseStock();
+var successAlert = await this.alertCtrl.create
+({
+  message: 'Your order has been approved. If we noticed that your personal information something wrong or your phone number is cannot be reached, we will automatically cancel your order.',
+  backdropDismiss: false,
+  buttons: 
+  [
+    {
+      text: 'Close',
+      role: 'cancel'
+    }
+  ]
+})
+await successAlert.present();
+
+setTimeout(() => {
+  this.removeall()
+  this.paymentMethod = ''
+}, 4000);
+  }
+}
+
+editQuantity(event: any, datamaterials: any)
+{
+  var value = event.target.value
+  datamaterials.Quantity = parseInt(value)
+  this.refreshMaterials();
+}
+decreaseStock()
+{
+var getmaterial = this.getCartDetails.map(function (e: any) {return e.Materials})
+var ew = _.flatten(getmaterial)
+
+ew.forEach((fe: any) => 
+{
+  this.updateStocks(fe.itemId, fe.Quantity, fe.gramsperorder)
+})
+}
+updateStocks(itemId: any, Quantity: any, gramsperorder: any)
+{
+//this.decreaseStocks()
+
+ var total = parseFloat(Quantity) * parseFloat(gramsperorder)
+
+var specificData = 
+{
+  Stock: increment(-total),
+};
+
+  this.dbservice
+  .updateData(itemId, specificData, 'Materials')
+  .then((success) => {})
+  .catch((err) => {});
+
+  // this.afstore.doc(`Materials/${itemId}`).update({
+// Stock: firebase.default.firestore.FieldValue.increment(-total),
+// }).then(el => {
+// }).catch(err => {
+// })
 }
 }
