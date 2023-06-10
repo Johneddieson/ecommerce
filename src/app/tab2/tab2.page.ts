@@ -6,6 +6,10 @@ import { LoadingController, AlertController } from '@ionic/angular';
 import * as moment from 'moment';
 import { buffer, map } from 'rxjs/operators';
 import { DbserviceService } from '../services/dbservice.service';
+import * as _ from 'lodash';
+import { collection } from 'firebase/firestore';
+import { Firestore, collectionData, query, where } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
@@ -18,6 +22,7 @@ notifCounts = 0
 myid: any
 subMeReference: any;
 email: any;
+orderedProducts: any[] = []
   constructor(private router: Router, 
     private loadingCtrl: LoadingController,
     private locationStrategy: LocationStrategy, 
@@ -25,26 +30,44 @@ email: any;
     private applicationRef: ApplicationRef,
     private zone: NgZone,
     private afauth: AngularFireAuth,
-    private dbservice: DbserviceService) 
+    private dbservice: DbserviceService,
+    private firestore: Firestore
+    ) 
     {
-        this.afauth.authState.subscribe((dataAuth: any) => 
+        this.afauth.authState.subscribe((dataAuth) => 
         {
-          if (dataAuth.uid)
+          if (dataAuth?.uid && dataAuth)
           {
-              this.dbservice.getData('Orders').subscribe((data) => 
-              {
-                  var currentuserAllOrders = data.filter(f => f.BillingIndexId == dataAuth.uid);
-                  //console.log("current user all orders", currentuserAllOrders)
-                  var currentuserAllOrderDetails = currentuserAllOrders.map((data: any) => {return data.OrderDetails});
-                  // console.log("current user all orderdetails", currentuserAllOrderDetails)
-                  currentuserAllOrderDetails.forEach(fe => 
-                    {
-                      console.log("order details", fe)
-                    })
-                })
+            this.email = dataAuth.email;
+            this.getCurrentUserHistory(dataAuth)
           }
         })
     }
+
+    getCurrentUserHistory(dataAuth: any)
+    {
+      this.dbservice.getData('History').subscribe((data) => 
+      {
+          var currentuserAllOrders = data.filter(f => f.BillingIndexId == dataAuth.uid);
+          var currentuserAllOrderDetails = currentuserAllOrders.map((data: any) => {return data.OrderDetails});
+        var flatAllOrderDetails =   _.flatten(currentuserAllOrderDetails)
+    
+        var list = _(flatAllOrderDetails)
+        .groupBy('id')
+        .map((items, id) => (  id             
+      )).value();
+      this.getAllOrderedProducts(list)
+    })
+    }
+
+    getAllOrderedProducts(idarraystring: any)
+    {
+        this.dbservice.getDataAny('Products', idarraystring).subscribe((data) => 
+        {
+          this.orderedProducts = data
+        })
+    }    
+
   async ngOnInit() 
   {
     // var alertControllerSendFeedBack = await this.alertCtrl.create({
@@ -67,75 +90,67 @@ email: any;
   }
 
 
-  async sendFeedBack(dataOrders: any)
+  async writefeedback(data: any)
   {
-    
-    var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
-      var alertSendFeedBack = await this.alertCtrl.create({
-        header: 'Send your feedback to this order',
-        inputs: [
-        {
-          type: 'textarea',
-        }
-        ],
-        buttons: [
+      var alertWriteFeedBack = await this.alertCtrl.create
+      ({
+        header: 'Write some comments on this product',
+        backdropDismiss: false,
+        inputs: 
+        [
           {
-            text: 'Send',
-            handler: async (feedbackMessage) => {
-            var alertAreyouSureWantToSend = await this.alertCtrl.create({
-              message: 'Are you sure you want to send your feedback to this order?',
-              buttons: [
+            type: 'textarea',
+            label: 'comments',
+            name: 'comments',
+            placeholder: 'Enter some comments...'
+          }
+        ],
+        buttons: 
+        [
+          {
+            text: 'Submit',
+            handler:  (datacomments) => 
+            {
+              if (datacomments.comments == '')
+              {
+                alert("comments shouldn't be empty")
+              }
+              else if (datacomments.comments.length < 3)
+              {
+                alert("comments should be 3 minimum characters")
+              }
+              else 
+              {
+                var feedbackobj = 
                 {
-                  text: 'Yes',
-                  handler: () => 
-                  {
-                      // this.OrderDocuments = this.afstore.doc(
-                      //   `Orders/${dataOrders.OrderId}`
-                      // );
-
-                      // var sub = this.OrderDocuments.get()
-                      // .pipe(map(actions => {
-                      //   return {
-                      //     id: actions.id,
-                      //     ...actions.data() as any
-                      //   }
-                      // }))
-                      // .subscribe(
-                      //   (data) => {
-                      //     this.afstore.collection('FeedBacks').add({
-                      //       Message: feedbackMessage,
-                      //       DateTime: datetime,
-                      //       DateTimeToSort: new Date(),
-                      //       Read: false,
-                      //       Email: this.email,
-                      //       Orders: data.OrderDetails
-                      //     }).then(async el => {
-                      //       this.afstore.doc(`users/${this.myid}/notifications/${dataOrders.id}`).update({
-                      //         read: true
-                      //       })
-
-                      //      var feedBackSentAlert = await this.alertCtrl.create({
-                      //       message: 'Feedback sent successfully!',
-                      //       buttons: [
-                      //         {
-                      //           text: 'Ok',
-                      //           role: 'cancel'
-                      //         }
-                      //       ]
-                      //      })
-                      //      await feedBackSentAlert.present()   
-                      //     })
-                      //   }
-                      // );
-                  }
-                },
-                {
-                  text: 'No',
-                  role: 'cancel'
+                  DatetimeToSort: new Date(),
+                  Datetime: moment(new Date()).format('MM-DD-YYYY hh:mm A'),
+                  ProductName: data.ProductName,
+                  Category: data.Category,
+                  ImageUrl: data.ImageUrl,
+                  Comments: datacomments.comments,
+                  CustomerEmail: this.email,
+                  read: false
                 }
-              ]
-            })
-            await alertAreyouSureWantToSend.present()
+                  this.dbservice.postData('Feedbacks', feedbackobj)
+                  .then(async (el) => 
+                  {
+
+                    var sendFeedbackAlertSuccess = await this.alertCtrl.create
+                    ({
+                      message: 'Your comments has been submitted.',
+                      backdropDismiss: false,
+                      buttons: 
+                      [
+                        {
+                          text: 'Close',
+                          role: 'cancel'
+                        }
+                      ]
+                    })
+                    await sendFeedbackAlertSuccess.present();
+                  })
+              }
             }
           },
           {
@@ -143,8 +158,8 @@ email: any;
             role: 'cancel'
           }
         ]
-      })
-      await alertSendFeedBack.present();
-  }
+      })      
+  await alertWriteFeedBack.present();
+    }
 
 }

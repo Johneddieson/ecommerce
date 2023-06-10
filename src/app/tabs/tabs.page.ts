@@ -5,6 +5,8 @@ import { AlertController, LoadingController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
 import * as moment from 'moment';
 import { AuthserviceService } from '../services/authservice.service';
+import { DbserviceService } from '../services/dbservice.service';
+import { PaymongoService } from '../services/paymongo.service';
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
@@ -22,7 +24,9 @@ myid: string = ''
     private alertCtrl: AlertController,
     private applicationRef: ApplicationRef,
     private zone: NgZone,
-    private auth: AuthserviceService
+    private auth: AuthserviceService,
+    private dbservice: DbserviceService,
+    private paymongoservice: PaymongoService
     ) 
     {
     // this.afauth.authState.subscribe(data => {
@@ -115,4 +119,29 @@ myid: string = ''
     })
     await alertLogout.present();
   }
+
+  // getcurrentuserallorders(uid: any)
+  // {
+  //     this.dbservice.getData('Orders').subscribe((data) => 
+  //     {
+  //       var currentuserorder = data.filter((f) => f.BillingIndexId == uid && f.PaymentMethod != 'Cash');
+      
+  //       currentuserorder = currentuserorder.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
+  //       currentuserorder.map((e) => 
+  //       {
+  //         setInterval(() => 
+  //         {
+  //           this.paymongoservice.retrievePaymentLink(e.paymentReference).subscribe((paymentapidata) => 
+  //         {
+  //             e.paymentStatus = paymentapidata.data.attributes.status
+  //         })
+  //         }, 300)
+  //         e.OrderDate = moment(moment(e.Datetime).toDate()).format('MMMM DD, YYYY');
+  //       })
+
+  //       currentuserorder = currentuserorder.filter(f => f.paymentStatus == 'unpaid');
+  //       this.notifCounts
+        
+  //     })
+  // }
 }

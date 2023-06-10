@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Firestore, collection, collectionData, doc, setDoc, updateDoc, 
   increment, addDoc,
-getDoc, docData, deleteDoc } from '@angular/fire/firestore';
+getDoc, docData, deleteDoc, where, query, collectionSnapshots } from '@angular/fire/firestore';
 import { Observable, catchError, from, throwError } from 'rxjs';
 @Injectable({
   providedIn: 'root'
@@ -14,9 +14,18 @@ export class DbserviceService {
   {
 
   }
+  getDataAny(parameter: any, arraystring: any)
+  {
+    
+    let $getDataQuery = collection(this.firestore,`${parameter}`);
+    const q = query($getDataQuery, where('id', 'in', arraystring));
+    return collectionData(q) as Observable<any[]>;
+  }
+
   getData(parameter: any)
   {
     let $getDataQuery = collection(this.firestore,`${parameter}`);
+
     return collectionData($getDataQuery, {idField: 'id'}) as Observable<any[]>;
   }
   getDataById(parameter: any, specificId: any)

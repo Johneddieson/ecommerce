@@ -13,7 +13,10 @@ import { provideAuth, getAuth } from '@angular/fire/auth'
 import { AngularFireModule, FIREBASE_OPTIONS } from '@angular/fire/compat'
 import { DbserviceService } from './services/dbservice.service';
 import { HttpClientModule } from '@angular/common/http';
-
+import { AsyncPipe, CurrencyPipe} from '@angular/common';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
+import { MessagingService } from './services/messaging.service';
+import { provideMessaging,getMessaging } from '@angular/fire/messaging';
 @NgModule({
   declarations: [AppComponent],
   imports: 
@@ -24,7 +27,9 @@ import { HttpClientModule } from '@angular/common/http';
     provideFirebaseApp(() => initializeApp(environment.firebase)), 
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
-    HttpClientModule
+    HttpClientModule,
+    provideMessaging(() => getMessaging()),
+    //AngularFireMessagingModule
     // AngularFireModule.initializeApp
     // ({
     // apiKey: 'AIzaSyCkwW8YBuDVVAVczXR9b4HsITlR17fiU8U',
@@ -42,10 +47,13 @@ import { HttpClientModule } from '@angular/common/http';
       useClass: IonicRouteStrategy 
     },
   DbserviceService,
+  MessagingService,
+  AsyncPipe,
     {
       provide: FIREBASE_OPTIONS, 
       useValue: environment.firebase
-    }
+    },
+    CurrencyPipe
 ],
   bootstrap: [AppComponent],
 })

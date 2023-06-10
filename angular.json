@@ -19,7 +19,9 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
+            "assets": 
+            [
+          
               {
                 "glob": "**/*",
                 "input": "src/assets",
@@ -32,7 +34,9 @@
               }
             ],
             "styles": ["src/theme/variables.scss", "src/global.scss"],
-            "scripts": []
+            "scripts": 
+            [
+            ]
           },
           "configurations": {
             "production": {
@@ -100,6 +104,7 @@
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",
             "assets": [
+              
               {
                 "glob": "**/*",
                 "input": "src/assets",
@@ -112,7 +117,9 @@
               }
             ],
             "styles": ["src/theme/variables.scss", "src/global.scss"],
-            "scripts": []
+            "scripts": 
+            [
+            ]
           },
           "configurations": {
             "ci": {

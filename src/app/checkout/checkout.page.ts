@@ -443,7 +443,24 @@ async OrderAutoApprove()
       var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
        var descriptionfinal = `${this.firstname} ${this.lastname} : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
        var totalForAPIPayment = parseInt(this.total + "00")
-    
+        if (this.total < 100)
+        {
+          var minimumifgcashalert = await this.alertCtrl.create
+          ({
+            message: 'You chosen online payment, It should be 100 pesos minimum order.',
+            backdropDismiss: false,
+            buttons: 
+            [
+              {
+                text: 'Close',
+                role: 'cancel'
+              }
+            ]
+          })
+          await minimumifgcashalert.present();
+        }
+        else 
+        {
        this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, '')
        .subscribe((data) => 
        {
@@ -469,6 +486,8 @@ async OrderAutoApprove()
       };
       this.dbservice.postData('Orders', specificdataForOrderCollection);
        })
+       this.successorderalert()
+      }
     }
     else 
     {
@@ -493,26 +512,9 @@ async OrderAutoApprove()
  
       };
       this.dbservice.postData('Orders', specificdataForOrderCollectionForCash);
+      this.successorderalert()
     }
-  this.decreaseStock();
-var successAlert = await this.alertCtrl.create
-({
-  message: 'Your order has been approved. If we noticed that your personal information something wrong or your phone number is cannot be reached, we will automatically cancel your order.',
-  backdropDismiss: false,
-  buttons: 
-  [
-    {
-      text: 'Close',
-      role: 'cancel'
-    }
-  ]
-})
-await successAlert.present();
 
-setTimeout(() => {
-  this.removeall()
-  this.paymentMethod = ''
-}, 4000);
   }
 }
 
@@ -553,5 +555,27 @@ var specificData =
 // }).then(el => {
 // }).catch(err => {
 // })
+}
+async successorderalert()
+{
+  this.decreaseStock();
+  var successAlert = await this.alertCtrl.create
+  ({
+    message: 'Your order has been approved. If we noticed that your personal information something wrong or your phone number is cannot be reached, we will automatically cancel your order.',
+    backdropDismiss: false,
+    buttons: 
+    [
+      {
+        text: 'Close',
+        role: 'cancel'
+      }
+    ]
+  })
+  await successAlert.present();
+  
+  setTimeout(() => {
+    this.removeall()
+    this.paymentMethod = ''
+  }, 4000);
 }
 }

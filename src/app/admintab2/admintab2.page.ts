@@ -81,7 +81,7 @@ export class Admintab2Page implements OnInit {
             //         })
                     dataHistory = dataHistory.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
                     this.allPendingOrders = dataHistory
-                    console.log("history", this.allPendingOrders)
+                    //console.log("history", this.allPendingOrders)
           })
         }
       })

@@ -3,7 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
 import { DbserviceService } from '../services/dbservice.service';
-
+import { MessagingService } from '../services/messaging.service';
+import { getMessaging, getToken, onMessage, } from "firebase/messaging";
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-mainpage',
   templateUrl: './mainpage.page.html',
@@ -25,7 +27,9 @@ public category: any
     private actRoute: ActivatedRoute,
     private router : Router,
     private alertCtrl: AlertController,
-    private dbservice: DbserviceService) 
+    private dbservice: DbserviceService,
+    private messagingservice: MessagingService
+    ) 
     {
       this.dbservice.getData('Products').subscribe((data) => 
       {
@@ -62,8 +66,10 @@ public category: any
         // })
    }
 
-  ngOnInit() {
+  ngOnInit() 
+  {
   }
+  
   hideDropdown(event: any) 
   {
     const xTouch = (event.clientX)

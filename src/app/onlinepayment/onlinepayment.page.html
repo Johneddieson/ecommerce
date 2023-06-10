@@ -1,0 +1,25 @@
+<ion-content [fullscreen]="true">
+    <ion-card class="ion-margin" *ngFor="let data of mycurrentonlinepaymentorder">
+        <ion-card-header class="ion-header">
+            <ion-card-subtitle class="ion-subtitle" style="font-weight: bolder;  color: black;"
+                *ngFor="let datadetails of data.OrderDetails">
+                {{datadetails.Quantity}}x {{datadetails.ProductName}} {{datadetails.UnitPrice | currency: '₱'}}
+                ➔ {{ (datadetails.Quantity * parseUnitPrice(datadetails.UnitPrice)) | currency: '₱' }}
+            </ion-card-subtitle>
+            <ion-item color="none" lines="none">
+                <ion-label text-wrap class="label" style="font-weight: bolder;  color: black;">
+                    Due {{data.OrderDate}}
+                </ion-label>
+            </ion-item>
+        </ion-card-header>
+        <ion-card-content style="font-weight: bolder;">
+            <ion-label style="font-weight: bolder; color: black;">TOTAL OF {{data.TotalAmount | currency:
+                '₱'}}</ion-label>
+        </ion-card-content>
+        <ion-row *ngIf="data.paymentStatus == 'unpaid'">
+            <ion-button color="danger" href="{{data.paymentUrl}}" target="_blank">
+                <p>Pay now!</p>
+            </ion-button>
+        </ion-row>
+    </ion-card>
+</ion-content>

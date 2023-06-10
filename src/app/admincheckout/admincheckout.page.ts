@@ -248,16 +248,13 @@ async OrderNow() {
                               
                       this.alertCtrl.create({
                 message:  `${data.Name} ${length} has been approved!`,
+                backdropDismiss: false,
                 buttons: [
                   {
                     text: 'Ok',
-                    role: 'cancel'
-                  }
-                ]
-              }).then(els => {
-               
-                    els.present()
-                    //Orders Saving Walk In
+                    handler: (datawew: any) => 
+                    {
+                                            //Orders Saving Walk In
                     var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
                     var specificdataForOrderCollection = 
                     {
@@ -305,49 +302,13 @@ async OrderNow() {
                     {
 
                     })
-                // this.afstore.collection('Orders').add({
-                //   OrderDetails: this.getCartDetails,
-                //   BillingFirstname: data.Name,
-                //   BillingLastname: "Walk-In",
-                //   BillingAddress1: "Walk-In",
-                //   BillingAddress2: "Walk-In",
-                //   BillingPhonenumber: "Walk-In",
-                //   Billingemail: "Walk-In",
-                //   BillingIndexId: "",
-                //   Status: 'Approved',
-                //   Datetime: datetime,
-                //   TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-                //   DatetimeToSort: new Date(),
-                //   Discount: this.discount,
-                //   PaymentMethod: this.paymentMethod,
-                //   Note: note[0]
-                // }).then((el: { id: any; }) => {
-                //   orderid = el.id
-                // }).catch((err: any) => {
-                // })
-                           
-     
-
-              //History Saving
-              // this.afstore.collection('History').add({
-              //   BillingAddress1: "Walk-In",
-              //   BillingAddress2: "Walk-In",
-              //   BillingFirstname: data.Name,
-              //   BillingIndexId: "",
-              //   BillingLastname: "Walk-In",
-              //   BillingPhonenumber: "Walk-In",
-              //   Billingemail: "Walk-In",
-              //   Datetime: datetime,
-              //   Status: "Approved",
-              //   TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-              //   id: orderid,
-              //   OrderDetails: this.getCartDetails,
-              //   read: false,
-              //   DatetimeToSort: new Date(),
-              //   Discount: this.discount,
-              //   PaymentMethod: this.paymentMethod,
-              //   Note: note[0]
-              // })
+                    }
+                  }
+                ]
+              }).then(els => 
+                {
+               
+                    els.present()
               })
                           }
                         },
@@ -576,13 +537,12 @@ getMaterialOfProducts(Data: any, ProductName: any)
     var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
        var descriptionfinal = `${Name} WALK-IN : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
        var totalForAPIPayment = parseInt(this.total + "00")
-       console.log("the payment", this.paymentMethod)
+       //console.log("the payment", this.paymentMethod)
        if (this.paymentMethod != 'Cash')
        {
         this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, note)
         .subscribe((data) => 
         {
-              //console.log("the data after creating payment api link", data.data.attributes.reference_number);
                //History Saving
                var specificDataObjectForHistoryCollection = 
                {
@@ -607,7 +567,7 @@ getMaterialOfProducts(Data: any, ProductName: any)
                };
                  this.dbservice.postData('History', specificDataObjectForHistoryCollection).then((el) => 
                  {
-                  this.router.navigateByUrl(`/historybyid/${el.id}`)
+                  this.router.navigateByUrl(`/adminpage/atab2`);
                  }).catch((err) => 
                  {
                   alert("Error posting history collection.");

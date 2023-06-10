@@ -1,8 +1,10 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { map } from 'rxjs/operators';
+import { DbserviceService } from '../services/dbservice.service';
 
 @Component({
   selector: 'app-customerfeedback',
@@ -13,13 +15,30 @@ export class CustomerfeedbackPage implements OnInit {
 
 feedbackLength: number = 0
 feedBacksData: any[] = []
+numberofnotread: number = 0
+customersfeedback: any[] = []
   constructor(
     //private afstore: AngularFirestore, 
-    //private afauth: AngularFireAuth,
+    private afauth: AngularFireAuth,
     private router: Router,
     //private currencyPipe: CurrencyPipe,
-    private alertCtrl: AlertController) 
+    private alertCtrl: AlertController,
+    private dbservice: DbserviceService
+    ) 
     {
+      this.afauth.authState.subscribe((user) => 
+      {
+        if (user && user.uid)
+        {
+              this.dbservice.getData('Feedbacks').subscribe((data) => 
+              {
+               data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
+               this.numberofnotread = data.length;
+               this.customersfeedback = data;
+               
+              })
+        }
+      })
         // this.afauth.authState.subscribe(data => {
         //   if (data && data.uid)
         //   {
@@ -110,10 +129,11 @@ feedBacksData: any[] = []
 
   async markAsRead(data: any)
   {
-      // await this.afstore.doc(`FeedBacks/${data.id}`)
-      // .update({
-      //   Read: true
-      // })
+    var obj = 
+    {
+      read: true
+    }
+    this.dbservice.updateData(data.id, obj, 'Feedbacks').then(() => {}).catch(() => {})
   }
 
 }

@@ -7,14 +7,14 @@ import { IonicModule } from '@ionic/angular';
 import { MainpagePageRoutingModule } from './mainpage-routing.module';
 
 import { MainpagePage } from './mainpage.page';
-import { DbserviceService } from '../services/dbservice.service';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    MainpagePageRoutingModule
+    MainpagePageRoutingModule,
+    
   ],
   declarations: [MainpagePage],
   providers: []

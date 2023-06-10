@@ -10,46 +10,21 @@
 
 <ion-content [fullscreen]="true">
 
-  <ion-card  class="ion-margin" *ngFor="let data of notificationsList">
+  <ion-card  class="ion-margin" *ngFor="let data of orderedProducts">
     <ion-card-header class="ion-header">
-      <!-- [style.color]="item.value.itemPriority === 'high' ? 'red' : (item.value.itemPriority === 'low' ? 'green' : 'orange')" -->
-      <ion-card-subtitle class="ion-subtitle" style="font-weight: bolder;  color: black;">
-        Remarks: {{data.remarks}}
-      </ion-card-subtitle>
-
       <ion-item color="none" lines="none">
-        <!-- <ion-icon *ngIf="item.value.itemPriority === 'high'" color="danger" size="small" name="ellipse"></ion-icon>
-        <ion-icon *ngIf="item.value.itemPriority === 'low'" color="success" size="small" name="ellipse"></ion-icon>
-        <ion-icon *ngIf="item.value.itemPriority === 'middle'" color="warning" size="small" name="ellipse"></ion-icon> -->
-        <ion-label text-wrap class="label" style="font-weight: bolder;  color: black;">{{data.Message}}</ion-label>
+      <ion-avatar>
+        <ion-img src="{{data.ImageUrl}}"></ion-img>
+      </ion-avatar>
+        <ion-label text-wrap class="label" style="font-weight: bolder;  color: black;">
+          ‎ ‎ ‎ ‎ {{data.ProductName}} ({{data.Category}})
+        </ion-label>
       </ion-item>
-
     </ion-card-header>
-
-  
-    <ion-card-content style="font-weight: bolder;">
-      <!-- {{item.value.itemDueDate | date:'fullDate'}} -->
-      <ion-label style="font-weight: bolder; color: black;">Due  {{data.Datetime}}</ion-label>
-    </ion-card-content>
-
     <ion-row>
-    
-
-      <!-- (click)="update(data)" -->
-      <ion-button (click)="sendFeedBack(data)">
-        <!-- <ion-icon name="book"></ion-icon> -->
-        <p>Send Feedback</p>
+      <ion-button color="success" size="small" (click)="writefeedback(data)">
+        Write Comments
       </ion-button>
-
-      <ion-button color="success" *ngIf="!data.read" (click)="update(data)">
-        <!-- <ion-icon name="book"></ion-icon> -->
-        <p>Mark as read</p>
-      </ion-button>
-
-      <!-- <ion-item button (click)="delete(item.key)">
-        <ion-icon name="trash-outline"></ion-icon>
-        <p>Cancel</p>
-      </ion-item> -->
     </ion-row>
 
   </ion-card>

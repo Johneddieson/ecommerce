@@ -38,26 +38,6 @@ public disabledSaveChanges: boolean = false
           this.dbservice.getData('Orders')
           .subscribe((dataorders) => 
           {
-            // dataorders = dataorders.map((i: any, index: any) => 
-            //         {
-            //           return Object.assign({
-            //             BillingAddress1: i.BillingAddress1,
-            //             BillingAddress2: i.BillingAddress2,
-            //             BillingFirstname: i.BillingFirstname,
-            //             BillingIndexId: i.BillingIndexId,
-            //             BillingLastname: i.BillingLastname,
-            //             BillingPhonenumber: i.BillingPhonenumber,
-            //             Billingemail: i.Billingemail,
-            //             Datetime: i.Datetime,
-            //             Status: i.Status,
-            //             TotalAmount: i.TotalAmount,
-            //             id: i.id,
-            //             DatetimeToSort: i.DatetimeToSort,
-            //             OrderDetails: i.OrderDetails,
-            //             Discount: i.Discount,
-            //             PaymentMethod: i.PaymentMethod
-            //           })
-            //         })
                     dataorders = dataorders.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
                     dataorders = dataorders.filter(f => f.Status == "Approved");
                     dataorders.map((i: any, index: any) => 
