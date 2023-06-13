@@ -1,7 +1,7 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, IonModal } from '@ionic/angular';
 import * as moment from 'moment';
 import { map } from 'rxjs/operators';
 import { DbserviceService } from '../services/dbservice.service';
@@ -14,119 +14,84 @@ import { PaymongoService } from '../services/paymongo.service';
 })
 export class Admintab2Page implements OnInit {
   allPendingOrders: any[] = []
+  startDateFilter: string = ''
+  endDateFilter: string = ''
+  customeremail: string = ''
+  customerfullname: string = ''
+  paymentstatus: string = ''
   
+  @ViewChild(IonModal) modal!: IonModal;
+ 
   constructor(
-    //private afstore: AngularFirestore, 
     private afauth: AngularFireAuth,
     private router: Router,
-    //private currencyPipe: CurrencyPipe,
     private dbservice: DbserviceService,
     private alertCtrl: AlertController,
     private paymongoservice: PaymongoService
     ) 
     {
-      this.afauth.authState.subscribe((data: any) => 
-      {
-        if (data.uid)
+      this.afauth.authState.subscribe((data: any) => {
+        if (data.uid) 
         {
-          this.dbservice.getData('History')
-          .subscribe((dataHistory) => 
-          {
-            //paymongoservice.retrievePaymentLink()
-            dataHistory.map((i, index) => 
-            {
-
-              if (i.PaymentMethod != 'Cash')
-                {
-                  i.paymentLink = `https://pm.link/Dmixologist/${i.paymentReference}`
-                  setInterval(() => 
-                  {
-                    paymongoservice.retrievePaymentLink(i.paymentReference).subscribe((paymentretrieve) => 
-                  {
-                    i.paymentStatus = paymentretrieve.data.attributes.status
-                     
-                  })
-                  },300)
-
-                }
-                else 
-                {
-                  i.paymentStatus = 'COD'
-                  i.paymentLink = 'COD'
-                }
-              
-      
-            })
-            
-            // dataHistory = dataHistory.map((i, index) => {
-
-            //           return Object.assign({
-            //             BillingAddress1: i.BillingAddress1,
-            //             BillingAddress2: i.BillingAddress2,
-            //             BillingFirstname: i.BillingFirstname,
-            //             BillingIndexId: i.BillingIndexId,
-            //             BillingLastname: i.BillingLastname,
-            //             BillingPhonenumber: i.BillingPhonenumber,
-            //             Billingemail: i.Billingemail,
-            //             Datetime: i.Datetime,
-            //             Status: i.Status,
-            //             TotalAmount: i.TotalAmount,
-            //             id: i.id,
-            //             DatetimeToSort: i.DatetimeToSort,
-            //             OrderDetails: i.OrderDetails,
-            //             Discount: i.Discount,
-            //             PaymentMethod: i.PaymentMethod,
-            //             paymentLink: i.paymentLink
-            //           })
-            //         })
-                    dataHistory = dataHistory.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-                    this.allPendingOrders = dataHistory
-                    //console.log("history", this.allPendingOrders)
-          })
+          this.getHistory()
         }
-      })
-    // this.afauth.authState.subscribe(data => {
-    //   if (data && data.uid) {
-    //     this.productReference = this.afstore.collection('History')
+      });
+    }
 
-    //     this.sub = this.productReference.snapshotChanges()
-    //       .pipe(map(actions => actions.map(a => {
-    //         return {
-    //           id: a.payload.doc.id,
-    //           ...a.payload.doc.data() as any
-    //         }
-    //       }))).subscribe(data => {
+    getHistory()
+    {
+      this.dbservice.getData('History').subscribe((dataHistory) => {
+        dataHistory.map((i, index) => {
+          if (i.PaymentMethod != 'Cash') {
+            i.paymentLink = `https://pm.link/Dmixologist/${i.paymentReference}`;
+            setInterval(() => {
+              this.paymongoservice
+                .retrievePaymentLink(i.paymentReference)
+                .subscribe((paymentretrieve) => {
+                  i.paymentStatus = paymentretrieve.data.attributes.status;
+                });
+            }, 300);
+          } 
+          else 
+          {
+            i.paymentStatus = 'paid';
+            i.paymentLink = 'COD';
+          }
+        });
 
-    //         data = data.map((i, index) => {
-    //           return Object.assign({
-    //             BillingAddress1: i.BillingAddress1,
-    //             BillingAddress2: i.BillingAddress2,
-    //             BillingFirstname: i.BillingFirstname,
-    //             BillingIndexId: i.BillingIndexId,
-    //             BillingLastname: i.BillingLastname,
-    //             BillingPhonenumber: i.BillingPhonenumber,
-    //             Billingemail: i.Billingemail,
-    //             Datetime: i.Datetime,
-    //             Status: i.Status,
-    //             TotalAmount: i.TotalAmount,
-    //             id: i.id,
-    //             DatetimeToSort: i.DatetimeToSort,
-    //             OrderDetails: i.OrderDetails,
-    //             Discount: i.Discount,
-    //             PaymentMethod: i.PaymentMethod
-    //           })
-    //         })
-    //         data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-    //         console.log("the data", data)
-    //         this.allPendingOrders = data
-    //       })
-    //   }
-    // })
-  }
+        dataHistory = dataHistory.sort(
+          (a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort)
+        );
+        if (this.startDateFilter != '' && this.endDateFilter != '')
+        {
+          dataHistory = dataHistory.filter(f => 
+            moment(f.Datetime).toDate() >= moment(this.startDateFilter).toDate()
+            && moment(f.Datetime).toDate() <= moment(this.endDateFilter).toDate()
+            
+            )
+        }
+        if (this.customeremail != '')
+        {
+          dataHistory = dataHistory.filter(f => f.Billingemail.toLowerCase().includes(this.customeremail));
+        }
+        if (this.customerfullname != '')
+        {
+          dataHistory = dataHistory.filter((f) => 
+          `${f.BillingFirstname} ${f.BillingLastname}`.toLowerCase()
+          .includes(this.customerfullname)
+          )
+        }
+        
+        this.allPendingOrders = dataHistory;
+      });
+    }
 
   ngOnInit() {
   }
+  startdateFilter($event: any)
+  {
 
+  }
 
   addproduct() {
     this.alertCtrl
@@ -194,4 +159,17 @@ export class Admintab2Page implements OnInit {
       });
   }
 
+  openFilterModal()
+  {
+    this.modal.present();
+  }
+  closeFilterModal()
+  {
+    this.modal.dismiss();
+  }
+  searchHistory()
+  {
+      this.getHistory();
+      this.closeFilterModal();
+  }
 }

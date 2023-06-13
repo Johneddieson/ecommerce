@@ -19,6 +19,11 @@ export class Admintab1Page implements OnInit {
   currentStock: any[] = []
   public dataMaterials: any[] = []
 comments: string = ''
+startDateFilter: string = ''
+  endDateFilter: string = ''
+  customeremail: string = ''
+  customerfullname: string = ''
+  paymentstatus: string = ''
 public disabledSaveChanges: boolean = false
 @ViewChild(IonModal) modal!: IonModal;
   constructor(
@@ -35,73 +40,60 @@ public disabledSaveChanges: boolean = false
       {
         if (data.uid)
         {
-          this.dbservice.getData('Orders')
-          .subscribe((dataorders) => 
-          {
-                    dataorders = dataorders.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-                    dataorders = dataorders.filter(f => f.Status == "Approved");
-                    dataorders.map((i: any, index: any) => 
-                    {
-                      if (i.PaymentMethod != 'Cash')
-                      {
-                        setInterval(() => 
-                        {
-                          this.paymongoservice.retrievePaymentLink(i.paymentReference).subscribe((data) => 
-                        {
-                          i.paymentStatus = data.data.attributes.status
-                        })
-                        }, 500)
-                      }
-                      else 
-                      {
-                        i.paymentStatus = 'unpaid'
-                      }
-                    })
-                    this.allPendingOrders = dataorders
-                    //console.log("wew", this.allPendingOrders)
-          })
+          this.getOnlineOrders();
         }
       })
-    // this.afauth.authState.subscribe(data => {
-    //   if (data && data.uid) {
-    //     this.productReference = this.afstore.collection('Orders', ref => ref.where("Status", "==", "Open"))
-
-    //     this.sub = this.productReference.snapshotChanges()
-    //       .pipe(map(actions => actions.map(a => {
-    //         return {
-    //           id: a.payload.doc.id,
-    //           ...a.payload.doc.data() as any
-    //         }
-    //       }))).subscribe(data => {
-    //         console.log("orders", data)  
-    //         data = data.map((i, index) => {
-    //           return Object.assign({
-    //             BillingAddress1: i.BillingAddress1,
-    //             BillingAddress2: i.BillingAddress2,
-    //             BillingFirstname: i.BillingFirstname,
-    //             BillingIndexId: i.BillingIndexId,
-    //             BillingLastname: i.BillingLastname,
-    //             BillingPhonenumber: i.BillingPhonenumber,
-    //             Billingemail: i.Billingemail,
-    //             Datetime: i.Datetime,
-    //             Status: i.Status,
-    //             TotalAmount: i.TotalAmount,
-    //             id: i.id,
-    //             DatetimeToSort: i.DatetimeToSort,
-    //             OrderDetails: i.OrderDetails,
-    //             Discount: i.Discount,
-    //             PaymentMethod: i.PaymentMethod
-    //           })
-    //         })
-    //         data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-
-
-    //        this.allPendingOrders = data
-    //       })
-    //   }
-    // })
   }
 
+  getOnlineOrders()
+  {
+    this.dbservice.getData('Orders')
+    .subscribe((dataorders) => 
+    {
+              dataorders = dataorders.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
+              dataorders = dataorders.filter(f => f.Status == "Approved");
+              dataorders.map((i: any, index: any) => 
+              {
+                if (i.PaymentMethod != 'Cash')
+                {
+                  setInterval(() => 
+                  {
+                    this.paymongoservice.retrievePaymentLink(i.paymentReference).subscribe((data) => 
+                  {
+                    i.paymentStatus = data.data.attributes.status
+                  })
+                  }, 300)
+                }
+                else 
+                {
+                  i.paymentStatus = 'unpaid'
+                }
+              })
+              if (this.startDateFilter != '' && this.endDateFilter != '')
+              {
+                dataorders = dataorders.filter(f => 
+                  moment(f.Datetime).toDate() >= moment(this.startDateFilter).toDate()
+                  && moment(f.Datetime).toDate() <= moment(this.endDateFilter).toDate()
+                  
+                  )
+              }
+              if (this.customeremail != '') 
+              {
+                dataorders = dataorders.filter((f) =>
+                  f.Billingemail.toLowerCase().includes(this.customeremail)
+                );
+              }
+              if (this.customerfullname != '') 
+              {
+                dataorders = dataorders.filter((f) =>
+                  `${f.BillingFirstname} ${f.BillingLastname}`
+                    .toLowerCase()
+                    .includes(this.customerfullname)
+                );
+              }
+              this.allPendingOrders = dataorders
+    })
+  }
   ngOnInit() {
   }
   morecategories() {
@@ -573,6 +565,15 @@ deleteOrder(data: any)
     .catch((err) => {
       
     })
+}
+openFilterModal()
+{
+  this.modal.present();
+}
+searchOrders()
+{
+  this.getOnlineOrders();
+  this.close();
 }
 
 }

@@ -2,7 +2,10 @@
   <ion-toolbar class="toolbar">
     <ion-buttons  slot="end">
       <ion-button (click)="addproduct()" class="addproduct">
-        <ion-icon color="dark" size="large" name="settings"></ion-icon>
+        <ion-icon color="dark" size="large" name="settings" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="openFilterModal()">
+        <ion-icon color="dark" size="large" name="search-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-title>History</ion-title>
@@ -13,8 +16,45 @@
 <br>
 <br> -->
 <ion-content>
-  <!-- <ion-button (click)="closeAccordion()" expand="full">Close accordion</ion-button>
-  <ion-button (click)="toggleSection()" expand="full">Toggle Section</ion-button> -->
+
+  <ion-modal  mode="sm" [backdropDismiss]="false"
+  class="example-modal">
+    <ng-template>
+      <ion-content color="light">
+      
+        <ion-item>
+          <ion-label text-wrap>Start Date </ion-label>
+          <ion-input  type="date" [(ngModel)]="startDateFilter"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label text-wrap>End Date </ion-label>
+        <ion-input  type="date" [(ngModel)]="endDateFilter"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label text-wrap>Email </ion-label>
+      <ion-input [(ngModel)]="customeremail"  type="text"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label text-wrap>Fullname </ion-label>
+    <ion-input [(ngModel)]="customerfullname"  type="text"></ion-input>
+</ion-item>
+
+
+        
+      <ion-item lines="none">
+         <ion-buttons slot="end">
+          <ion-button color="success" (click)="searchHistory()">Search</ion-button>
+          <ion-button color="danger" (click)="closeFilterModal()">Close</ion-button> 
+        </ion-buttons>
+        </ion-item> 
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+
 <ion-accordion-group multiple="true">
   <ion-accordion *ngFor="let data of allPendingOrders">
     <ion-item slot="header" lines="none">
@@ -37,7 +77,8 @@
       <br>
       Status : {{data.Status}}
       <br>
-      <ion-text *ngIf="data.paymentStatus == 'COD' || data.paymentStatus == 'paid'">PAID</ion-text>
+      <!-- <ion-text *ngIf="data.paymentStatus == 'COD' || data.paymentStatus == 'paid'">PAID</ion-text> -->
+      <ion-text>({{data.paymentStatus.toUpperCase()}})</ion-text>
       <ion-button href="{{data.paymentLink}}" target="_blank" *ngIf="data.paymentStatus == 'unpaid'">PAY NOW!</ion-button>
     </ion-label> 
       
@@ -59,4 +100,6 @@
   </ion-accordion>
 
 </ion-accordion-group>
+
+
 </ion-content>
