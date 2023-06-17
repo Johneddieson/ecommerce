@@ -99,6 +99,11 @@ const routes: Routes = [
     loadChildren: () => import('./historybyid/historybyid.module').then( m => m.HistorybyidPageModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'userinformation',
+    loadChildren: () => import('./tab3/tab3.module').then( m => m.Tab3PageModule),
+    canActivate: [AuthGuard]
+  },
   // {
   //   path: 'onlinepayment',
   //   loadChildren: () => import('./onlinepayment/onlinepayment.module').then( m => m.OnlinepaymentPageModule)

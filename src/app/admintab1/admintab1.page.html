@@ -87,8 +87,9 @@
         </ion-label>
     </ion-item> 
     <!-- (click)="approveOrder(data)" -->
-      <ion-button size="small"  color="success" (click)="delivered(data)">Delivered</ion-button>
-      <ion-button (click)="deleteOrder(data)" size="small"   color="danger">Cancel Order</ion-button>
+      <ion-button *ngIf="data.Status == 'To Deliver'" size="small"  color="success" (click)="delivered(data)">Delivered</ion-button>
+      <ion-button *ngIf="data.Status == 'Approved'" size="small"  color="primary" (click)="todeliver(data)">To Deliver</ion-button>
+      <ion-button *ngIf="data.Status == 'Approved'" (click)="deleteOrder(data)" size="small"   color="danger">Cancel Order</ion-button>
     </ion-list>
   </ion-accordion>
   

@@ -12,6 +12,8 @@ import {
   FormControl,
   ValidatorFn,
 } from '@angular/forms';
+import { VonageapisendsmsService } from '../services/vonageapi/vonageapisendsms.service';
+import { Sendsms } from '../interface/sendsms';
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
@@ -31,6 +33,8 @@ name: any;
 forcheckout: any
 public aFormGroup!: FormGroup;
 currentuserid: string = ''
+vonageModal!: Sendsms;
+myotpcode: string = '' 
   constructor(private actRoute: ActivatedRoute, 
     //private afstore: AngularFirestore, 
     private afauth: AngularFireAuth,
@@ -38,7 +42,8 @@ currentuserid: string = ''
     private alertCtrl: AlertController, private router: Router,
     private msg: MessengerService,
     private dbservice: DbserviceService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private vonageservice: VonageapisendsmsService
     ) 
     {
     this.afauth.authState.subscribe((data: any) => 
@@ -52,6 +57,7 @@ currentuserid: string = ''
           this.aFormGroup.controls['lastname'].setValue(data.LastName);  
           this.aFormGroup.controls['phonenumber'].setValue(data.PhoneNumber);
           this.aFormGroup.controls['address'].setValue(data.Address1);
+          this.myotpcode = data.otpcodenumber == null || undefined ? "" : data.otpcodenumber  
         });
       }
     })
@@ -80,7 +86,7 @@ currentuserid: string = ''
         [
           Validators.required,
           Validators.pattern(
-            /^(09|63)[\d]{9}$/
+            /^(09)[\d]{9}$/
           ),
           ],
       ],
@@ -269,51 +275,200 @@ currentuserid: string = ''
   //   }
   // }
 
-   Edit()
+   async Edit()
   {
-    var specificdataobject = 
-    {
-      FirstName: this.aFormGroup.controls['firstname'].value,
-      LastName: this.aFormGroup.controls['lastname'].value,
-      PhoneNumber: this.aFormGroup.controls['phonenumber'].value,
-      Address1: this.aFormGroup.controls['address'].value
-    }
-    this.dbservice.updateData(this.currentuserid, specificdataobject, 'users').then(async (success) => 
-    {
-      var alertEditSuccess = await this.alertCtrl.create
-      ({
-        message: 'You edited your information successfully.',
-        buttons:
-        [
-          {
-            text: 'Close',
-            handler: () => 
-            {
-              var cartItem = sessionStorage.getItem('cart');
+    this.sendSMS();
 
-              if (cartItem != null)
-              {
-                this.router.navigateByUrl('/checkout')
-              }
-            }
-          }
-        ]
-      })
-      await alertEditSuccess.present();
-    }).catch(async (err) => 
-    {
-       var alertEditError = await this.alertCtrl.create
+    var alertSentOtp = await this.alertCtrl.create
     ({
-      message: JSON.stringify(err),
+      header: "We've sent you an otp code number to your phone number, type here to proceed",
+      backdropDismiss: false,
+      inputs: 
+      [
+        {
+          type: 'number',
+          max: 6,
+          label: 'otp',
+          name: 'otp'
+        }
+      ],
       buttons: 
       [
+        {
+          text: 'Verify',
+          handler: (async (otp) => 
+          {
+            if (otp.otp == this.myotpcode.toString())
+            {
+              var specificdataobject = {
+                FirstName: this.aFormGroup.controls['firstname'].value,
+                LastName: this.aFormGroup.controls['lastname'].value,
+                PhoneNumber: this.aFormGroup.controls['phonenumber'].value,
+                Address1: this.aFormGroup.controls['address'].value,
+              };
+              this.dbservice
+                .updateData(this.currentuserid, specificdataobject, 'users')
+                .then(async (success) => {
+                  var buttontext = '';
+                  var cartItem = sessionStorage.getItem('cart');
+                  if (
+                    cartItem != null ||
+                    JSON.parse(cartItem as any).length > 0
+                  ) {
+                    buttontext = 'Proceed To Checkout';
+                  } else {
+                    buttontext = 'Go back';
+                  }
+                  var alertEditSuccess = await this.alertCtrl.create({
+                    message: 'You edited your information successfully.',
+                    backdropDismiss: false,
+                    buttons: [
+                      {
+                        text: `${buttontext}`,
+                        handler: async () => {
+                          if (
+                            cartItem != null ||
+                            JSON.parse(cartItem as any).length > 0
+                          ) {
+                            this.router.navigateByUrl('/checkout');
+                           }
+                           else 
+                           {
+                            this.router.navigateByUrl('/tabs/tab1');
+                           }
+                           alertSentOtp.dismiss();
+                           setTimeout(() => {
+                             this.updatecodetonone()
+                           }, 3000);
+                        },
+                      },
+                    ],
+                  });
+                  await alertEditSuccess.present();
+                })
+                .catch(async (err) => {
+                  var alertEditError = await this.alertCtrl.create({
+                    message: JSON.stringify(err),
+                    buttons: [
+                      {
+                        text: 'Close',
+                        role: 'cancel',
+                      },
+                    ],
+                  });
+                  await alertEditError.present();
+                }); 
+            }
+          return false
+          })
+        },
+        {
+          text: "Didn't receive? Send again!",
+          handler: () => 
+          {
+            this.sendSMS();
+            return false
+          }
+        },
         {
           text: 'Close',
           role: 'cancel'
         }
       ]
     })
-    await alertEditError.present();
-    })
+    await alertSentOtp.present();
+    // var specificdataobject = 
+    // {
+    //   FirstName: this.aFormGroup.controls['firstname'].value,
+    //   LastName: this.aFormGroup.controls['lastname'].value,
+    //   PhoneNumber: this.aFormGroup.controls['phonenumber'].value,
+    //   Address1: this.aFormGroup.controls['address'].value
+    // }
+    // this.dbservice.updateData(this.currentuserid, specificdataobject, 'users').then(async (success) => 
+    // {
+    //   var buttontext = ""
+    //   var cartItem = sessionStorage.getItem('cart');
+    //   if (cartItem != null || JSON.parse(cartItem as any).length > 0)
+    //   {
+    //     buttontext = "Proceed To Checkout"
+    //   }
+    //   else 
+    //   {
+    //     buttontext = "Go back"
+    //   }
+    //   var alertEditSuccess = await this.alertCtrl.create
+    //   ({
+    //     message: 'You edited your information successfully.',
+    //     backdropDismiss: false,
+    //     buttons:
+    //     [
+    //       {
+    //         text: `${buttontext}`,
+    //         handler: () => 
+    //         {
+
+    //           if (cartItem != null || JSON.parse(cartItem as any).length > 0)
+    //           {
+    //             this.router.navigateByUrl('/checkout')
+    //           }
+    //         }
+    //       }
+    //     ]
+    //   })
+    //   await alertEditSuccess.present();
+    // }).catch(async (err) => 
+    // {
+    //    var alertEditError = await this.alertCtrl.create
+    // ({
+    //   message: JSON.stringify(err),
+    //   buttons: 
+    //   [
+    //     {
+    //       text: 'Close',
+    //       role: 'cancel'
+    //     }
+    //   ]
+    // })
+    // await alertEditError.present();
+    // })
+  }
+  async updateCurrentUserOtpCode(otpcode: any)
+  {
+    var specificdata = 
+    {
+      otpcodenumber: otpcode
+    }
+      this.dbservice.updateData(this.currentuserid, specificdata, 'users').then(() => {})
+      .catch(() => {})
+  }
+  async sendSMS()
+  {
+    var phonenumber = this.aFormGroup.controls['phonenumber'].value
+      phonenumber =  phonenumber.replace(phonenumber[0], "63")
+      var newotpcode = Math.floor(Math.random() * 899999 + 100000)
+      this.updateCurrentUserOtpCode(newotpcode);
+      this.vonageModal = 
+      {
+        text: `Hi! your otpcode is ${newotpcode}`,
+        to: phonenumber,
+        from: 'DMixologist'
+      }
+      //this.vonageModal.from = 'DMixologist';
+    //this.vonageModal.to = phonenumber;
+    //this.vonageModal.text = `Hi! your otpcode is ${newotpcode}`
+      this.vonageservice.sendSms(this.vonageModal).subscribe((data) => 
+      {
+        console.log("the response of sending sms", data);
+      })  
+  }
+  async updatecodetonone()
+  {
+    var specificData = 
+    {
+      otpcodenumber: 0,
+      PhoneNumber: ""
+    }
+    this.dbservice.updateData(this.currentuserid, specificData, 'users').then(() => {})
+    .catch(() => {})
   }
 }

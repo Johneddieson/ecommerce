@@ -206,11 +206,12 @@ export class SignupPage implements OnInit {
             alert(JSON.stringify(err));
           });
 
-        success.user.sendEmailVerification();
+        success.user.sendEmailVerification()
 
           var alertController = await this.alertCtrl.create
           ({
             message: `We have sent you an email verification to ${this.Email1}, Once it is verified, you can go to login and use your account.`,
+            backdropDismiss: false,
             buttons:
             [
               {

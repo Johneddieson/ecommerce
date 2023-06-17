@@ -564,7 +564,7 @@ getMaterialOfProducts(Data: any, ProductName: any)
                    PaymentMethod: this.paymentMethod,
                    Note: note,
                    paymentReference: this.paymentMethod != 'Cash' ?  data.data.attributes.reference_number : 'COD'
-               };
+                  };
                  this.dbservice.postData('History', specificDataObjectForHistoryCollection).then((el) => 
                  {
                   this.router.navigateByUrl(`/adminpage/atab2`);

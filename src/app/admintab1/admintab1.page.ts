@@ -7,6 +7,9 @@ import * as _ from 'lodash'
 import { DbserviceService } from '../services/dbservice.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { PaymongoService } from '../services/paymongo.service';
+import { increment } from 'firebase/firestore';
+import { VonageapisendsmsService } from '../services/vonageapi/vonageapisendsms.service';
+import { Sendsms } from '../interface/sendsms';
 @Component({
   selector: 'app-admintab1',
   templateUrl: './admintab1.page.html',
@@ -24,9 +27,11 @@ startDateFilter: string = ''
   customeremail: string = ''
   customerfullname: string = ''
   paymentstatus: string = ''
+  smsModal!: Sendsms
 public disabledSaveChanges: boolean = false
 @ViewChild(IonModal) modal!: IonModal;
   constructor(
+    private vonageservice: VonageapisendsmsService,
     //private afstore: AngularFirestore, 
     private afauth: AngularFireAuth,
     private router: Router,
@@ -51,7 +56,7 @@ public disabledSaveChanges: boolean = false
     .subscribe((dataorders) => 
     {
               dataorders = dataorders.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-              dataorders = dataorders.filter(f => f.Status == "Approved");
+              dataorders = dataorders.filter(f => f.Status != "Delivered");
               dataorders.map((i: any, index: any) => 
               {
                 if (i.PaymentMethod != 'Cash')
@@ -503,6 +508,18 @@ async delivered(data: any)
   } 
   else 
   {
+    var items = data.OrderDetails.map(function (e: any) 
+    { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ${e.UnitPrice} pesos` }).join(', ')
+      this.smsModal = 
+      {
+        from: 'DMixologist',
+        text: `Your order ${items} has been delivered!`,
+        to: data.BillingPhonenumber.replace(data.BillingPhonenumber[0], "63")
+      }
+    this.vonageservice.sendSms(this.smsModal).subscribe((data) => 
+    {
+      console.log("success sent message", data)
+    })
     var markAsDelivered = 
     {
       Status: "Delivered"
@@ -574,6 +591,78 @@ searchOrders()
 {
   this.getOnlineOrders();
   this.close();
+}
+
+async todeliver(data: any)
+{
+    var items = data.OrderDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ${e.UnitPrice} pesos` }).join(', ')
+      this.smsModal = 
+      {
+        from: 'DMixologist',
+        text: `Your order ${items} is to deliver!`,
+        to: data.BillingPhonenumber.replace(data.BillingPhonenumber[0], "63")
+      }
+    this.vonageservice.sendSms(this.smsModal).subscribe((data) => 
+    {
+      console.log("success sent message", data)
+    })
+    var markAstoDeliver = 
+    {
+      Status: "To Deliver"
+    }
+        var todeliverAlert = await this.alertCtrl.create
+        ({
+          message: `<b>${data.BillingFirstname} ${data.BillingLastname}</b>'s order is to deliver`,
+          backdropDismiss: false,
+          buttons: 
+          [
+            {
+              text: 'Close',
+              role: 'cancel'
+            }
+          ]
+        })
+        this.dbservice.updateData(data.id, markAstoDeliver, 'Orders')
+        .then(async (success) => 
+        {
+          await todeliverAlert.present();
+           this.decreaseStocks(data.OrderDetails);
+        }).catch((err) => 
+         {
+
+         }) 
+}
+
+decreaseStocks(orderdetails: any)
+{
+  var getmaterial = orderdetails.map(function (e: any) {return e.Materials})
+  var ew = _.flatten(getmaterial)
+  ew.forEach((fe: any) => 
+  {
+    this.updateStocksMaterial(fe.itemId, fe.Quantity, fe.gramsperorder)
+  })
+}
+updateStocksMaterial(itemId: any, Quantity: any, gramsperorder: any)
+{
+//this.decreaseStocks()
+
+ var total = parseFloat(Quantity) * parseFloat(gramsperorder)
+
+var specificData = 
+{
+  Stock: increment(-total),
+};
+
+  this.dbservice
+  .updateData(itemId, specificData, 'Materials')
+  .then((success) => {})
+  .catch((err) => {});
+
+  // this.afstore.doc(`Materials/${itemId}`).update({
+// Stock: firebase.default.firestore.FieldValue.increment(-total),
+// }).then(el => {
+// }).catch(err => {
+// })
 }
 
 }

@@ -31,7 +31,7 @@
       <p style="color: red;" *ngIf="f['address'].errors && f['address'].errors['required']">Shouldn't be empty.</p>   
     
     </form>    
-    <ion-button (click)="Edit()" [disabled]="!aFormGroup.valid">Edit</ion-button>
+    <ion-button (click)="Edit()" [disabled]="!aFormGroup.valid">Finalize!</ion-button>
     <!-- <ion-button (click)="Edit()" *ngIf="forcheckout == true">Proceed to checkout</ion-button> -->
   </div>
   <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!isEdit" (click)="getCurrentLocation()">  

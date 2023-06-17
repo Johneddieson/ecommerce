@@ -435,6 +435,27 @@ async OrderAutoApprove()
   }
   else 
   {
+    if (!this.myaddress || !this.firstname || !this.lastname || !this.phonenumber)
+    {
+      var alertNoInformation = await this.alertCtrl.create
+      ({
+        message: 'Please fill up some of your details first',
+        backdropDismiss: false,
+        buttons: 
+        [
+          {
+            text: 'Ok',
+            handler: () => 
+            {
+              this.router.navigateByUrl('/userinformation')
+            }
+          }
+        ]
+      })
+      await alertNoInformation.present();
+    }
+    else 
+    {
     this.refreshMaterials()
     var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
 
@@ -517,6 +538,7 @@ async OrderAutoApprove()
 
   }
 }
+}
 
 editQuantity(event: any, datamaterials: any)
 {
@@ -558,7 +580,7 @@ var specificData =
 }
 async successorderalert()
 {
-  this.decreaseStock();
+  //this.decreaseStock();
   var successAlert = await this.alertCtrl.create
   ({
     message: 'Your order has been approved. If we noticed that your personal information something wrong or your phone number is cannot be reached, we will automatically cancel your order.',

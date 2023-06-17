@@ -74,8 +74,8 @@
       Payment : {{data.PaymentMethod}}
       <br>
       Total Amount : {{data.TotalAmount | currency: '₱'}}
-      <br>
-      Status : {{data.Status}}
+      <!-- <br>
+      Status : {{data.Status}} -->
       <br>
       <!-- <ion-text *ngIf="data.paymentStatus == 'COD' || data.paymentStatus == 'paid'">PAID</ion-text> -->
       <ion-text>({{data.paymentStatus.toUpperCase()}})</ion-text>
