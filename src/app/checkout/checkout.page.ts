@@ -535,7 +535,6 @@ async OrderAutoApprove()
       this.dbservice.postData('Orders', specificdataForOrderCollectionForCash);
       this.successorderalert()
     }
-
   }
 }
 }
@@ -598,6 +597,18 @@ async successorderalert()
   setTimeout(() => {
     this.removeall()
     this.paymentMethod = ''
+    this.clearShippingDetails();
   }, 4000);
+}
+clearShippingDetails()
+{
+  var specificData = 
+  {
+    PhoneNumber: "",
+    FirstName: "",
+    LastName: "",
+    Address1: ""
+  }
+  this.dbservice.updateData(this.uid, specificData, 'users')
 }
 }

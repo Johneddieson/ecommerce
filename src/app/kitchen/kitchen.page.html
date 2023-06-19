@@ -1,14 +1,11 @@
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons  slot="end">   
-      <ion-button (click)="morecategories()" class="addproduct">
-        <ion-icon color="dark" size="large" name="settings" slot="icon-only"></ion-icon>
-      </ion-button>
       <ion-button (click)="openFilterModal()">
         <ion-icon color="dark" size="large" name="search-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Online Orders</ion-title>
+    <ion-title>Kitchen Page</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -87,12 +84,9 @@
           <p style="font-weight: 1000; color: white;">Quantity: {{datadetails.Quantity}}</p>
           <p style="font-weight: 1000; color: white;">Unit Price: {{datadetails.UnitPrice | currency: '₱'}}</p>
         </ion-label>
-        
     </ion-item> 
     <!-- (click)="approveOrder(data)" -->
-      <ion-button *ngIf="data.Status == 'Approved'" size="small"  color="success" (click)="preparing(data)">Preparing</ion-button>
-      <!-- <ion-button *ngIf="data.Status == 'Approved'" size="small"  color="primary" (click)="todeliver(data)">To Deliver</ion-button> -->
-      <ion-button *ngIf="data.Status == 'Approved'" (click)="deleteOrder(data)" size="small"   color="danger">Cancel Order</ion-button>
+      <ion-button *ngIf="data.Status == 'Preparing'" size="small"  color="success" (click)="markasdone(data)">Mark as done</ion-button>
     </ion-list>
   </ion-accordion>
   

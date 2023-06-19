@@ -104,6 +104,18 @@ const routes: Routes = [
     loadChildren: () => import('./tab3/tab3.module').then( m => m.Tab3PageModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'kitchen',
+    loadChildren: () => import('./kitchen/kitchen.module').then( m => m.KitchenPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'rider',
+    loadChildren: () => import('./rider/rider.module').then( m => m.RiderPageModule),
+    canActivate: [AuthGuard]
+  },
+
+
   // {
   //   path: 'onlinepayment',
   //   loadChildren: () => import('./onlinepayment/onlinepayment.module').then( m => m.OnlinepaymentPageModule)

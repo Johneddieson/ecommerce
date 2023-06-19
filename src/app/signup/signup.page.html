@@ -70,8 +70,7 @@ Already a member? Sign In
        </div>
        <div *ngIf="!ishide" class="pass" (click)="ResetPassword()">Forgot Password?</div>
        <button class="button" *ngIf="!ishide" (click)="SignUp()">Sign Up</button>
-       <button class="button" *ngIf="ishide && isthisadmin" (click)="navigateadmin()"  >Continue as Admin</button>
-       <button class="button" *ngIf="ishide && !isthisadmin" (click)="navigatecustomer()" >Continue as Customer</button>
+       <button class="button" *ngIf="ishide" (click)="navigateURL()" >Continue as {{mainpage}}</button>
      
      
        <div class="signup_link">

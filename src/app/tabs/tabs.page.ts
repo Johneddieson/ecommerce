@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { AuthserviceService } from '../services/authservice.service';
 import { DbserviceService } from '../services/dbservice.service';
 import { PaymongoService } from '../services/paymongo.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
@@ -26,76 +27,23 @@ myid: string = ''
     private zone: NgZone,
     private auth: AuthserviceService,
     private dbservice: DbserviceService,
-    private paymongoservice: PaymongoService
+    private paymongoservice: PaymongoService,
+    private afauth: AngularFireAuth
     ) 
     {
-    // this.afauth.authState.subscribe(data => {
-    //   if (data && data.uid) {
-    //     this.myid = data.uid
-    //     this.meReference = this.afstore.doc(`users/${data.uid}`)
-    //     if (data.displayName == 'admin') {
-    //       router.navigateByUrl('adminpage')
-    //     } else {
-    //       router.navigateByUrl('tabs')
-    //     }
-
-    //     this.notificationsReference = this.afstore.collection(`users/${data.uid}/notifications`)
-
-    //     this.sub = this.notificationsReference.snapshotChanges()
-    //       .pipe(map(actions => actions.map(a => {
-    //         return {
-    //           id: a.payload.doc.id,
-    //           ...a.payload.doc.data() as any
-    //         }
-    //       }))).subscribe(data => {
-    //         data = data.map((i, index) => {
-    //           return Object.assign({
-    //             id: i.id,
-    //             Datetime: i.Datetime,
-    //             DatetimeToSort: moment(i.Datetime).toDate(),
-    //             read: i.read,
-    //             remarks: i.remarks,
-    //             Message: i.Message
-    //           })
-    //         })
-    //         data = data.sort((a, b) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-    //         this.notificationsList = data
-    //         var filterOnlyNotRead = data.filter(f => f.read != true)
-    //           this.notifCounts = filterOnlyNotRead.length
-    //       })
-    //   }
-    // })
-  }
+      this.afauth.authState.subscribe((user) => 
+      {
+        if (user && user.uid)
+        {
+          this.myid = user.uid
+        }
+      })
+    }
 
 
-  ngOnInit(): void {
-    //     history.pushState(null, null, location.href);
-    // this.locationStrategy.onPopState(() => {
-    //   history.pushState(null, null, location.href);
-    // })
-    // this.router.events.subscribe((d) => {
-    //   console.log("pota", d)
-    //   this.zone.run(() => {
-    //     setTimeout(() => {
-    //       this.applicationRef.tick()
-    //         var thesession = JSON.parse(sessionStorage.getItem('user'))
-    //         console.log("current user", thesession)
-    //         if (thesession != null) {
-             
-    //           if (thesession.displayName == "customer") {
-                
-    //             this.router.navigateByUrl('tabs')
-      
-    //           } else {
-    //             this.router.navigateByUrl('adminpage')
+  ngOnInit(): void 
+  {
 
-    //           }
-    //         } else {
-    //         }
-           
-    //     }, 0)
-    //   })
-    // })
   }
   async logout() 
   {
@@ -109,6 +57,7 @@ myid: string = ''
           handler: () => 
           { 
               this.auth.SignOut();
+              this.clearShippingDetails();
             }
         },
         {
@@ -119,29 +68,15 @@ myid: string = ''
     })
     await alertLogout.present();
   }
-
-  // getcurrentuserallorders(uid: any)
-  // {
-  //     this.dbservice.getData('Orders').subscribe((data) => 
-  //     {
-  //       var currentuserorder = data.filter((f) => f.BillingIndexId == uid && f.PaymentMethod != 'Cash');
-      
-  //       currentuserorder = currentuserorder.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-  //       currentuserorder.map((e) => 
-  //       {
-  //         setInterval(() => 
-  //         {
-  //           this.paymongoservice.retrievePaymentLink(e.paymentReference).subscribe((paymentapidata) => 
-  //         {
-  //             e.paymentStatus = paymentapidata.data.attributes.status
-  //         })
-  //         }, 300)
-  //         e.OrderDate = moment(moment(e.Datetime).toDate()).format('MMMM DD, YYYY');
-  //       })
-
-  //       currentuserorder = currentuserorder.filter(f => f.paymentStatus == 'unpaid');
-  //       this.notifCounts
-        
-  //     })
-  // }
+  clearShippingDetails()
+{
+  var specificData = 
+  {
+    PhoneNumber: "",
+    FirstName: "",
+    LastName: "",
+    Address1: ""
+  }
+  this.dbservice.updateData(this.myid, specificData, 'users')
+}
 }

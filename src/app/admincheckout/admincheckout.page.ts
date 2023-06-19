@@ -12,6 +12,8 @@ import { Firestore, collection, collectionData, doc, setDoc, updateDoc,
   increment, addDoc,
 getDoc, docData } from '@angular/fire/firestore';
 import { PaymongoService } from '../services/paymongo.service';
+import { SendemailapiService } from '../services/sendemailapi/sendemailapi.service';
+import { Sendemail } from '../interface/sendemail';
 @Component({
   selector: 'app-admincheckout',
   templateUrl: './admincheckout.page.html',
@@ -31,6 +33,7 @@ export class AdmincheckoutPage implements OnInit {
   paymentMethod: string = ''
   public specificProduct: string  = ''
   public dataMaterials: any[] = []
+  sendemailModal!: Sendemail;
   @ViewChild(IonModal) modal!: IonModal;
   public disabledSaveChanges: boolean = false
   constructor(private alertCtrl: AlertController, 
@@ -40,7 +43,8 @@ export class AdmincheckoutPage implements OnInit {
     //private afstore: AngularFirestore,
     private dbservice: DbserviceService, 
     private msg: MessengerService,
-    private paymongoservice: PaymongoService
+    private paymongoservice: PaymongoService,
+    private sendemailservice: SendemailapiService
     ) 
     {
     // this.msg.cartSubject.next(this.CartDetails())
@@ -206,11 +210,25 @@ async OrderNow() {
               
               this.alertCtrl.create({
                 header: 'Customer Name',
-                inputs: [
+                inputs: this.paymentMethod != 'Cash' ? [
                   {
                     name: 'Name',
                     placeholder: 'Customer Name',
-                    type: 'text'
+                    type: 'text',
+                    
+                  },
+                  {
+                    name: 'Email',
+                    placeholder: 'Email',
+                    type: 'email',
+                  },
+                  
+                ] : [
+                  {
+                    name: 'Name',
+                    placeholder: 'Customer Name',
+                    type: 'text',
+                    
                   }
                 ],
                 buttons: [
@@ -284,7 +302,8 @@ async OrderNow() {
                             data.Name,
                             datetime,
                             orderid,
-                            note[0]
+                            note[0],
+                            data.Email
                           );
                           //End of Paymongo Create Link
         
@@ -532,7 +551,7 @@ getMaterialOfProducts(Data: any, ProductName: any)
     this.modal.dismiss();
   }
 
-  createAPIPaymentLink(Name: any, datetime: any, orderid: any, note: any)
+  createAPIPaymentLink(Name: any, datetime: any, orderid: any, note: any, email: any)
   {
     var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
        var descriptionfinal = `${Name} WALK-IN : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
@@ -543,6 +562,34 @@ getMaterialOfProducts(Data: any, ProductName: any)
         this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, note)
         .subscribe((data) => 
         {
+          //Sending Email Service
+          this.sendemailModal = 
+          {
+            to: email,
+            subject: `Hi! ${Name}, here is your payment link`,
+            html: ` <a href="https://pm.link/Dmixologist/${data.data.attributes.reference_number}" target='_blank' style='background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;'>Link Button</a>`,
+            text: ` <a href="https://pm.link/Dmixologist/${data.data.attributes.reference_number}" target='_blank' style='background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;'>Link Button</a>`
+          }
+          this.sendemailservice.sendEmailApi(this.sendemailModal).subscribe(() => {})
+
                //History Saving
                var specificDataObjectForHistoryCollection = 
                {

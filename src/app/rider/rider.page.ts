@@ -1,23 +1,23 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import * as moment from 'moment';
-import { Router } from '@angular/router';
-import { AlertController, IonAccordionGroup, IonModal } from '@ionic/angular';
-import { CurrencyPipe } from '@angular/common';
-import * as _ from 'lodash'
-import { DbserviceService } from '../services/dbservice.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { PaymongoService } from '../services/paymongo.service';
+import { Router } from '@angular/router';
+import { IonAccordionGroup, IonModal, AlertController } from '@ionic/angular';
 import { increment } from 'firebase/firestore';
-import { VonageapisendsmsService } from '../services/vonageapi/vonageapisendsms.service';
-import { Sendsms } from '../interface/sendsms';
+import * as _ from 'lodash';
+import * as moment from 'moment';
 import { Sendemail } from '../interface/sendemail';
+import { Sendsms } from '../interface/sendsms';
+import { DbserviceService } from '../services/dbservice.service';
+import { PaymongoService } from '../services/paymongo.service';
 import { SendemailapiService } from '../services/sendemailapi/sendemailapi.service';
+import { VonageapisendsmsService } from '../services/vonageapi/vonageapisendsms.service';
+
 @Component({
-  selector: 'app-admintab1',
-  templateUrl: './admintab1.page.html',
-  styleUrls: ['./admintab1.page.scss'],
+  selector: 'app-rider',
+  templateUrl: './rider.page.html',
+  styleUrls: ['./rider.page.scss'],
 })
-export class Admintab1Page implements OnInit {
+export class RiderPage implements OnInit {
   @ViewChild(IonAccordionGroup) accordionGroup!: IonAccordionGroup;
 
   allPendingOrders: any[] = []
@@ -60,7 +60,7 @@ public disabledSaveChanges: boolean = false
     .subscribe((dataorders) => 
     {
               dataorders = dataorders.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-              dataorders = dataorders.filter(f => f.Status != "Delivered");
+              dataorders = dataorders.filter(f => f.Status == "Done" || f.Status == "To Deliver");
               dataorders.map((i: any, index: any) => 
               {
                 if (i.PaymentMethod != 'Cash')
@@ -514,16 +514,14 @@ async delivered(data: any)
   {
     var items = data.OrderDetails.map(function (e: any) 
     { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ${e.UnitPrice} pesos` }).join(', ')
-      this.smsModal = 
-      {
-        from: 'DMixologist',
-        text: `Your order ${items} has been delivered!`,
-        to: data.BillingPhonenumber.replace(data.BillingPhonenumber[0], "63")
-      }
-    this.vonageservice.sendSms(this.smsModal).subscribe((data) => 
+    this.sendemailModal = 
     {
-      console.log("success sent message", data)
-    })
+      to: data.Billingemail,
+      subject: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order has been delivered.`,
+      html: `<h1>${items}</h1>`,
+      text: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order has been delivered.`
+    }
+    this.sendemailapiservice.sendEmailApi(this.sendemailModal).subscribe(() => {})  
     var markAsDelivered = 
     {
       Status: "Delivered"
@@ -600,16 +598,15 @@ searchOrders()
 async todeliver(data: any)
 {
     var items = data.OrderDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ${e.UnitPrice} pesos` }).join(', ')
-      this.smsModal = 
-      {
-        from: 'DMixologist',
-        text: `Your order ${items} is to deliver!`,
-        to: data.BillingPhonenumber.replace(data.BillingPhonenumber[0], "63")
-      }
-    this.vonageservice.sendSms(this.smsModal).subscribe((data) => 
+    this.sendemailModal = 
     {
-      console.log("success sent message", data)
-    })
+      to: data.Billingemail,
+      subject: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order is to deliver, Kindly wait the rider thanks!.`,
+      html: `<h1>${items}</h1>`,
+      text: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order is to deliver, Kindly wait the rider thanks!.`
+    }
+    this.sendemailapiservice.sendEmailApi(this.sendemailModal).subscribe(() => {})  
+
     var markAstoDeliver = 
     {
       Status: "To Deliver"
@@ -630,7 +627,6 @@ async todeliver(data: any)
         .then(async (success) => 
         {
           await todeliverAlert.present();
-           this.decreaseStocks(data.OrderDetails);
         }).catch((err) => 
          {
 
@@ -668,7 +664,7 @@ var specificData =
 // }).catch(err => {
 // })
 }
-async preparing(data: any)
+async markasdone(data: any)
 {
     var items = data.OrderDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ${e.UnitPrice} pesos` }).join(', ')
     //   this.smsModal = 
@@ -685,30 +681,18 @@ async preparing(data: any)
     this.sendemailModal = 
     {
       to: data.Billingemail,
-      subject: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order is now preparing`,
-      html: data.PaymentMethod != 'Cash' ? `<h1>${items}</h1>
-      <br />
-      <br />
-      <a href="https://pm.link/Dmixologist/${data.paymentReference}" target='_blank' style='background-color: #4CAF50;
-      border: none;
-      color: white;
-      padding: 15px 32px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      margin: 4px 2px;
-      cursor: pointer;'>Link Button</a>` : `<h1>${items}</h1>`,
-      text: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order is now preparing`
+      subject: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order is done preparing, Wait the rider to pick up your order.`,
+      html: `<h1>${items}</h1>`,
+      text: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order is done preparing, Wait the rider to pick up your order.`
     }
     this.sendemailapiservice.sendEmailApi(this.sendemailModal).subscribe(() => {})    
     var markAstoDeliver = 
     {
-      Status: "Preparing"
+      Status: "Done"
     }
         var todeliverAlert = await this.alertCtrl.create
         ({
-          message: `<b>${data.BillingFirstname} ${data.BillingLastname}</b>'s order is now preparing`,
+          message: `<b>${data.BillingFirstname} ${data.BillingLastname}</b>'s order is done preparing`,
           backdropDismiss: false,
           buttons: 
           [
@@ -727,6 +711,5 @@ async preparing(data: any)
          {
          }) 
 }
-
 
 }

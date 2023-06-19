@@ -16,6 +16,7 @@ export class LoginPage implements OnInit {
   ishide = false;
   continueAsCustomer: any
   isthisadmin = false
+  mainpage: string = ''
   constructor(private navCtrl: NavController,
     //private auth: AuthServiceService, 
     //private afstore: AngularFirestore,
@@ -38,16 +39,23 @@ export class LoginPage implements OnInit {
             var thesession = JSON.parse(sessionStorage.getItem('user') as any)
             if (thesession != null) {
               this.ishide = true
-              if (thesession.displayName == "customer") {
-                this.continueAsCustomer = `CONTINUE AS ${thesession.displayName.toUpperCase()}`
-                this.isthisadmin = false
+              // if (thesession.displayName == "customer") {
+              //   this.continueAsCustomer = `CONTINUE AS ${thesession.displayName.toUpperCase()}`
+              //   this.isthisadmin = false
+              //   this.mainpage = `${thesession.displayName.toUpperCase()}`
 
-              } else {
-                this.continueAsCustomer = `CONTINUE AS ${thesession.displayName.toUpperCase()}`
-                this.isthisadmin = true
-
-              }
-            } else {
+              // } else if (thesession.displayName == 'admin') {
+              //   this.continueAsCustomer = `CONTINUE AS ${thesession.displayName.toUpperCase()}`
+              //   this.isthisadmin = true
+              //   this.mainpage = `${thesession.displayName.toUpperCase()}`  
+              // }
+              // else 
+              // {
+              //     this.mainpage = `${thesession.displayName.toUpperCase()}`
+              // }
+              this.mainpage = `${thesession.displayName.toUpperCase()}`
+            } 
+            else {
               this.ishide = false
             }
            
@@ -103,31 +111,6 @@ export class LoginPage implements OnInit {
   gotosignup() {
     this.navCtrl.navigateForward('signup');
   }
-  // LogIn(email, password) {
-  //   this.auth.SignIn(email.value, password.value).then((res => {
-      
-        
-  //       if (res.user.displayName == "admin") {
-  //       this.router.navigateByUrl('adminpage')
-        
-  //     } else {
-  //       this.router.navigateByUrl('tabs')
-  //     }
-        
-     
-  //     sessionStorage.setItem('user', JSON.stringify(res.user));
-  //  this.Email1 = ''
-  //  this.Password1 = ''
-  //   })).catch(err => {
-      
-      
-  //       this.alertCtrl.create({
-  //         message: err.message
-  //       }).then(el => {
-  //         el.present()
-  //       })
-  //   })
-  // }
   LogIn()
     {
     //   this.auth.signInWithEmailAndPassword
@@ -241,6 +224,14 @@ export class LoginPage implements OnInit {
                 if (success.user.displayName == 'admin')
                 {
                   this.router.navigateByUrl('/adminpage')
+                } 
+                else if (success.user.displayName == 'kitchen')
+                {
+                  this.router.navigateByUrl('/kitchen')
+                }
+                else if (success.user.displayName == 'rider')
+                {
+                  this.router.navigateByUrl('/rider')
                 }
                 else 
                 {
@@ -273,4 +264,19 @@ export class LoginPage implements OnInit {
         });
       }
 
+      navigateURL()
+      {
+        if (this.mainpage == 'ADMIN')
+        {
+            this.navigateadmin()
+        }
+        else if (this.mainpage == 'CUSTOMER')
+        {
+          this.navigatecustomer()
+        }
+        else 
+        {
+          this.router.navigateByUrl(`/${this.mainpage.toLowerCase()}`)
+        }
+      } 
 }

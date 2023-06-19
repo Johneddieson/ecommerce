@@ -1,6 +1,6 @@
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { MessengerService } from './../messenger.service';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { first, last } from 'rxjs/operators';
@@ -14,12 +14,14 @@ import {
 } from '@angular/forms';
 import { VonageapisendsmsService } from '../services/vonageapi/vonageapisendsms.service';
 import { Sendsms } from '../interface/sendsms';
+import { Sendemail } from '../interface/sendemail';
+import { SendemailapiService } from '../services/sendemailapi/sendemailapi.service';
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss']
 })
-export class Tab3Page {
+export class Tab3Page implements OnInit {
   getCartDetails: any = []
 sub: any
 firstname: any;
@@ -35,6 +37,8 @@ public aFormGroup!: FormGroup;
 currentuserid: string = ''
 vonageModal!: Sendsms;
 myotpcode: string = '' 
+sendEmailModal!: Sendemail
+currentuseremail: string = ''
   constructor(private actRoute: ActivatedRoute, 
     //private afstore: AngularFirestore, 
     private afauth: AngularFireAuth,
@@ -43,21 +47,27 @@ myotpcode: string = ''
     private msg: MessengerService,
     private dbservice: DbserviceService,
     private formBuilder: FormBuilder,
-    private vonageservice: VonageapisendsmsService
+    private vonageservice: VonageapisendsmsService,
+    private sendemailapiservice: SendemailapiService
     ) 
     {
-    this.afauth.authState.subscribe((data: any) => 
+    this.afauth.authState.subscribe((data) => 
     {
-      if (data.uid)
+      if (data?.uid)
       {
-        this.currentuserid = data.uid
-        this.dbservice.getDataById('users', data.uid).subscribe((data: any) => 
+        this.currentuserid = data?.uid
+        this.dbservice.getDataById('users', data?.uid).subscribe((data: any) => 
         {
-          this.aFormGroup.controls['firstname'].setValue(data.FirstName);
-          this.aFormGroup.controls['lastname'].setValue(data.LastName);  
-          this.aFormGroup.controls['phonenumber'].setValue(data.PhoneNumber);
-          this.aFormGroup.controls['address'].setValue(data.Address1);
-          this.myotpcode = data.otpcodenumber == null || undefined ? "" : data.otpcodenumber  
+          //this.aFormGroup.controls['firstname'].setValue(data.FirstName);
+          //this.aFormGroup.controls['lastname'].setValue(data.LastName);  
+          //this.aFormGroup.controls['phonenumber'].setValue(data.PhoneNumber);
+          //this.aFormGroup.controls['address'].setValue(data.Address1);
+          //this.firstname = data.FirstName;
+          //this.lastname = data.LastName;
+          //this.phonenumber = data.PhoneNumber;
+          //this.address1 = data.Address1;
+          this.myotpcode = data.otpcodenumber == null || undefined ? 0 : data.otpcodenumber  
+          this.currentuseremail = data.Email;
         });
       }
     })
@@ -281,7 +291,7 @@ myotpcode: string = ''
 
     var alertSentOtp = await this.alertCtrl.create
     ({
-      header: "We've sent you an otp code number to your phone number, type here to proceed",
+      header: `We've sent you an otp code number to your email ${this.currentuseremail}, type the code here to proceed`,
       backdropDismiss: false,
       inputs: 
       [
@@ -289,7 +299,8 @@ myotpcode: string = ''
           type: 'number',
           max: 6,
           label: 'otp',
-          name: 'otp'
+          name: 'otp',
+          placeholder: 'Enter otp code here...'
         }
       ],
       buttons: 
@@ -443,30 +454,33 @@ myotpcode: string = ''
   }
   async sendSMS()
   {
-    var phonenumber = this.aFormGroup.controls['phonenumber'].value
-      phonenumber =  phonenumber.replace(phonenumber[0], "63")
       var newotpcode = Math.floor(Math.random() * 899999 + 100000)
       this.updateCurrentUserOtpCode(newotpcode);
-      this.vonageModal = 
+      this.sendEmailModal = 
       {
-        text: `Hi! your otpcode is ${newotpcode}`,
-        to: phonenumber,
-        from: 'DMixologist'
+        to: this.currentuseremail,
+        subject: "Hi! your otpcode is",
+        html: `<h1>${newotpcode}</h1>`,
+        text: `${newotpcode}`
       }
-      //this.vonageModal.from = 'DMixologist';
-    //this.vonageModal.to = phonenumber;
-    //this.vonageModal.text = `Hi! your otpcode is ${newotpcode}`
-      this.vonageservice.sendSms(this.vonageModal).subscribe((data) => 
-      {
-        console.log("the response of sending sms", data);
-      })  
+      this.sendemailapiservice.sendEmailApi(this.sendEmailModal).subscribe((data) => {})
+      // this.vonageModal = 
+      // {
+      //   text: `Hi! your otpcode is ${newotpcode}`,
+      //   to: phonenumber,
+      //   from: 'DMixologist'
+      // }
+      // this.vonageservice.sendSms(this.vonageModal).subscribe((data) => 
+      // {
+      //   console.log("the response of sending sms", data);
+      // })  
   }
   async updatecodetonone()
   {
     var specificData = 
     {
       otpcodenumber: 0,
-      PhoneNumber: ""
+      //PhoneNumber: ""
     }
     this.dbservice.updateData(this.currentuserid, specificData, 'users').then(() => {})
     .catch(() => {})

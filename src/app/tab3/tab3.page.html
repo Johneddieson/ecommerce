@@ -5,28 +5,28 @@
     <form [formGroup]="aFormGroup">
       <ion-item lines="none">
         <ion-label position="floating">First Name</ion-label>
-        <ion-input  formControlName="firstname" type="text" placeholder="First Name"></ion-input>
+        <ion-input  formControlName="firstname" [(ngModel)]="firstname" type="text" placeholder="First Name"></ion-input>
       </ion-item>
       <p style="color: red;" *ngIf="f['firstname'].errors && f['firstname'].errors['required']">Shouldn't be empty.</p>   
       <p style="color: red;" *ngIf="f['firstname'].errors && f['firstname'].errors['pattern']">This format is not allowed</p> 
       
       <ion-item lines="none">
         <ion-label position="floating">Last Name</ion-label>
-        <ion-input type="text" formControlName="lastname" placeholder="Last Name"></ion-input>
+        <ion-input type="text" formControlName="lastname" [(ngModel)]="lastname" placeholder="Last Name"></ion-input>
       </ion-item>
       <p style="color: red;" *ngIf="f['lastname'].errors && f['lastname'].errors['required']">Shouldn't be empty.</p>   
       <p style="color: red;" *ngIf="f['lastname'].errors && f['lastname'].errors['pattern']">This format is not allowed</p> 
       
       <ion-item lines="none">
         <ion-label position="floating">Phone Number</ion-label>
-        <ion-input type="text" formControlName="phonenumber" placeholder="Phone Number"></ion-input>
+        <ion-input type="text" formControlName="phonenumber" [(ngModel)]="phonenumber" placeholder="Phone Number"></ion-input>
       </ion-item>
       <p style="color: red;" *ngIf="f['phonenumber'].errors && f['phonenumber'].errors['required']">Shouldn't be empty.</p>   
       <p style="color: red;" *ngIf="f['phonenumber'].errors && f['phonenumber'].errors['pattern']">Format(11 Digits): '09XXXXXXXXX.'</p>  
     
       <ion-item lines="none">
         <ion-label position="floating">Address</ion-label>
-        <ion-input type="text" formControlName="address" placeholder="Address"></ion-input>
+        <ion-input type="text" formControlName="address" [(ngModel)]="address1" placeholder="Address"></ion-input>
       </ion-item>
       <p style="color: red;" *ngIf="f['address'].errors && f['address'].errors['required']">Shouldn't be empty.</p>   
     

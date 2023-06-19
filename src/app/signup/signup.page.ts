@@ -19,6 +19,7 @@ export class SignupPage implements OnInit {
   ishide = false;
   continueAsCustomer: any;
   isthisadmin = false;
+  mainpage: string = ''
   constructor(
     private navCtrl: NavController,
     //private auth: AuthServiceService,
@@ -41,13 +42,7 @@ export class SignupPage implements OnInit {
           var thesession = JSON.parse(sessionStorage.getItem('user') as any);
           if (thesession != null) {
             this.ishide = true;
-            if (thesession.displayName == 'customer') {
-              this.continueAsCustomer = `CONTINUE AS ${thesession.displayName.toUpperCase()}`;
-              this.isthisadmin = false;
-            } else {
-              this.continueAsCustomer = `CONTINUE AS ${thesession.displayName.toUpperCase()}`;
-              this.isthisadmin = true;
-            }
+            this.mainpage = `${thesession.displayName.toUpperCase()}` 
           } else {
             this.ishide = false;
           }
@@ -300,4 +295,19 @@ export class SignupPage implements OnInit {
     //   await alertController.present();
     // })
   }
+  navigateURL()
+      {
+        if (this.mainpage == 'ADMIN')
+        {
+            this.navigateadmin()
+        }
+        else if (this.mainpage == 'CUSTOMER')
+        {
+          this.navigatecustomer()
+        }
+        else 
+        {
+          this.router.navigateByUrl(`/${this.mainpage.toLowerCase()}`)
+        }
+      } 
 }
