@@ -89,6 +89,23 @@ export class DbserviceService {
       )
     );
   }
+  resetPassword(email: any): Observable<any>
+  {
+    return from
+    (
+      this.auth.sendPasswordResetEmail
+      (
+        email
+      )
+    ).pipe
+    (
+      catchError
+      (
+        (error: FirebaseError) => 
+      throwError(() => new Error(this.translateFirebaseErrorMessageForSignUp(error)))
+      )
+    );
+  }
 
   translateFirebaseErrorMessageForSignUp({code, message}: FirebaseError) {
     if (code === "auth/admin-restricted-operation") {

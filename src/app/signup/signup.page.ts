@@ -51,51 +51,40 @@ export class SignupPage implements OnInit {
     });
   }
   ResetPassword() {
-    // this.alertCtrl
-    //   .create({
-    //     header: 'Reset Password',
-    //     inputs: [
-    //       {
-    //         name: 'Email',
-    //         placeholder: 'Please type your email',
-    //         type: 'email',
-    //       },
-    //     ],
-    //     buttons: [
-    //       {
-    //         text: 'Ok',
-    //         handler: (data) => {
-    //           console.log('hahaha', data);
-    //           this.auth
-    //             .ForgotPassword(data.Email)
-    //             .then((success) => {
-    //               this.alertCtrl
-    //                 .create({
-    //                   header: 'Success',
-    //                   message:
-    //                     'The reset password code has been sent to your email',
-    //                 })
-    //                 .then((els) => {
-    //                   els.present();
-    //                 });
-    //             })
-    //             .catch((error) => {
-    //               this.alertCtrl
-    //                 .create({
-    //                   header: 'Error',
-    //                   message: 'Email not found',
-    //                 })
-    //                 .then((els2) => {
-    //                   els2.present();
-    //                 });
-    //             });
-    //         },
-    //       },
-    //     ],
-    //   })
-    //   .then((El) => {
-    //     El.present();
-    //   });
+    this.alertCtrl
+      .create({
+        header: 'Reset Password',
+        inputs: [
+          {
+            name: 'Email',
+            placeholder: 'Please type your email',
+            type: 'email',
+          },
+        ],
+        buttons: [
+          {
+            text: 'Ok',
+            handler: (data) => {
+              console.log('hahaha', data);
+              this.dbservice.resetPassword(data.Email)
+                .subscribe((success) => {
+                  this.alertCtrl
+                    .create({
+                      header: 'Success',
+                      message:
+                        'The reset password code has been sent to your email',
+                    })
+                    .then((els) => {
+                      els.present();
+                    });
+                })
+            },
+          },
+        ],
+      })
+      .then((El) => {
+        El.present();
+      });
   }
 
   navigateadmin() {

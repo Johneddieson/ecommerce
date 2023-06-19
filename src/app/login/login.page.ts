@@ -77,22 +77,18 @@ export class LoginPage implements OnInit {
     {
       text: 'Ok',
       handler: (data) => {
-        // this.auth.ForgotPassword(data.Email)
-        // .then(success => {
-        //   this.alertCtrl.create({
-        //     header: 'Success',
-        //     message: 'The reset password code has been sent to your email'
-        //   }).then(els => {
-        //     els.present()
-        //   })
-        // }).catch(error => {
-        //   this.alertCtrl.create({
-        //     header: 'Error',
-        //     message: "Email not found"
-        //   }).then(els2 => {
-        //     els2.present()
-        //   })
-        // })
+        this.dbservice.resetPassword(data.Email)
+        .subscribe((success) => {
+          this.alertCtrl
+            .create({
+              header: 'Success',
+              message:
+                'The reset password code has been sent to your email',
+            })
+            .then((els) => {
+              els.present();
+            });
+        })
       }
     }
   ]

@@ -33,6 +33,7 @@ export class CheckoutPage implements OnInit {
   phonenumber: any;
   email: any;
   uid: any;
+  thenotes: string = ''
   constructor(private applicationRef: ApplicationRef,
     private zone: NgZone,
     private alertCtrl: AlertController, 
@@ -189,6 +190,7 @@ refreshMaterials()
     
     i.Materials.map((iMat: any, index: any) => 
     {
+      
      // iMat.Quantity = i.Quantity
       if (i.Category != "Slushee")
       {
@@ -200,6 +202,11 @@ refreshMaterials()
       }
     })
   })
+// var MaterialsArray =  this.getCartDetails.map((e: any) => {return e.Materials});
+// var flatten = _.flatten(MaterialsArray);
+//  var materialText = flatten.map((e: any) => {return `${e.Quantity} pcs ${e.itemName}`}).join(', ')
+//  //console.log("materialText", materialText)
+//  this.thenotes = materialText;
 }
 
   removeall() {
@@ -458,7 +465,7 @@ async OrderAutoApprove()
     {
     this.refreshMaterials()
     var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
-
+    this.materialsText()
     if (this.paymentMethod != 'Cash')
     {
       var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
@@ -482,6 +489,7 @@ async OrderAutoApprove()
         }
         else 
         {
+          //dito ilalagay yung notes
        this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, '')
        .subscribe((data) => 
        {
@@ -502,7 +510,7 @@ async OrderAutoApprove()
         DatetimeToSort: new Date(),
         Discount: "None",
         PaymentMethod: this.paymentMethod,
-        Note: '',
+        Note: this.thenotes,
         paymentReference: data.data.attributes.reference_number
       };
       this.dbservice.postData('Orders', specificdataForOrderCollection);
@@ -512,6 +520,7 @@ async OrderAutoApprove()
     }
     else 
     {
+      //dito ilalagay yung notes
       const specificdataForOrderCollectionForCash = 
       {
         OrderDetails: this.getCartDetails,
@@ -528,7 +537,7 @@ async OrderAutoApprove()
         DatetimeToSort: new Date(),
         Discount: "None",
         PaymentMethod: this.paymentMethod,
-        Note: '',
+        Note: this.thenotes,
         paymentReference: 'COD'
  
       };
@@ -610,5 +619,23 @@ clearShippingDetails()
     Address1: ""
   }
   this.dbservice.updateData(this.uid, specificData, 'users')
+}
+materialsText()
+{
+  this.getCartDetails.map((i: any, index: any) => 
+  {
+    i.Materials.map((iMat: any, index: any) => 
+    {
+      
+        iMat.itemName = i.ProductName.toLowerCase().includes('large') ? iMat.itemName + " Large" : iMat.itemName + " Medium" 
+      
+      
+    })
+  })
+var MaterialsArray =  this.getCartDetails.map((e: any) => {return e.Materials});
+
+var flatten = _.flatten(MaterialsArray);
+ var materialText = flatten.map((e: any) => {return `${e.Quantity} pcs ${e.itemName}`}).join(', ')
+ this.thenotes = materialText;
 }
 }
