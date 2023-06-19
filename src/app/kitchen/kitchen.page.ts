@@ -81,8 +81,8 @@ public disabledSaveChanges: boolean = false
               if (this.startDateFilter != '' && this.endDateFilter != '')
               {
                 dataorders = dataorders.filter(f => 
-                  moment(f.Datetime).toDate() >= moment(this.startDateFilter).toDate()
-                  && moment(f.Datetime).toDate() <= moment(this.endDateFilter).toDate()
+                  moment(f.Datetime).toDate() >= moment(this.startDateFilter + " 00:00").toDate()
+                  && moment(f.Datetime).toDate() <= moment(this.endDateFilter + " 23:59").toDate()
                   
                   )
               }

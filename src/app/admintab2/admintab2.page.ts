@@ -65,8 +65,8 @@ export class Admintab2Page implements OnInit {
         if (this.startDateFilter != '' && this.endDateFilter != '')
         {
           dataHistory = dataHistory.filter(f => 
-            moment(f.Datetime).toDate() >= moment(this.startDateFilter).toDate()
-            && moment(f.Datetime).toDate() <= moment(this.endDateFilter).toDate()
+            moment(f.Datetime).toDate() >= moment(this.startDateFilter + " 00:00").toDate()
+            && moment(f.Datetime).toDate() <= moment(this.endDateFilter + " 23:59").toDate()
             
             )
         }
