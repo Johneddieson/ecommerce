@@ -60,7 +60,7 @@ public disabledSaveChanges: boolean = false
     .subscribe((dataorders) => 
     {
               dataorders = dataorders.sort((a: any, b: any) => Number(b.DatetimeToSort) - Number(a.DatetimeToSort))
-              dataorders = dataorders.filter(f => f.Status != "Delivered");
+              dataorders = dataorders.filter(f => f.Status != "Delivered" && f.Type == 'Online');
               dataorders.map((i: any, index: any) => 
               {
                 if (i.PaymentMethod != 'Cash')

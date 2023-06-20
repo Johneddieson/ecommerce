@@ -114,6 +114,7 @@ export class ViewproductsPage implements OnInit {
             //   Destination: 'Admin'
             // })
             // this.afstore.doc(`Products/${data.id}`).delete()
+            this.dbservice.deleteData(data.id, 'Products').then(() => {})
           }
         },
         {

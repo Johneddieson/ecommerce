@@ -16,7 +16,7 @@
             <ion-label style="font-weight: bolder; color: black;">TOTAL OF {{data.TotalAmount | currency:
                 '₱'}}</ion-label>
         </ion-card-content>
-        <ion-row *ngIf="data.paymentStatus == 'unpaid' && data.Status == 'To Deliver'">
+        <ion-row *ngIf="data.paymentStatus == 'unpaid' && data.Status != 'Approved'">
             <ion-button color="danger" href="{{data.paymentUrl}}" target="_blank">
                 <p>Pay now!</p>
             </ion-button>

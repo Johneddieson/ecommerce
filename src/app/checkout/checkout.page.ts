@@ -511,7 +511,8 @@ async OrderAutoApprove()
         Discount: "None",
         PaymentMethod: this.paymentMethod,
         Note: this.thenotes,
-        paymentReference: data.data.attributes.reference_number
+        paymentReference: data.data.attributes.reference_number,
+        Type: 'Online'
       };
       this.dbservice.postData('Orders', specificdataForOrderCollection);
        })
@@ -538,7 +539,8 @@ async OrderAutoApprove()
         Discount: "None",
         PaymentMethod: this.paymentMethod,
         Note: this.thenotes,
-        paymentReference: 'COD'
+        paymentReference: 'COD',
+        Type: 'Online'
  
       };
       this.dbservice.postData('Orders', specificdataForOrderCollectionForCash);

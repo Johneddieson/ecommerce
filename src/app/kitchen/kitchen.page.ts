@@ -514,16 +514,14 @@ async delivered(data: any)
   {
     var items = data.OrderDetails.map(function (e: any) 
     { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ${e.UnitPrice} pesos` }).join(', ')
-      this.smsModal = 
-      {
-        from: 'DMixologist',
-        text: `Your order ${items} has been delivered!`,
-        to: data.BillingPhonenumber.replace(data.BillingPhonenumber[0], "63")
-      }
-    this.vonageservice.sendSms(this.smsModal).subscribe((data) => 
+    this.sendemailModal = 
     {
-      console.log("success sent message", data)
-    })
+      to: data.Billingemail,
+      subject: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order has been delivered.`,
+      html: `<h1>${items}</h1>`,
+      text: `Hi! ${data.BillingFirstname} ${data.BillingLastname}, your order has been delivered.`
+    }
+    this.sendemailapiservice.sendEmailApi(this.sendemailModal).subscribe(() => {})  
     var markAsDelivered = 
     {
       Status: "Delivered"

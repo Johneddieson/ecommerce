@@ -266,37 +266,13 @@ async OrderNow() {
                               
                       this.alertCtrl.create({
                 message:  `${data.Name} ${length} has been approved!`,
-                backdropDismiss: false,
                 buttons: [
                   {
                     text: 'Ok',
                     handler: (datawew: any) => 
                     {
                                             //Orders Saving Walk In
-                    var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
-                    var specificdataForOrderCollection = 
-                    {
-                        OrderDetails: this.getCartDetails,
-                        BillingFirstname: data.Name,
-                        BillingLastname: "Walk-In",
-                        BillingAddress1: "Walk-In",
-                        BillingAddress2: "Walk-In",
-                        BillingPhonenumber: "Walk-In",
-                        Billingemail: "Walk-In",
-                        BillingIndexId: "",
-                        Status: 'Delivered',
-                        Datetime: datetime,
-                        TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-                        DatetimeToSort: new Date(),
-                        Discount: this.discount,
-                        PaymentMethod: this.paymentMethod,
-                        Note: note[0]
-                    };
-                    this.dbservice.postData('Orders', specificdataForOrderCollection)
-                    .then((el) => 
-                    {
-                      orderid = el.id
-                     
+                    var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")                      
                           //Paymongo Create Link
                           this.createAPIPaymentLink(
                             data.Name,
@@ -315,12 +291,8 @@ async OrderNow() {
                               this.removeall()
                               this.discount = 'None'
                               this.paymentMethod = ''
-                            }, 4000);
-                })
-                    .catch((err) => 
-                    {
-
-                    })
+                            }, 3000);
+                
                     }
                   }
                 ]
@@ -557,17 +529,15 @@ getMaterialOfProducts(Data: any, ProductName: any)
        var descriptionfinal = `${Name} WALK-IN : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
        var totalForAPIPayment = parseInt(this.total + "00")
        //console.log("the payment", this.paymentMethod)
-       if (this.paymentMethod != 'Cash')
-       {
-        this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, note)
-        .subscribe((data) => 
-        {
-          //Sending Email Service
-          this.sendemailModal = 
-          {
-            to: email,
-            subject: `Hi! ${Name}, here is your payment link`,
-            html: ` <a href="https://pm.link/Dmixologist/${data.data.attributes.reference_number}" target='_blank' style='background-color: #4CAF50;
+       if (this.paymentMethod != 'Cash') {
+         this.paymongoservice
+           .createPaymentLink(totalForAPIPayment, descriptionfinal, note)
+           .subscribe((data) => {
+             //Sending Email Service
+             this.sendemailModal = {
+               to: email,
+               subject: `Hi! ${Name}, here is your payment link`,
+               html: ` <a href="https://pm.link/Dmixologist/${data.data.attributes.reference_number}" target='_blank' style='background-color: #4CAF50;
             border: none;
             color: white;
             padding: 15px 32px;
@@ -576,8 +546,8 @@ getMaterialOfProducts(Data: any, ProductName: any)
             display: inline-block;
             font-size: 16px;
             margin: 4px 2px;
-            cursor: pointer;'>Link Button</a>`,
-            text: ` <a href="https://pm.link/Dmixologist/${data.data.attributes.reference_number}" target='_blank' style='background-color: #4CAF50;
+            cursor: pointer;'>Pay now!</a>`,
+               text: ` <a href="https://pm.link/Dmixologist/${data.data.attributes.reference_number}" target='_blank' style='background-color: #4CAF50;
             border: none;
             color: white;
             padding: 15px 32px;
@@ -586,76 +556,62 @@ getMaterialOfProducts(Data: any, ProductName: any)
             display: inline-block;
             font-size: 16px;
             margin: 4px 2px;
-            cursor: pointer;'>Link Button</a>`
-          }
-          this.sendemailservice.sendEmailApi(this.sendemailModal).subscribe(() => {})
-
-               //History Saving
-               var specificDataObjectForHistoryCollection = 
-               {
-                   BillingAddress1: "Walk-In",
-                   BillingAddress2: "Walk-In",
-                   BillingFirstname: Name,
-                   BillingIndexId: "",
-                   BillingLastname: "Walk-In",
-                   BillingPhonenumber: "Walk-In",
-                   Billingemail: "Walk-In",
-                   Datetime: datetime,
-                   Status: "Delivered",
-                   TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-                   id: orderid,
-                   OrderDetails: this.getCartDetails,
-                   read: false,
-                   DatetimeToSort: new Date(),
-                   Discount: this.discount,
-                   PaymentMethod: this.paymentMethod,
-                   Note: note,
-                   paymentReference: this.paymentMethod != 'Cash' ?  data.data.attributes.reference_number : 'COD'
-                  };
-                 this.dbservice.postData('History', specificDataObjectForHistoryCollection).then((el) => 
-                 {
-                  this.router.navigateByUrl(`/adminpage/atab2`);
-                 }).catch((err) => 
-                 {
-                  alert("Error posting history collection.");
-                 })
-                 //End of History Saving
-        })
-       }
+            cursor: pointer;'>Pay now!</a>`,
+             };
+             this.sendemailservice
+               .sendEmailApi(this.sendemailModal)
+               .subscribe(() => {});
+           
+           
+         //Orders Saving Walk In
+         var specificdataForOrderCollection = {
+          OrderDetails: this.getCartDetails,
+          BillingFirstname: Name,
+          BillingLastname: 'Walk-In',
+          BillingAddress1: 'Walk-In',
+          BillingAddress2: 'Walk-In',
+          BillingPhonenumber: 'Walk-In',
+          Billingemail: 'Walk-In',
+          BillingIndexId: '',
+          Status: 'Preparing',
+          Datetime: datetime,
+          TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+          DatetimeToSort: new Date(),
+          Discount: 'None',
+          PaymentMethod: this.paymentMethod,
+          Note: note,
+          paymentReference: data.data.attributes.reference_number,
+          Type: 'POS',
+        };
+        this.dbservice.postData('Orders', specificdataForOrderCollection).then(() => {})
+           
+           
+              });
+       } 
        else 
        {
-        var specificDataObjectForHistoryCollection = 
-        {
-            BillingAddress1: "Walk-In",
-            BillingAddress2: "Walk-In",
-            BillingFirstname: Name,
-            BillingIndexId: "",
-            BillingLastname: "Walk-In",
-            BillingPhonenumber: "Walk-In",
-            Billingemail: "Walk-In",
-            Datetime: datetime,
-            Status: "Delivered",
-            TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-            id: orderid,
-            OrderDetails: this.getCartDetails,
-            read: false,
-            DatetimeToSort: new Date(),
-            Discount: this.discount,
-            PaymentMethod: this.paymentMethod,
-            Note: note,
-            paymentReference: 'COD'
-        };
-          this.dbservice.postData('History', specificDataObjectForHistoryCollection).then((el) => 
-          {
-            //  if (this.paymentMethod != 'Cash')
-            //  {
-            //    this.router.navigateByUrl(`/historybyid/${el.id}`)
-            //  }
-          }).catch((err) => 
-          {
-           alert("Error posting history collection.");
-          })
+         //Orders Saving Walk In
+         var specificdataForOrderCollection = {
+           OrderDetails: this.getCartDetails,
+           BillingFirstname: Name,
+           BillingLastname: 'Walk-In',
+           BillingAddress1: 'Walk-In',
+           BillingAddress2: 'Walk-In',
+           BillingPhonenumber: 'Walk-In',
+           Billingemail: 'Walk-In',
+           BillingIndexId: '',
+           Status: 'Preparing',
+           Datetime: datetime,
+           TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+           DatetimeToSort: new Date(),
+           Discount: 'None',
+           PaymentMethod: this.paymentMethod,
+           Note: note,
+           paymentReference: '',
+           Type: 'POS',
+         };
+         this.dbservice.postData('Orders', specificdataForOrderCollection).then(() => {})
        }
-  
+     
   }
 }

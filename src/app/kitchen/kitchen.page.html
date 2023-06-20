@@ -68,9 +68,9 @@
       <br>
       Total Amount : {{data.TotalAmount | currency: '₱'}}
       <br>
-      {{data.paymentStatus == 'paid' ? '(PAID)' : '(UNPAID)'}}
-      <br>
       Status : {{data.Status}}
+        <br>
+        {{data.paymentStatus == 'paid' ? '(PAID) - ' + data.Type   : '(UNPAID) - ' + data.Type}}
     </ion-label> 
       
     </ion-item>
@@ -88,7 +88,8 @@
         </ion-label>
     </ion-item> 
     <!-- (click)="approveOrder(data)" -->
-      <ion-button *ngIf="data.Status == 'Preparing'" size="small"  color="success" (click)="markasdone(data)">Mark as done</ion-button>
+      <ion-button *ngIf="data.Status == 'Preparing' && data.Type == 'Online'" size="small"  color="success" (click)="markasdone(data)">Mark as done</ion-button>
+      <ion-button *ngIf="data.Status == 'Preparing' && data.Type == 'POS'" size="small"  color="success" (click)="delivered(data)">Delivered</ion-button>
     </ion-list>
   </ion-accordion>
   
