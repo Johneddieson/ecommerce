@@ -7,11 +7,11 @@ import { Sendemail } from 'src/app/interface/sendemail';
   providedIn: 'root'
 })
 export class SendemailapiService {
-
+public sendEmailAPI: string = 'https://dmixologistsendemailapi.onrender.com/sendemailapi/sendemail'
   constructor(private http: HttpClient) { }
 
   sendEmailApi(data: Sendemail)
   {
-    return this.http.post('http://localhost:3000/sendemailapi/sendemail', data) as Observable<any>;
+    return this.http.post(`${this.sendEmailAPI}`, data) as Observable<any>;
   }
 }
