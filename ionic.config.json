@@ -1,5 +1,7 @@
 {
   "name": "dmixologist",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }
