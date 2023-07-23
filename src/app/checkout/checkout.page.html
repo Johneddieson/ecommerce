@@ -5,6 +5,9 @@
     </ion-buttons>
 
     <ion-buttons  slot="end" *ngIf="total > 0">
+      <ion-button color="light" (click)="selectDiscount()">
+        <img class="discount" />
+        </ion-button>
       <ion-button color="light" (click)="selectPaymentMethod()">
         <img class="paymentMethod" />
       </ion-button>
@@ -62,6 +65,7 @@
           <!-- <div *ngFor="let datamaterials of data.Materials">
             <p>{{datamaterials.Quantity}}x {{datamaterials.itemName}}</p>
           </div> -->
+          <p style="font-weight: 10;">Condiments :</p>
           <p *ngFor="let datamaterials of data.Materials" style="color: #434343; font-weight: bolder; font-size: 15px;"><input style="width: 44px;" (change)="editQuantity($event, datamaterials)" type="number" value="{{datamaterials.Quantity}}" /> {{datamaterials.itemName}}</p>
           <p style="color: var(--ion-color-primary); font-weight: bolder;">{{data.UnitPrice | currency: '₱'}}</p>
           <div class="qty-selector">
@@ -108,10 +112,18 @@
       <ion-label>Sub Total</ion-label>
       <ion-label slot="end" class="ion-text-right">₱160.00</ion-label>
     </ion-item> -->
+
     <!-- <ion-item lines="none">
       <ion-label>Discount</ion-label>
       <ion-label slot="end" class="ion-text-right">5%</ion-label>
     </ion-item> -->
+
+    
+    <ion-item>
+      <ion-label>Discount</ion-label>
+      <ion-label slot="end" class="ion-text-justify">{{discount}}</ion-label>
+    </ion-item>
+
     <ion-item>
       <ion-label>Payment Method</ion-label>
       <ion-label slot="end" class="ion-text-justify">{{paymentMethod}}</ion-label>

@@ -353,15 +353,15 @@ async selectDiscount()
       },
       {
         type: 'radio',
-        label: 'PWD less 30',
-        name: 'PWD less 30',
-        value: 'PWD less 30'
+        label: 'PWD less 20',
+        name: 'PWD less 20',
+        value: 'PWD less 20'
       },
       {
         type: 'radio',
-        label: 'Senior Citizen less 50',
-        name: 'Senior Citizen less 50',
-        value: 'Senior Citizen less 50'
+        label: 'Senior Citizen less 20',
+        name: 'Senior Citizen less 20',
+        value: 'Senior Citizen less 20'
       }
     ],
     buttons: 
@@ -370,18 +370,20 @@ async selectDiscount()
         text: 'Select',
         handler: (data) => 
         {
-          if (data == 'Senior Citizen less 50')
+          if (data == 'Senior Citizen less 20')
             {
               this.discount = ''
               this.loadCart()
-              this.total = this.total - 50
+              var discountpercent = (this.total * 20) / 100
+              this.total = this.total - discountpercent
               this.discount = data
             }
-            else if (data == 'PWD less 30')
+            else if (data == 'PWD less 20')
             {
               this.discount = ''
               this.loadCart()
-              this.total = this.total - 30
+              var discountpercent = (this.total * 20) / 100
+              this.total = this.total - discountpercent
               this.discount = data      
             }
             else 

@@ -34,6 +34,7 @@ export class CheckoutPage implements OnInit {
   email: any;
   uid: any;
   thenotes: string = ''
+  discount: string = 'None'
   constructor(private applicationRef: ApplicationRef,
     private zone: NgZone,
     private alertCtrl: AlertController, 
@@ -463,89 +464,110 @@ async OrderAutoApprove()
     }
     else 
     {
-    this.refreshMaterials()
-    var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
-    this.materialsText()
-    if (this.paymentMethod != 'Cash')
-    {
-      var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
-       var descriptionfinal = `${this.firstname} ${this.lastname} : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
-       var totalForAPIPayment = parseInt(this.total + "00")
-        if (this.total < 100)
-        {
-          var minimumifgcashalert = await this.alertCtrl.create
-          ({
-            message: 'You chosen online payment, It should be 100 pesos minimum order.',
-            backdropDismiss: false,
-            buttons: 
-            [
+      var commentalert = await this.alertCtrl.create({
+        header: 'Write some note here...',
+        inputs: 
+        [
+          {
+            type: 'textarea',
+            label: 'Note',
+            placeholder: 'Write some notes here...'
+          }
+        ],
+        buttons: 
+        [
+          {
+            text: 'Submit',
+            handler: (async (note) => 
+            {
+              this.refreshMaterials()
+              var datetime = moment(new Date()).format("MM-DD-YYYY hh:mm A")
+              this.materialsText()
+              if (this.paymentMethod != 'Cash')
               {
-                text: 'Close',
-                role: 'cancel'
+                var descriptionofCreatingPaymentLink = this.getCartDetails.map(function (e: any) { return `${e.ProductName}(${e.Quantity} pcs), Unit price of ₱${e.UnitPrice}` }).join(', ')
+                 var descriptionfinal = `${this.firstname} ${this.lastname} : ${descriptionofCreatingPaymentLink}. Total amount of ₱${this.total}`
+                 var totalForAPIPayment = parseInt(this.total + "00")
+                  if (this.total < 100)
+                  {
+                    var minimumifgcashalert = await this.alertCtrl.create
+                    ({
+                      message: 'You chosen online payment, It should be 100 pesos minimum order.',
+                      backdropDismiss: false,
+                      buttons: 
+                      [
+                        {
+                          text: 'Close',
+                          role: 'cancel'
+                        }
+                      ]
+                    })
+                    await minimumifgcashalert.present();
+                  }
+                  else 
+                  {
+                    //dito ilalagay yung notes
+                 this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, '')
+                 .subscribe((data) => 
+                 {
+                    
+                const specificdataForOrderCollection = 
+                {
+                  OrderDetails: this.getCartDetails,
+                  BillingFirstname: this.firstname,
+                  BillingLastname: this.lastname,
+                  BillingAddress1: this.myaddress,
+                  BillingAddress2: '',
+                  BillingPhonenumber: this.phonenumber,
+                  Billingemail: this.email,
+                  BillingIndexId: this.uid,
+                  Status: 'Approved',
+                  Datetime: datetime,
+                  TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+                  DatetimeToSort: new Date(),
+                  Discount: this.discount,
+                  PaymentMethod: this.paymentMethod,
+                  Note: this.thenotes + " " + `(${note[0]})`,
+                  paymentReference: data.data.attributes.reference_number,
+                  Type: 'Online'
+                };
+                this.dbservice.postData('Orders', specificdataForOrderCollection);
+                 })
+                 this.successorderalert()
+                }
               }
-            ]
-          })
-          await minimumifgcashalert.present();
-        }
-        else 
-        {
-          //dito ilalagay yung notes
-       this.paymongoservice.createPaymentLink(totalForAPIPayment, descriptionfinal, '')
-       .subscribe((data) => 
-       {
-          
-      const specificdataForOrderCollection = 
-      {
-        OrderDetails: this.getCartDetails,
-        BillingFirstname: this.firstname,
-        BillingLastname: this.lastname,
-        BillingAddress1: this.myaddress,
-        BillingAddress2: '',
-        BillingPhonenumber: this.phonenumber,
-        Billingemail: this.email,
-        BillingIndexId: this.uid,
-        Status: 'Approved',
-        Datetime: datetime,
-        TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-        DatetimeToSort: new Date(),
-        Discount: "None",
-        PaymentMethod: this.paymentMethod,
-        Note: this.thenotes,
-        paymentReference: data.data.attributes.reference_number,
-        Type: 'Online'
-      };
-      this.dbservice.postData('Orders', specificdataForOrderCollection);
-       })
-       this.successorderalert()
-      }
-    }
-    else 
-    {
-      //dito ilalagay yung notes
-      const specificdataForOrderCollectionForCash = 
-      {
-        OrderDetails: this.getCartDetails,
-        BillingFirstname: this.firstname,
-        BillingLastname: this.lastname,
-        BillingAddress1: this.myaddress,
-        BillingAddress2: '',
-        BillingPhonenumber: this.phonenumber,
-        Billingemail: this.email,
-        BillingIndexId: this.uid,
-        Status: 'Approved',
-        Datetime: datetime,
-        TotalAmount: parseFloat(this.total.toString()).toFixed(2),
-        DatetimeToSort: new Date(),
-        Discount: "None",
-        PaymentMethod: this.paymentMethod,
-        Note: this.thenotes,
-        paymentReference: 'COD',
-        Type: 'Online'
- 
-      };
-      this.dbservice.postData('Orders', specificdataForOrderCollectionForCash);
-      this.successorderalert()
-    }
+              else 
+              {
+                //dito ilalagay yung notes
+                const specificdataForOrderCollectionForCash = 
+                {
+                  OrderDetails: this.getCartDetails,
+                  BillingFirstname: this.firstname,
+                  BillingLastname: this.lastname,
+                  BillingAddress1: this.myaddress,
+                  BillingAddress2: '',
+                  BillingPhonenumber: this.phonenumber,
+                  Billingemail: this.email,
+                  BillingIndexId: this.uid,
+                  Status: 'Approved',
+                  Datetime: datetime,
+                  TotalAmount: parseFloat(this.total.toString()).toFixed(2),
+                  DatetimeToSort: new Date(),
+                  Discount: this.discount,
+                  PaymentMethod: this.paymentMethod,
+                  Note: this.thenotes + " " + `(${note[0]})`,
+                  paymentReference: 'COD',
+                  Type: 'Online'
+           
+                };
+                this.dbservice.postData('Orders', specificdataForOrderCollectionForCash);
+                this.successorderalert()
+              }
+            })
+          }
+        ]
+      })
+      await commentalert.present();
   }
 }
 }
@@ -639,5 +661,69 @@ var MaterialsArray =  this.getCartDetails.map((e: any) => {return e.Materials});
 var flatten = _.flatten(MaterialsArray);
  var materialText = flatten.map((e: any) => {return `${e.Quantity} pcs ${e.itemName}`}).join(', ')
  this.thenotes = materialText;
+}
+
+async selectDiscount()
+{
+  var discountAlert = await this.alertCtrl.create({
+    header: 'Select discount category',
+    inputs: 
+    [
+      {
+        type: 'radio',
+        label: 'None',
+        name: 'None',
+        value: 'None'
+      },
+      {
+        type: 'radio',
+        label: 'PWD less 20',
+        name: 'PWD less 20',
+        value: 'PWD less 20'
+      },
+      {
+        type: 'radio',
+        label: 'Senior Citizen less 20',
+        name: 'Senior Citizen less 20',
+        value: 'Senior Citizen less 20'
+      }
+    ],
+    buttons: 
+    [
+      {
+        text: 'Select',
+        handler: (data) => 
+        {
+          if (data == 'Senior Citizen less 20')
+            {
+              this.discount = ''
+              this.loadCart()
+              var discountpercent = (this.total * 20) / 100
+              this.total = this.total - discountpercent
+              this.discount = data
+            }
+            else if (data == 'PWD less 20')
+            {
+              this.discount = ''
+              this.loadCart()
+              var discountpercent = (this.total * 20) / 100
+              this.total = this.total - discountpercent
+              this.discount = data      
+            }
+            else 
+            {
+              this.discount = ''
+              this.loadCart()
+              this.discount = data
+            }
+        }
+      },
+      {
+        text: 'Close',
+        role: 'cancel'
+      }
+    ]
+  })
+  await discountAlert.present();
 }
 }
