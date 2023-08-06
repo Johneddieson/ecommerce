@@ -264,6 +264,7 @@ export class AddProductPage implements OnInit {
     data.append('file', files[0]);
     //00fb1c6ab7c377f68517
     // data.append('UPLOADCARE_PUB_KEY', '760e7038539ea9dd5176')
+    //atute13@gmail.com
     data.append('UPLOADCARE_PUB_KEY', '2f6b781d802ebb97d2e3');
     this.http
       .post('https://upload.uploadcare.com/base/', data)

@@ -17,6 +17,7 @@ import { AsyncPipe, CurrencyPipe} from '@angular/common';
 import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { MessagingService } from './services/messaging.service';
 import { provideMessaging,getMessaging } from '@angular/fire/messaging';
+
 @NgModule({
   declarations: [AppComponent],
   imports: 

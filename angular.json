@@ -36,6 +36,8 @@
             "styles": ["src/theme/variables.scss", "src/global.scss"],
             "scripts": 
             [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/owl.carousel/dist/owl.carousel.js"
             ]
           },
           "configurations": {
@@ -82,9 +84,6 @@
             },
             "development": {
               "browserTarget": "app:build:development"
-            },
-            "ci": {
-              "progress": false
             }
           },
           "defaultConfiguration": "development"
@@ -119,6 +118,8 @@
             "styles": ["src/theme/variables.scss", "src/global.scss"],
             "scripts": 
             [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/owl.carousel/dist/owl.carousel.js"
             ]
           },
           "configurations": {
@@ -143,7 +144,8 @@
   "cli": {
     "schematicCollections": [
       "@ionic/angular-toolkit"
-    ]
+    ],
+    "analytics": "4fd6a955-311a-4d1a-b5c8-48065f2ca4af"
   },
   "schematics": {
     "@ionic/angular-toolkit:component": {

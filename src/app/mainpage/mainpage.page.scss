@@ -1,70 +1,11 @@
-ion-content {
-    --background:  url('../../assets/milktea4.jpg') no-repeat center center / cover;
-   // background-color: #654c05;
-   // background: linear-gradient(120deg,#2980b9, #8e44ad);
-   background: linear-gradient(120deg,#2980b9, #8e44ad);
-  }
-
-
-@media(min-width: 768px) {
-    .mobile-header {
-        display: none;
-    }
-    .header {
-        display: flex;
-        //background: #92949c;
-        background: linear-gradient(120deg,#2980b9, #8e44ad);
-        padding-left: 40px;
-        padding-right: 40px;
-    }
-}
-
-@media(max-width: 768px) {
-    .mobile-header {
-        display: block;
-    }
-    .header {
-        display: none;
-      
-    }
-}
-
-.active-item {
-    border-bottom: 2px solid var(--ion-color-dark);
-}
-
-.dropdown {
-    width: 136px;
-    height: 150px;
-    background: #fff;
-    position: absolute;
-    top: 40px;
-    left: 87px;
-    z-index: 1;
-    ion-item:hover {
-        --ion-item-color: var(--ion-color-primary);
-    }
-}
-// ion-content {
-//     --ion-background-color: linear-gradient(120deg,#2980b9, #8e44ad);
+// #stick
+// {
+//     position: sticky;
+//     top: 0;
 // }
 
-.hero {
-    background-image: url('https://ucarecdn.com/b4223107-fa83-4409-9ca9-b80e6ef36a5d/mixologistremovebgpreview.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    height: 30vh;
-    width: 100%;
-}
-
-
-ion-grid {
-    --ion-grid-padding-sm: 20px;
-    --ion-grid-padding-md: 30px;
-    --ion-grid-padding-lg: 40px;
-    --ion-grid-padding-xl: 100px;
-}
-h1 {
-    text-transform: uppercase;
+.img-fluid2
+{
+    width: 150%;
+    height: auto;
 }
