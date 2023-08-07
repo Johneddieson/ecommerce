@@ -1,5 +1,5 @@
 import { ApplicationRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, IonContent } from '@ionic/angular';
 import { map } from 'rxjs/operators';
 import * as firebase from 'firebase/app'
 import { MessengerService } from '../messenger.service';
@@ -22,9 +22,13 @@ cartItem:number = 0
 @Input()title!: string;
 dropdown = false;
 @ViewChild('productbtn', {read: ElementRef}) productbtn!: ElementRef;
+@ViewChild(IonContent) content!: IonContent;
 private unsubscriber : Subject<void> = new Subject<void>();
 pendingorder: any
-  constructor(private msg: MessengerService, 
+currentPage: number = 1;
+testproducts: any[] = []
+public productLength: number = 0
+constructor(private msg: MessengerService, 
     private alertCtrl: AlertController, 
     private locationStrategy: LocationStrategy,
     private router: Router,
@@ -43,52 +47,18 @@ pendingorder: any
           }, 0)
         })
       })
-//     this.afauth.authState.subscribe(user => {
-
-//       if (user && user.uid) {
-
-// this.meReference = this.afstore.doc(`users/${user.uid}`);
-// this.sub2 = this.meReference.valueChanges().subscribe(myobjectInformation => 
-//   {
-//       this.pendingorder = myobjectInformation.pendingorder
-//   })
-
-//        this.actRoute.queryParams.subscribe(params => {
-//         if (params.category == undefined) {
-//           this.productReference =  afstore.collection('Products')
-       
-//         } else {
-//           this.productReference =  afstore.collection('Products', ref => ref.where("Category", "==", params.category))
-//         }
-//         this.sub = this.productReference.snapshotChanges().pipe(map(actions => actions.map(a => {
-//           return {
-//             id: a.payload.doc.id,
-//             ...a.payload.doc.data() as any
-//           }
-//          }))).subscribe(data => {
-//           data = data.sort(function(a, b) {
-//             if (a.ProductName < b.ProductName) {
-//               return -1
-//             }
-//             if (a.ProductName > b.ProductName) {
-//               return 1
-//             }
-//             return 0
-//           })
-//           this.productList = data
-//          }) 
-//        })  
-//       }
-//     })
-     
-this.getProducts()
+      this.getProducts()     
    }
    getProducts()
    {
-    this.actRoute.queryParams.subscribe((params: any) => 
-    {
-      this.dbservice.getData('Products').subscribe((data) => 
+      this.dbservice.getData('Products').subscribe(async (data) => 
       {
+          data.map((i) => 
+          {
+            var imageConverted = i.ImageUrl.split("/")
+            i.ImageConverted = `${imageConverted[0]}//${imageConverted[2]}/${imageConverted[3]}//-/contrast/3/-/filter/cyren/100/-/preview/400x400/`
+          })
+
                   data = data.sort(function(a, b) {
                     if (a.ProductName < b.ProductName) {
                       return -1
@@ -98,20 +68,12 @@ this.getProducts()
                     }
                     return 0
                   })
-                  if (params.category == undefined)
-                  {
-                    this.productList = data;
-                  }
-                  else 
-                  {
-                    this.productList = data.filter(f => f.Category == params.category);
-                  }
+                    this.productList = data;        
       })
-    })
+   
    }
 
   ngOnInit(): void {
-    
     this.router.events.subscribe(() => {
       this.zone.run(() => {
         setTimeout(() => {
@@ -120,9 +82,13 @@ this.getProducts()
         }, 0)
       })
     })
-var wew = sessionStorage.getItem('cart')
-console.log(wew)
+  
+}
+  changePage(page: number): void
+  {
+    this.currentPage = page;
   }
+
 loadCart() {
   if (sessionStorage.getItem('cart') != null) {
 var thearray = []
@@ -367,4 +333,46 @@ async queryProducts(params: any)
   console.log("params", params)
   this.productList = this.productList.filter(f => f.Category == params);
 }
+onScroll(event: any)
+    {
+      //console.log("Wew", event.detail.scrollTop)
+      if (event.detail.scrollTop > 300)
+      {
+        $('.sticky-top').addClass('shadow-sm').css('top', '0px');
+      }
+      else 
+      {
+        $('.sticky-top').removeClass('shadow-sm').css('top', '-150px');
+      }
+    }
+
+      backtoTop()
+      {
+        this.content.scrollToTop(400);
+      }
+
+      checkIfExisting(data: any)
+      {
+        var  cart = JSON.parse(sessionStorage.getItem('cart') as any)
+         
+        if (cart == undefined || cart == null || cart.length == 0)
+        {
+          return false
+        }
+        else 
+        {
+          var existinglength;  
+            if(data.Category == 'Slushee')
+            {
+             existinglength = cart.filter((f: any) => f.id == data.id && f.ProductName == data.ProductName)
+            }
+            else 
+            {
+              existinglength = cart.filter((f: any) => (f.id == data.id && f.ProductName == data.ProductName + " Medium") ||
+              (f.id == data.id && f.ProductName == data.ProductName + " Large"))
+            }
+          return existinglength.length <= 0 ? false : true
+        }
+      
+      }
 }

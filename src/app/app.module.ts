@@ -17,7 +17,7 @@ import { AsyncPipe, CurrencyPipe} from '@angular/common';
 import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { MessagingService } from './services/messaging.service';
 import { provideMessaging,getMessaging } from '@angular/fire/messaging';
-
+// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   declarations: [AppComponent],
   imports: 
@@ -30,6 +30,7 @@ import { provideMessaging,getMessaging } from '@angular/fire/messaging';
     provideFirestore(() => getFirestore()),
     HttpClientModule,
     provideMessaging(() => getMessaging()),
+    //NgbModule 
     //AngularFireMessagingModule
     // AngularFireModule.initializeApp
     // ({

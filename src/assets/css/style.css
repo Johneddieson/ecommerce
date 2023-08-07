@@ -198,9 +198,9 @@
         object-fit: cover;
     }
 }
-
+/* ../img/carousel-1.jpg */
 .page-header {
-    background: linear-gradient(rgba(136, 180, 78, .7), rgba(136, 180, 78, .7)), url('../img/carousel-1.jpg') center center no-repeat;
+    background: linear-gradient(rgba(136, 180, 78, .7), rgba(136, 180, 78, .7)), url('../../assets/img/resize-1691288118373767155mixologistfirstimage.jpg') center center no-repeat;
     background-size: cover;
 }
 

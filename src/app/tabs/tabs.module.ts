@@ -7,6 +7,7 @@ import { TabsPageRoutingModule } from './tabs-routing.module';
 
 import { TabsPage } from './tabs.page';
 import { SharedComponentsModule } from '../components/shared-components.module';
+import { HomePageModule } from '../home/home.module';
 
 @NgModule({
   imports: [

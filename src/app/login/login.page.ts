@@ -102,7 +102,7 @@ export class LoginPage implements OnInit {
     this.router.navigateByUrl('/adminpage/atab1')
   }
   navigatecustomer() {
-    this.router.navigateByUrl('tabs')
+    this.router.navigateByUrl('home')
   }
   gotosignup() {
     this.navCtrl.navigateForward('signup');
@@ -231,7 +231,7 @@ export class LoginPage implements OnInit {
                 }
                 else 
                 {
-                  this.router.navigateByUrl('/tabs/tab1')
+                  this.router.navigateByUrl('/home')
                 }
                 sessionStorage.setItem('user', JSON.stringify(success.user));
                 

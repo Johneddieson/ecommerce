@@ -7,13 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { HomePageRoutingModule } from './home-routing.module';
 
 import { HomePage } from './home.page';
+import { PaginationComponent } from '../pagination/pagination.component';
+import { PaginationModule } from '../pagination/pagination.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule
+    HomePageRoutingModule,
+    PaginationModule
   ],
   declarations: [HomePage]
 })

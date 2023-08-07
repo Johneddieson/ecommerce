@@ -91,7 +91,7 @@ export class SignupPage implements OnInit {
     this.router.navigateByUrl('adminpage');
   }
   navigatecustomer() {
-    this.router.navigateByUrl('tabs');
+    this.router.navigateByUrl('home');
   }
 
   gotosignin() {
