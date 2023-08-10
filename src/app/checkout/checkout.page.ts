@@ -1,7 +1,7 @@
 import { LocationStrategy } from '@angular/common';
-import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
+import { ApplicationRef, Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, IonContent, LoadingController } from '@ionic/angular';
 import { MessengerService } from '../messenger.service';
 import * as firebase from 'firebase/app'
 import { map } from 'rxjs/operators';
@@ -12,6 +12,7 @@ import { DbserviceService } from '../services/dbservice.service';
 import { PaymongoService } from '../services/paymongo.service';
 import * as _ from 'lodash';
 import {  increment } from '@angular/fire/firestore';
+import { AuthserviceService } from '../services/authservice.service';
 declare var google: any;
 @Component({
   selector: 'app-checkout',
@@ -19,9 +20,10 @@ declare var google: any;
   styleUrls: ['./checkout.page.scss'],
 })
 export class CheckoutPage implements OnInit {
+  @ViewChild(IonContent) content!: IonContent;
   getCartDetails: any = []
   total: number = 0;
-  cartItem:number = 0
+  cartItem:number = 0 
   getOrders: any = []
   myInformation: any = {}
   paymentMethod: string = ''
@@ -35,6 +37,8 @@ export class CheckoutPage implements OnInit {
   uid: any;
   thenotes: string = ''
   discount: string = 'None'
+  public emailnameonly: string = ""
+  public discountpercentvalue: number = 0
   constructor(private applicationRef: ApplicationRef,
     private zone: NgZone,
     private alertCtrl: AlertController, 
@@ -46,11 +50,14 @@ export class CheckoutPage implements OnInit {
     private loadingController: LoadingController,
     private httpClient: HttpClient,
     private dbservice: DbserviceService,
-    private paymongoservice: PaymongoService
+    private paymongoservice: PaymongoService,
+    private authservice: AuthserviceService
     ) 
     {
     this.afauth.authState.subscribe(data => {
-      this.email = data?.email;
+      if (data && data.uid)
+      {
+        this.email = data?.email;
         this.uid = data?.uid;
         this.dbservice.getDataById('users', data?.uid).subscribe((data) => 
         {
@@ -58,8 +65,11 @@ export class CheckoutPage implements OnInit {
           this.firstname = data.FirstName;
           this.lastname = data.LastName;
           this.phonenumber = data.PhoneNumber;
-
+          var emailsplit = data.Email.split("@")
+          this.emailnameonly = emailsplit[0]
         })
+      }
+
     })
    }
    currentlat(): void
@@ -148,13 +158,13 @@ getAddress(latitude: any, longitude: any) {
   //    })
   //  })
   }
-  inc(id: any, quantity: any) 
+  inc(data: any) 
   {
     for (let i = 0; i < this.getCartDetails.length; i++) {
-      if (this.getCartDetails[i].id === id) {
+      if (this.getCartDetails[i].id === data.id && this.getCartDetails[i].ProductName === data.ProductName) {
 
 
-        this.getCartDetails[i].Quantity = quantity + 1
+        this.getCartDetails[i].Quantity++
       }
     }
 
@@ -162,13 +172,13 @@ getAddress(latitude: any, longitude: any) {
 
     this.loadCart()
   }
-  dec(id: any, quantity: any) {
+  dec(data: any) {
 
     for (let i = 0; i < this.getCartDetails.length; i++) {
-      if (this.getCartDetails[i].id === id) {
+      if (this.getCartDetails[i].id === data.id && this.getCartDetails[i].ProductName === data.ProductName) {
 
-        if (quantity != 1)
-          this.getCartDetails[i].Quantity = quantity - 1
+        if (data.Quantity != 1)
+          this.getCartDetails[i].Quantity = this.getCartDetails[i].Quantity - 1
       }
     }
 
@@ -429,7 +439,7 @@ async OrderAutoApprove()
    
     var nopaymentmethod = await this.alertCtrl.create
     ({
-      message: 'Please select a payment method, click on the upper right icon to select',
+      message: 'Please select a payment method',
       backdropDismiss: false,
       buttons: 
       [
@@ -701,6 +711,7 @@ async selectDiscount()
               var discountpercent = (this.total * 20) / 100
               this.total = this.total - discountpercent
               this.discount = data
+              this.discountpercentvalue = discountpercent
             }
             else if (data == 'PWD less 20')
             {
@@ -708,13 +719,15 @@ async selectDiscount()
               this.loadCart()
               var discountpercent = (this.total * 20) / 100
               this.total = this.total - discountpercent
-              this.discount = data      
+              this.discount = data
+              this.discountpercentvalue = discountpercent      
             }
             else 
             {
               this.discount = ''
               this.loadCart()
               this.discount = data
+              this.discountpercentvalue = 0
             }
         }
       },
@@ -726,4 +739,55 @@ async selectDiscount()
   })
   await discountAlert.present();
 }
+
+
+logout()
+{
+  this.authservice.SignOut()
+}
+
+onScroll(event: any)
+    {
+      //console.log("Wew", event.detail.scrollTop)
+      if (event.detail.scrollTop > 300)
+      {
+        $('.sticky-top').addClass('shadow-sm').css('top', '0px');
+      }
+      else 
+      {
+        $('.sticky-top').removeClass('shadow-sm').css('top', '-150px');
+      }
+    }
+
+    backtoTop()
+    {
+      this.content.scrollToTop(400);
+    }
+
+    Increase(data: any) {
+      localStorage.removeItem('cart')
+      data.Quantity +=1
+    this.loadCart()
+    }
+    Decrease(data: any) {
+      if (data.Quantity == 1) {
+        this.alertCtrl.create({
+          message: 'Quantity should not be zero',
+          buttons: [
+            {
+              text: 'Ok',
+              role: 'cancel'
+            }
+          ]
+        }).then(el => {
+          el.present()
+          this.loadCart()
+        })
+      } else {
+        data.Quantity = data.Quantity - 1
+  this.loadCart()
+      }
+    }
+    
+
 }

@@ -8,6 +8,8 @@ import { takeUntil } from 'rxjs/operators';
 import { LocationStrategy } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DbserviceService } from '../services/dbservice.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AuthserviceService } from '../services/authservice.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -27,7 +29,9 @@ private unsubscriber : Subject<void> = new Subject<void>();
 pendingorder: any
 currentPage: number = 1;
 testproducts: any[] = []
+email: string = "";
 public productLength: number = 0
+public currentcategoryfilter: string = ""
 constructor(private msg: MessengerService, 
     private alertCtrl: AlertController, 
     private locationStrategy: LocationStrategy,
@@ -35,9 +39,25 @@ constructor(private msg: MessengerService,
     private applicationRef: ApplicationRef,
     private zone: NgZone,
     private actRoute: ActivatedRoute,
-    private dbservice: DbserviceService
+    private dbservice: DbserviceService,
+    private afauth: AngularFireAuth,
+    private authservice: AuthserviceService
     ) 
     {
+
+      this.afauth.authState.subscribe((user) => {
+        if (user && user.uid)
+        
+        {
+          this.dbservice.getDataById('users', user.uid)
+          .subscribe((data) => 
+          {
+            var emailsplit = data.Email.split("@")
+            this.email = emailsplit[0]
+          })
+        }
+
+      })
 
       router.events.subscribe(() => {
         zone.run(() => {
@@ -47,9 +67,9 @@ constructor(private msg: MessengerService,
           }, 0)
         })
       })
-      this.getProducts()     
+      this.getProducts('')     
    }
-   getProducts()
+   getProducts(category: any)
    {
       this.dbservice.getData('Products').subscribe(async (data) => 
       {
@@ -57,6 +77,7 @@ constructor(private msg: MessengerService,
           {
             var imageConverted = i.ImageUrl.split("/")
             i.ImageConverted = `${imageConverted[0]}//${imageConverted[2]}/${imageConverted[3]}//-/contrast/3/-/filter/cyren/100/-/preview/400x400/`
+            i.ImageForCheckout = `${imageConverted[0]}//${imageConverted[2]}/${imageConverted[3]}//-/contrast/3/-/filter/cyren/100/-/preview/130x130/`
           })
 
                   data = data.sort(function(a, b) {
@@ -68,6 +89,18 @@ constructor(private msg: MessengerService,
                     }
                     return 0
                   })
+
+                    if (category !== '')
+                    {
+                          data = data.filter(f => f.Category == category)
+                          this.currentcategoryfilter = category.toUpperCase()
+                    }
+                    else 
+                    {
+                      this.currentcategoryfilter = "ALL"
+                      data = data
+                    }
+                    
                     this.productList = data;        
       })
    
@@ -254,6 +287,8 @@ this.loadCart()
                 Category: dataProducts.Category,
                 GramsPerOrder: data == 'Medium' ? dataProducts.MediumGramsPerOrder : dataProducts.LargeGramsPerOrder,
                 ImageUrl: dataProducts.ImageUrl,
+                ImageConverted: dataProducts.ImageConverted,
+                ImageForCheckout: dataProducts.ImageForCheckout,  
                 LargeGramsPerOrder: dataProducts.LargeGramsPerOrder,
                 LargePrice: dataProducts.LargePrice,
                 MediumGramsPerOrder: dataProducts.MediumGramsPerOrder,
@@ -374,5 +409,65 @@ onScroll(event: any)
           return existinglength.length <= 0 ? false : true
         }
       
+      }
+
+      logout()
+      {
+        this.authservice.SignOut()
+      }
+
+
+      async searchcategory()
+      {
+        var alertSearchRadioButton = await this.alertCtrl.create
+        ({
+          header: 'Select category',
+          backdropDismiss: false,
+          inputs: 
+          [
+            {
+              name: 'Show All',
+              label: 'Show All',
+              type: 'radio',
+              value: ''
+            },
+            {
+              name: 'Milktea',
+              label: 'Milktea',
+              type: 'radio',
+              value: 'Milktea'
+            },
+            {
+              name: 'Fruit tea',
+              label: 'Fruit tea',
+              type: 'radio',
+              value: 'Fruit tea'
+            },
+            {
+              name: 'Slushee',
+              label: 'Slushee',
+              type: 'radio',
+              value: 'Slushee'
+            },
+          ],
+          buttons: 
+          [
+            {
+              text: 'Search',
+              handler: ((data) => 
+              {
+                 // console.log("the data filter", data)
+                  this.getProducts(data)
+              })
+            },
+            {
+              text: 'Close',
+              role: 'cancel'
+            }
+          ]
+        })
+
+        await alertSearchRadioButton.present();
+
       }
 }

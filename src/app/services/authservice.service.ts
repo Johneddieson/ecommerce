@@ -26,6 +26,6 @@ export class AuthserviceService {
     this.afauth.signOut();
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('cart');
-    this.router.navigateByUrl('/login')
+    this.router.navigateByUrl('/mainpage')
   }
 }

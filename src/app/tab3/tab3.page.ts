@@ -1,8 +1,8 @@
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { MessengerService } from './../messenger.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, IonContent, LoadingController } from '@ionic/angular';
 import { first, last } from 'rxjs/operators';
 import { DbserviceService } from '../services/dbservice.service';
 import {
@@ -16,12 +16,14 @@ import { VonageapisendsmsService } from '../services/vonageapi/vonageapisendsms.
 import { Sendsms } from '../interface/sendsms';
 import { Sendemail } from '../interface/sendemail';
 import { SendemailapiService } from '../services/sendemailapi/sendemailapi.service';
+import { AuthserviceService } from '../services/authservice.service';
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss']
 })
 export class Tab3Page implements OnInit {
+  @ViewChild(IonContent) content!: IonContent;
   getCartDetails: any = []
 sub: any
 firstname: any;
@@ -39,6 +41,7 @@ vonageModal!: Sendsms;
 myotpcode: string = '' 
 sendEmailModal!: Sendemail
 currentuseremail: string = ''
+public email : string = ""
   constructor(private actRoute: ActivatedRoute, 
     //private afstore: AngularFirestore, 
     private afauth: AngularFireAuth,
@@ -48,7 +51,8 @@ currentuseremail: string = ''
     private dbservice: DbserviceService,
     private formBuilder: FormBuilder,
     private vonageservice: VonageapisendsmsService,
-    private sendemailapiservice: SendemailapiService
+    private sendemailapiservice: SendemailapiService,
+    private authservice: AuthserviceService
     ) 
     {
     this.afauth.authState.subscribe((data) => 
@@ -56,6 +60,7 @@ currentuseremail: string = ''
       if (data?.uid)
       {
         this.currentuserid = data?.uid
+        
         this.dbservice.getDataById('users', data?.uid).subscribe((data: any) => 
         {
           //this.aFormGroup.controls['firstname'].setValue(data.FirstName);
@@ -68,6 +73,9 @@ currentuseremail: string = ''
           //this.address1 = data.Address1;
           this.myotpcode = data.otpcodenumber == null || undefined ? 0 : data.otpcodenumber  
           this.currentuseremail = data.Email;
+
+          var emailsplit = data.Email.split("@");
+          this.email = emailsplit[0]
         });
       }
     })
@@ -485,4 +493,29 @@ currentuseremail: string = ''
     this.dbservice.updateData(this.currentuserid, specificData, 'users').then(() => {})
     .catch(() => {})
   }
+
+  onScroll(event: any)
+    {
+      //console.log("Wew", event.detail.scrollTop)
+      if (event.detail.scrollTop > 300)
+      {
+        $('.sticky-top').addClass('shadow-sm').css('top', '0px');
+      }
+      else 
+      {
+        $('.sticky-top').removeClass('shadow-sm').css('top', '-150px');
+      }
+    }
+
+    
+    backtoTop()
+    {
+      this.content.scrollToTop(400);
+    }
+
+    logout()
+    {
+      this.authservice.SignOut()
+    }
+
 }

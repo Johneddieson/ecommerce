@@ -15,10 +15,10 @@ const routes: Routes = [
         //   path: 'tab1',
         //   loadChildren: () => import('../home/home.module').then(m => m.HomePageModule)
         // },
-      {
-        path: 'tab2',
-        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
-      },
+      // {
+      //   path: 'tab2',
+      //   loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+      // },
       {
         path: 'tab3',
         loadChildren: () => import('../onlinepayment/onlinepayment.module').then(m => m.OnlinepaymentPageModule)

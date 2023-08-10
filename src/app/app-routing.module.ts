@@ -114,6 +114,17 @@ const routes: Routes = [
     loadChildren: () => import('./rider/rider.module').then( m => m.RiderPageModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'writefeedback',
+    loadChildren: () => import('./tab2/tab2.module').then(m => m.Tab2PageModule),
+    canActivate: [AuthGuard]
+  },
+
+  {
+    path: 'onlinepayments',
+    loadChildren: () => import('./onlinepayment/onlinepayment.module').then(m => m.OnlinepaymentPageModule),
+    canActivate: [AuthGuard]
+  },
 
 
   // {

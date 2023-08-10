@@ -1,28 +1,35 @@
 import { map } from 'rxjs/operators';
 import { DbserviceService } from './../services/dbservice.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { PaymongoService } from '../services/paymongo.service';
 import { CurrencyPipe } from '@angular/common';
 import * as moment from 'moment';
+import { IonContent } from '@ionic/angular';
+import { AuthserviceService } from '../services/authservice.service';
 @Component({
   selector: 'app-onlinepayment',
   templateUrl: './onlinepayment.page.html',
   styleUrls: ['./onlinepayment.page.scss'],
 })
 export class OnlinepaymentPage implements OnInit {
+  @ViewChild(IonContent) content!: IonContent;
 mycurrentonlinepaymentorder: any[] = []
+public emailsplit: any;
   constructor(
     private afauth : AngularFireAuth,
     private dbservice : DbserviceService,
     private paymongoservice: PaymongoService,
     private currencyPipe: CurrencyPipe,
+    private authservice: AuthserviceService
   ) 
   { 
     this.afauth.authState.subscribe((user) => 
     {
       if (user && user.uid)
       {
+        var emailsplit = user.email?.split("@") as any;
+        this.emailsplit = emailsplit[0]
           this.getcurrentuserallorders(user.uid);
       }
     })
@@ -60,5 +67,27 @@ mycurrentonlinepaymentorder: any[] = []
   {
       return parseFloat(UnitPrice);
   }
+
+  onScroll(event: any)
+    {
+      //console.log("Wew", event.detail.scrollTop)
+      if (event.detail.scrollTop > 300)
+      {
+        $('.sticky-top').addClass('shadow-sm').css('top', '0px');
+      }
+      else 
+      {
+        $('.sticky-top').removeClass('shadow-sm').css('top', '-150px');
+      }
+    }
+
+    backtoTop()
+    {
+      this.content.scrollToTop(400);
+    }
+    logout()
+      {
+        this.authservice.SignOut()
+      }
 
 }

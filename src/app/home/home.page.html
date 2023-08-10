@@ -85,23 +85,23 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarCollapse">
                   <div class="navbar-nav ms-auto">
-                      <a href="index.html" class="nav-item nav-link">Home</a>
-                      <a href="about.html" class="nav-item nav-link">About</a>
-                      <a href="product.html" class="nav-item nav-link">Products</a>
-                      <a href="store.html" class="nav-item nav-link active">Store</a>
+                    <!-- active -->
+                      <a href="/home" class="nav-item nav-link">Store</a>
+                      <a href="/writefeedback" class="nav-item nav-link">Send Feedback</a>
+                      <a href="/onlinepayments" class="nav-item nav-link">Online Payments</a>
+                      <a *ngIf="numbers !== 0" href="/checkout" class="nav-item nav-link"><ion-badge color="danger">{{numbers}}</ion-badge>Checkout</a>
                       <div class="nav-item dropdown">
-                          <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
-                          <div class="dropdown-menu bg-light rounded-0 m-0">
-                              <a href="feature.html" class="dropdown-item">Features</a>
-                              <a href="blog.html" class="dropdown-item">Blog Article</a>
-                              <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                              <a href="404.html" class="dropdown-item">404 Page</a>
-                          </div>
-                      </div>
-                      <a href="contact.html" class="nav-item nav-link">Contact</a>
-                  </div>
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{{email}}</a>
+                        <div class="dropdown-menu bg-light rounded-0 m-0">
+                            <a (click)="logout()" class="dropdown-item">Logout</a>
+                            <!-- <a href="blog.html" class="dropdown-item">Blog Article</a>
+                            <a href="testimonial.html" class="dropdown-item">Testimonial</a>
+                            <a href="404.html" class="dropdown-item">404 Page</a> -->
+                        </div>
+                    </div>
+                    </div>
                   <div class="border-start ps-4 d-none d-lg-block">
-                      <button type="button" class="btn btn-sm p-0"><i class="fa fa-search"></i></button>
+                      <button type="button" class="btn btn-sm p-0" (click)="searchcategory()"><i class="fa fa-search"></i></button>
                   </div>
               </div>
           </nav>
@@ -130,7 +130,7 @@
       <div class="container">
           <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
               <p class="fs-5 fw-medium fst-italic text-primary">Online Store</p>
-              <h1 class="display-6">Want to stay healthy? Choose tea taste</h1>
+              <h1 class="display-6">{{currentcategoryfilter}}</h1>
           </div>
           <div class="row g-4">
 
@@ -142,14 +142,15 @@
                       <div class="p-4">
                           <h4 class="mb-3">{{data.ProductName}}</h4>
                           <!-- <p>Aliqu diam amet diam et eos. Clita erat ipsum lorem erat ipsum lorem sit sed</p> -->
-                          <h4 class="text-primary" *ngIf="data.Category == 'Slushee'">{{data.UnitPrice | currency: '₱'}}</h4>
-                          <h4 class="text-primary" *ngIf="data.Category != 'Slushee'">MD: {{data.MediumPrice | currency: '₱'}}</h4>
-                          <h4 class="text-primary" *ngIf="data.Category != 'Slushee'">LG: {{data.LargePrice | currency: '₱'}}</h4>
+                          <h4 class="text-primary" *ngIf="data.Category === 'Slushee'">{{data.UnitPrice | currency: '₱'}}</h4>
+                          <h4 class="text-primary" *ngIf="data.Category !== 'Slushee'">MD: {{data.MediumPrice | currency: '₱'}}</h4>
+                          <h4 class="text-primary" *ngIf="data.Category !== 'Slushee'">LG: {{data.LargePrice | currency: '₱'}}</h4>
                       </div>
                       <div class="store-overlay">
                           <!-- <a href="" class="btn btn-primary rounded-pill py-2 px-4 m-2">More Detail <i class="fa fa-arrow-right ms-2"></i></a> -->
-                          <a *ngIf="!checkIfExisting(data)" type="button" (click)="AddtoCart(data)" class="btn btn-dark rounded-pill py-2 px-4 m-2">Add to Cart <i class="fa fa-cart-plus ms-2"></i></a>
-                      </div>
+                          <a type="button" (click)="AddtoCart(data)" class="btn btn-dark rounded-pill py-2 px-4 m-2">Add to Cart <i class="fa fa-cart-plus ms-2"></i></a>
+                          <!-- *ngIf="!checkIfExisting(data)" -->
+                        </div>
                   </div>
               </div>
 <!-- 

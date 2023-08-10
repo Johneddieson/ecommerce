@@ -1,8 +1,8 @@
 import { LocationStrategy } from '@angular/common';
-import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
+import { ApplicationRef, Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
-import { LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController, AlertController, IonContent } from '@ionic/angular';
 import * as moment from 'moment';
 import { buffer, map } from 'rxjs/operators';
 import { DbserviceService } from '../services/dbservice.service';
@@ -10,18 +10,20 @@ import * as _ from 'lodash';
 import { collection } from 'firebase/firestore';
 import { Firestore, collectionData, query, where } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { AuthserviceService } from '../services/authservice.service';
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss']
 })
 export class Tab2Page implements OnInit {
-
+  @ViewChild(IonContent) content!: IonContent;
 notificationsList : any[] = []
 notifCounts = 0
 myid: any
 subMeReference: any;
 email: any;
+emailsplit: any
 orderedProducts: any[] = []
   constructor(private router: Router, 
     private loadingCtrl: LoadingController,
@@ -31,7 +33,8 @@ orderedProducts: any[] = []
     private zone: NgZone,
     private afauth: AngularFireAuth,
     private dbservice: DbserviceService,
-    private firestore: Firestore
+    private firestore: Firestore,
+    private authservice: AuthserviceService
     ) 
     {
         this.afauth.authState.subscribe((dataAuth) => 
@@ -40,6 +43,9 @@ orderedProducts: any[] = []
           {
             this.email = dataAuth.email;
             this.getCurrentUserHistory(dataAuth)
+
+            var emailsplit = dataAuth.email?.split("@") as any
+            this.emailsplit = emailsplit[0]
           }
         })
     }
@@ -160,6 +166,29 @@ orderedProducts: any[] = []
         ]
       })      
   await alertWriteFeedBack.present();
+    }
+
+    onScroll(event: any)
+    {
+      //console.log("Wew", event.detail.scrollTop)
+      if (event.detail.scrollTop > 300)
+      {
+        $('.sticky-top').addClass('shadow-sm').css('top', '0px');
+      }
+      else 
+      {
+        $('.sticky-top').removeClass('shadow-sm').css('top', '-150px');
+      }
+    }
+
+    logout()
+    {
+      this.authservice.SignOut()
+    }
+
+    backtoTop()
+    {
+      this.content.scrollToTop(400);
     }
 
 }
